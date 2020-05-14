@@ -2,7 +2,7 @@
 namespace AtomicAuth\Database\Seeds;
 
 /**
- * @package CodeIgniter-Ion-Auth
+ * @package CodeIgniter-Atomic-Auth
  */
 
 class AtomicAuthSeeder extends \CodeIgniter\Database\Seeder

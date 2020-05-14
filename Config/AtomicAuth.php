@@ -12,7 +12,7 @@ namespace AtomicAuth\Config;
  *
  * Requirements: PHP7.2 or above
  *
- * @package    CodeIgniter-Ion-Auth
+ * @package    CodeIgniter-Atomic-Auth
  * @author     Ben Edmunds <ben.edmunds@gmail.com>
  * @author     Phil Sturgeon
  * @author     Benoit VRIGNAUD <benoit.vrignaud@tangue.fr>
@@ -22,9 +22,9 @@ namespace AtomicAuth\Config;
  */
 
 /**
- * Configuration file for Ion Auth
+ * Configuration file for Atomic Auth
  *
- * @package CodeIgniter-Ion-Auth
+ * @package CodeIgniter-Atomic-Auth
  */
 class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 {

@@ -2,7 +2,7 @@
 namespace AtomicAuth\Models;
 
 /**
- * Name:    Ion Auth Model
+ * Name:    Atomic Auth Model
  *
  * Created:  10.01.2009
  *
@@ -12,7 +12,7 @@ namespace AtomicAuth\Models;
  *
  * Requirements: PHP 7.2 or above
  *
- * @package    CodeIgniter-Ion-Auth
+ * @package    CodeIgniter-Atomic-Auth
  * @author     Ben Edmunds <ben.edmunds@gmail.com>
  * @author     Phil Sturgeon
  * @author     Benoit VRIGNAUD <benoit.vrignaud@tangue.fr>
@@ -26,7 +26,7 @@ use \CodeIgniter\Database\ConnectionInterface;
 /**
  * Class AtomicAuthModel
  *
- * @property Ion_auth $ion_auth The Ion_auth library
+ * @property Atomic_auth $atomic_auth The Atomic_auth library
  */
 class AtomicAuthModel
 {
@@ -243,7 +243,7 @@ class AtomicAuthModel
 	}
 
 	/**
-	 * Getter to the DB connection used by Ion Auth
+	 * Getter to the DB connection used by Atomic Auth
 	 * May prove useful for debugging
 	 *
 	 * @return object

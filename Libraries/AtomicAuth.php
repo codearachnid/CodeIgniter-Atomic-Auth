@@ -2,7 +2,7 @@
 namespace AtomicAuth\Libraries;
 
 /**
- * Name:    Ion Auth
+ * Name:    Atomic Auth
  *
  * Created:  10.01.2009
  *
@@ -12,7 +12,7 @@ namespace AtomicAuth\Libraries;
  *
  * Requirements: PHP7.2 or above
  *
- * @package    CodeIgniter-Ion-Auth
+ * @package    CodeIgniter-Atomic-Auth
  * @author     Ben Edmunds <ben.edmunds@gmail.com>
  * @author     Phil Sturgeon
  * @author     Benoit VRIGNAUD <benoit.vrignaud@zaclys.net>
@@ -91,7 +91,7 @@ class AtomicAuth
 	{
 		if (! method_exists( $this->atomicAuthModel, $method))
 		{
-			throw new \Exception('Undefined method Ion_auth::' . $method . '() called');
+			throw new \Exception('Undefined method Atomic_auth::' . $method . '() called');
 		}
 		if ($method === 'create_user')
 		{
@@ -202,7 +202,7 @@ class AtomicAuth
 	 * @param array  $additionalData Additional data
 	 * @param array  $groupIds       Groups id
 	 *
-	 * @return integer|array|boolean The new user's ID if e-mail activation is disabled or Ion-Auth e-mail activation
+	 * @return integer|array|boolean The new user's ID if e-mail activation is disabled or Atomic-Auth e-mail activation
 	 *                               was completed;
 	 *                               or an array of activation details if CI e-mail validation is enabled; or false
 	 *                               if the operation failed.
@@ -404,7 +404,7 @@ class AtomicAuth
 
 		/*
 		// Compatibility check for CSPRNG
-		// See functions used in Ion_auth_model::randomToken()
+		// See functions used in Atomic_auth_model::randomToken()
 		if (!function_exists('random_bytes') && !function_exists('mcrypt_create_iv') && !function_exists('openssl_random_pseudo_bytes'))
 		{
 			show_error("No CSPRNG functions to generate random enough token. " .

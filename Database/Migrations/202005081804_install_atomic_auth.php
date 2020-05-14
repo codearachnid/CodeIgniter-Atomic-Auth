@@ -4,7 +4,7 @@ namespace AtomicAuth\Database\Migrations;
 /**
  * CodeIgniter AtomicAuth
  *
- * @package CodeIgniter-Ion-Auth
+ * @package CodeIgniter-Atomic-Auth
  * @author  Benoit VRIGNAUD <benoit.vrignaud@zaclys.net>
  * @license https://opensource.org/licenses/MIT	MIT License
  * @link    http://github.com/benedmunds/CodeIgniter-Ion-Auth
@@ -13,9 +13,9 @@ namespace AtomicAuth\Database\Migrations;
 /**
  * Migration class
  *
- * @package CodeIgniter-Ion-Auth
+ * @package CodeIgniter-Atomic-Auth
  */
-class Migration_Install_ion_auth extends \CodeIgniter\Database\Migration
+class Migration_Install_atomic_auth extends \CodeIgniter\Database\Migration
 {
 	/**
 	 * Tables
