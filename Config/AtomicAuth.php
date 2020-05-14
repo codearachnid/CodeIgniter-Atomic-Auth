@@ -47,10 +47,10 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 * @var array
 	 */
 	public $tables = [
-		'users'          => 'users',
-		'groups'         => 'groups',
-		'users_groups'   => 'users_groups',
-		'login_attempts' => 'login_attempts',
+		'users'          => 'atomicauth_users',
+		'groups'         => 'atomicauth_groups',
+		'users_groups'   => 'atomicauth_users_groups',
+		'login_attempts' => 'atomicauth_login_attempts',
 	];
 
 	/**
@@ -61,8 +61,8 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 * @var array
 	 */
 	public $join = [
-		'users'  => 'user_id',
-		'groups' => 'group_id',
+		'atomicauth_users'  => 'user_id',
+		'atomicauth_groups' => 'group_id',
 	];
 
 	/*

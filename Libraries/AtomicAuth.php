@@ -24,7 +24,7 @@ namespace AtomicAuth\Libraries;
 /**
  * This class is the AtomicAuth library.
  */
-class AtomcAuth
+class AtomicAuth
 {
 	/**
 	 * Configuration
