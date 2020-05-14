@@ -26,7 +26,7 @@ namespace AtomicAuth\Config;
  *
  * @package CodeIgniter-Ion-Auth
  */
-class IonAuth extends \CodeIgniter\Config\BaseConfig
+class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 {
 
 	/**
@@ -192,11 +192,11 @@ class IonAuth extends \CodeIgniter\Config\BaseConfig
 	/**
 	 * Email templates.
 	 * Folder where email templates are stored.
-	 * Default: IonAuth\\Views\\auth\\email\\
+	 * Default: AtomicAuth\\Views\\auth\\email\\
 	 *
 	 * @var string
 	 */
-	public $emailTemplates = 'IonAuth\\Views\\auth\\email\\';
+	public $emailTemplates = 'AtomicAuth\\Views\\auth\\email\\';
 
 	/**
 	 * -------------------------------------------------------------------------
@@ -233,8 +233,8 @@ class IonAuth extends \CodeIgniter\Config\BaseConfig
 
 		// templates for messages
 		'messages' => [
-			'list'   => 'IonAuth\Views\Messages\list',
-			'single' => 'IonAuth\Views\Messages\single',
+			'list'   => 'AtomicAuth\Views\Messages\list',
+			'single' => 'AtomicAuth\Views\Messages\single',
 		],
 	];
 }

@@ -1,5 +1,5 @@
 <?php
-namespace IonAuth\Models;
+namespace AtomicAuth\Models;
 
 /**
  * Name:    Ion Auth Model
@@ -24,11 +24,11 @@ namespace IonAuth\Models;
 use \CodeIgniter\Database\ConnectionInterface;
 
 /**
- * Class IonAuthModel
+ * Class AtomicAuthModel
  *
  * @property Ion_auth $ion_auth The Ion_auth library
  */
-class IonAuthModel
+class AtomicAuthModel
 {
 	/**
 	 * Max cookie lifetime constant
@@ -41,9 +41,9 @@ class IonAuthModel
 	const MAX_PASSWORD_SIZE_BYTES = 4096;
 
 	/**
-	 * IonAuth config
+	 * AtomicAuth config
 	 *
-	 * @var Config\IonAuth
+	 * @var Config\AtomicAuth
 	 */
 	protected $config;
 
@@ -207,7 +207,7 @@ class IonAuthModel
 	 */
 	public function __construct()
 	{
-		$this->config = config('IonAuth');
+		$this->config = config('AtomicAuth');
 		helper(['cookie', 'date']);
 		$this->session = session();
 
@@ -404,13 +404,13 @@ class IonAuthModel
 			if ($this->db->affectedRows() === 1)
 			{
 				$this->triggerEvents(['post_activate', 'post_activate_successful']);
-				$this->setMessage('IonAuth.activate_successful');
+				$this->setMessage('AtomicAuth.activate_successful');
 				return true;
 			}
 		}
 
 		$this->triggerEvents(['post_activate', 'post_activate_unsuccessful']);
-		$this->setError('IonAuth.activate_unsuccessful');
+		$this->setError('AtomicAuth.activate_unsuccessful');
 		return false;
 	}
 
@@ -428,12 +428,12 @@ class IonAuthModel
 
 		if (! $id)
 		{
-			$this->setError('IonAuth.deactivate_unsuccessful');
+			$this->setError('AtomicAuth.deactivate_unsuccessful');
 			return false;
 		}
-		else if ((new \IonAuth\Libraries\IonAuth())->loggedIn() && $this->user()->row()->id == $id)
+		else if ((new \AtomicAuth\Libraries\AtomicAuth())->loggedIn() && $this->user()->row()->id == $id)
 		{
-			$this->setError('IonAuth.deactivate_current_user_unsuccessful');
+			$this->setError('AtomicAuth.deactivate_current_user_unsuccessful');
 			return false;
 		}
 
@@ -452,11 +452,11 @@ class IonAuthModel
 		$return = $this->db->affectedRows() === 1;
 		if ($return)
 		{
-			$this->setMessage('IonAuth.deactivate_successful');
+			$this->setMessage('AtomicAuth.deactivate_successful');
 		}
 		else
 		{
-			$this->setError('IonAuth.deactivate_unsuccessful');
+			$this->setError('AtomicAuth.deactivate_unsuccessful');
 		}
 
 		return $return;
@@ -531,12 +531,12 @@ class IonAuthModel
 		if ($return)
 		{
 			$this->triggerEvents(['post_change_password', 'post_change_password_successful']);
-			$this->setMessage('IonAuth.password_change_successful');
+			$this->setMessage('AtomicAuth.password_change_successful');
 		}
 		else
 		{
 			$this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
-			$this->setError('IonAuth.password_change_unsuccessful');
+			$this->setError('AtomicAuth.password_change_unsuccessful');
 		}
 
 		return $return;
@@ -568,7 +568,7 @@ class IonAuthModel
 		if (empty($query))
 		{
 			$this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
-			$this->setError('IonAuth.password_change_unsuccessful');
+			$this->setError('AtomicAuth.password_change_unsuccessful');
 			return false;
 		}
 
@@ -581,18 +581,18 @@ class IonAuthModel
 			if ($result)
 			{
 				$this->triggerEvents(['post_change_password', 'post_change_password_successful']);
-				$this->setMessage('IonAuth.password_change_successful');
+				$this->setMessage('AtomicAuth.password_change_successful');
 			}
 			else
 			{
 				$this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
-				$this->setError('IonAuth.password_change_unsuccessful');
+				$this->setError('AtomicAuth.password_change_unsuccessful');
 			}
 
 			return $result;
 		}
 
-		$this->setError('IonAuth.password_change_unsuccessful');
+		$this->setError('AtomicAuth.password_change_unsuccessful');
 		return false;
 	}
 
@@ -701,7 +701,7 @@ class IonAuthModel
 	/**
 	 * Insert a forgotten password key.
 	 *
-	 * @param string $identity As defined in Config/IonAuth
+	 * @param string $identity As defined in Config/AtomicAuth
 	 *
 	 * @return boolean|string
 	 *
@@ -789,12 +789,12 @@ class IonAuthModel
 
 		if ($this->identityCheck($identity))
 		{
-			$this->setError('IonAuth.account_creation_duplicate_identity');
+			$this->setError('AtomicAuth.account_creation_duplicate_identity');
 			return false;
 		}
 		else if (! $this->config->defaultGroup && empty($groups))
 		{
-			$this->setError('IonAuth.account_creation_missing_defaultGroup');
+			$this->setError('AtomicAuth.account_creation_missing_defaultGroup');
 			return false;
 		}
 
@@ -802,7 +802,7 @@ class IonAuthModel
 		$query = $this->db->table($this->tables['groups'])->where(['name' => $this->config->defaultGroup], 1)->get()->getRow();
 		if (! isset($query->id) && empty($groups))
 		{
-			$this->setError('IonAuth.account_creation_invalid_defaultGroup');
+			$this->setError('AtomicAuth.account_creation_invalid_defaultGroup');
 			return false;
 		}
 
@@ -817,7 +817,7 @@ class IonAuthModel
 
 		if ($password === false)
 		{
-			$this->setError('IonAuth.account_creation_unsuccessful');
+			$this->setError('AtomicAuth.account_creation_unsuccessful');
 			return false;
 		}
 
@@ -878,7 +878,7 @@ class IonAuthModel
 
 		if (empty($identity) || empty($password))
 		{
-			$this->setError('IonAuth.login_unsuccessful');
+			$this->setError('AtomicAuth.login_unsuccessful');
 			return false;
 		}
 
@@ -896,7 +896,7 @@ class IonAuthModel
 			$this->hashPassword($password);
 
 			$this->triggerEvents('post_login_unsuccessful');
-			$this->setError('IonAuth.login_timeout');
+			$this->setError('AtomicAuth.login_timeout');
 
 			return false;
 		}
@@ -910,7 +910,7 @@ class IonAuthModel
 				if ($user->active == 0)
 				{
 					$this->triggerEvents('post_login_unsuccessful');
-					$this->setError('IonAuth.login_unsuccessful_not_active');
+					$this->setError('AtomicAuth.login_unsuccessful_not_active');
 
 					return false;
 				}
@@ -941,7 +941,7 @@ class IonAuthModel
 				$this->session->regenerate(false);
 
 				$this->triggerEvents(['post_login', 'post_login_successful']);
-				$this->setMessage('IonAuth.login_successful');
+				$this->setMessage('AtomicAuth.login_successful');
 
 				return true;
 			}
@@ -953,7 +953,7 @@ class IonAuthModel
 		$this->increaseLoginAttempts($identity);
 
 		$this->triggerEvents('post_login_unsuccessful');
-		$this->setError('IonAuth.login_unsuccessful');
+		$this->setError('AtomicAuth.login_unsuccessful');
 
 		return false;
 	}
@@ -1796,10 +1796,10 @@ class IonAuthModel
 		if (array_key_exists($this->identityColumn, $data) && $this->identityCheck($data[$this->identityColumn]) && $user->{$this->identityColumn} !== $data[$this->identityColumn])
 		{
 			$this->db->transRollback();
-			$this->setError('IonAuth.account_creation_duplicate_identity');
+			$this->setError('AtomicAuth.account_creation_duplicate_identity');
 
 			$this->triggerEvents(['post_update_user', 'post_update_user_unsuccessful']);
-			$this->setError('IonAuth.update_unsuccessful');
+			$this->setError('AtomicAuth.update_unsuccessful');
 
 			return false;
 		}
@@ -1818,7 +1818,7 @@ class IonAuthModel
 					{
 						$this->db->transRollback();
 						$this->triggerEvents(['post_update_user', 'post_update_user_unsuccessful']);
-						$this->setError('IonAuth.update_unsuccessful');
+						$this->setError('AtomicAuth.update_unsuccessful');
 
 						return false;
 					}
@@ -1839,14 +1839,14 @@ class IonAuthModel
 			$this->db->transRollback();
 
 			$this->triggerEvents(['post_update_user', 'post_update_user_unsuccessful']);
-			$this->setError('IonAuth.update_unsuccessful');
+			$this->setError('AtomicAuth.update_unsuccessful');
 			return false;
 		}
 
 		$this->db->transCommit();
 
 		$this->triggerEvents(['post_update_user', 'post_update_user_successful']);
-		$this->setMessage('IonAuth.update_successful');
+		$this->setMessage('AtomicAuth.update_successful');
 		return true;
 	}
 
@@ -1874,7 +1874,7 @@ class IonAuthModel
 		{
 			$this->db->transRollback();
 			$this->triggerEvents(['post_delete_user', 'post_delete_user_unsuccessful']);
-			$this->setError('IonAuth.delete_unsuccessful');
+			$this->setError('AtomicAuth.delete_unsuccessful');
 			return false;
 		}
 
@@ -2102,7 +2102,7 @@ class IonAuthModel
 		// bail if the group name was not passed
 		if (! $groupName)
 		{
-			$this->setError('IonAuth.groupName_required');
+			$this->setError('AtomicAuth.groupName_required');
 			return false;
 		}
 
@@ -2110,7 +2110,7 @@ class IonAuthModel
 		$existingGroup = $this->db->table($this->tables['groups'])->where(['name' => $groupName])->countAllResults();
 		if ($existingGroup !== 0)
 		{
-			$this->setError('IonAuth.group_already_exists');
+			$this->setError('AtomicAuth.group_already_exists');
 			return false;
 		}
 
@@ -2133,7 +2133,7 @@ class IonAuthModel
 		$groupId = $this->db->insertId($this->tables['groups'] . '_id_seq');
 
 		// report success
-		$this->setMessage('IonAuth.group_creation_successful');
+		$this->setMessage('AtomicAuth.group_creation_successful');
 		// return the brand new group id
 		return $groupId;
 	}
@@ -2165,7 +2165,7 @@ class IonAuthModel
 			$existingGroup = $this->db->table($this->tables['groups'])->getWhere(['name' => $groupName])->getRow();
 			if (isset($existingGroup->id) && (int)$existingGroup->id !== $groupId)
 			{
-				$this->setError('IonAuth.group_already_exists');
+				$this->setError('AtomicAuth.group_already_exists');
 				return false;
 			}
 
@@ -2176,7 +2176,7 @@ class IonAuthModel
 		$group = $this->db->table($this->tables['groups'])->getWhere(['id' => $groupId])->getRow();
 		if ($this->config->adminGroup === $group->name && $groupName !== $group->name)
 		{
-			$this->setError('IonAuth.groupName_admin_not_alter');
+			$this->setError('AtomicAuth.groupName_admin_not_alter');
 			return false;
 		}
 
@@ -2189,7 +2189,7 @@ class IonAuthModel
 
 		$this->db->table($this->tables['groups'])->update($data, ['id' => $groupId]);
 
-		$this->setMessage('IonAuth.group_update_successful');
+		$this->setMessage('AtomicAuth.group_update_successful');
 
 		return true;
 	}
@@ -2213,7 +2213,7 @@ class IonAuthModel
 		if ($group->name === $this->config->adminGroup)
 		{
 			$this->triggerEvents(['post_delete_group', 'post_delete_group_notallowed']);
-			$this->setError('IonAuth.group_delete_notallowed');
+			$this->setError('AtomicAuth.group_delete_notallowed');
 			return false;
 		}
 
@@ -2230,7 +2230,7 @@ class IonAuthModel
 		{
 			$this->db->transRollback();
 			$this->triggerEvents(['post_delete_group', 'post_delete_group_unsuccessful']);
-			$this->setError('IonAuth.group_delete_unsuccessful');
+			$this->setError('AtomicAuth.group_delete_unsuccessful');
 			return false;
 		}
 

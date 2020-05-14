@@ -1,8 +1,8 @@
 <?php
-namespace IonAuth\Database\Migrations;
+namespace AtomicAuth\Database\Migrations;
 
 /**
- * CodeIgniter IonAuth
+ * CodeIgniter AtomicAuth
  *
  * @package CodeIgniter-Ion-Auth
  * @author  Benoit VRIGNAUD <benoit.vrignaud@zaclys.net>
@@ -31,7 +31,7 @@ class Migration_Install_ion_auth extends \CodeIgniter\Database\Migration
 	 */
 	public function __construct()
 	{
-		$config = config('IonAuth');
+		$config = config('AtomicAuth');
 
 		// initialize the database
 		$this->DBGroup = empty($config->databaseGroupName) ? '' : $config->databaseGroupName;

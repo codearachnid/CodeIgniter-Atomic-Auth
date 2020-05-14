@@ -1,5 +1,5 @@
 <?php
-namespace IonAuth\Libraries;
+namespace AtomicAuth\Libraries;
 
 /**
  * Name:    Ion Auth
@@ -22,23 +22,23 @@ namespace IonAuth\Libraries;
  */
 
 /**
- * This class is the IonAuth library.
+ * This class is the AtomicAuth library.
  */
-class IonAuth
+class AtomcAuth
 {
 	/**
 	 * Configuration
 	 *
-	 * @var \IonAuth\Config\IonAuth
+	 * @var \AtomicAuth\Config\AtomicAuth
 	 */
 	protected $config;
 
 	/**
-	 * IonAuth model
+	 * AtomicAuth model
 	 *
-	 * @var \IonAuth\Models\IonAuthModel
+	 * @var \AtomicAuth\Models\AtomicAuthModel
 	 */
-	protected $ionAuthModel;
+	protected $atomicAuthModel;
 
 	/**
 	 * Email class
@@ -57,14 +57,14 @@ class IonAuth
 		// Check compat first
 		$this->checkCompatibility();
 
-		$this->config = config('IonAuth');
+		$this->config = config('AtomicAuth');
 
 		$this->email = \Config\Services::email();
 		helper('cookie');
 
 		$this->session = session();
 
-		$this->ionAuthModel = new \IonAuth\Models\IonAuthModel();
+		$this->atomicAuthModel = new \AtomicAuth\Models\AtomicAuthModel();
 
 		$emailConfig = $this->config->emailConfig;
 
@@ -73,7 +73,7 @@ class IonAuth
 			$this->email->initialize($emailConfig);
 		}
 
-		$this->ionAuthModel->triggerEvents('library_constructor');
+		$this->atomicAuthModel->triggerEvents('library_constructor');
 	}
 
 	/**
@@ -89,7 +89,7 @@ class IonAuth
 	 */
 	public function __call(string $method, array $arguments)
 	{
-		if (! method_exists( $this->ionAuthModel, $method))
+		if (! method_exists( $this->atomicAuthModel, $method))
 		{
 			throw new \Exception('Undefined method Ion_auth::' . $method . '() called');
 		}
@@ -101,7 +101,7 @@ class IonAuth
 		{
 			return call_user_func_array([$this, 'update'], $arguments);
 		}
-		return call_user_func_array([$this->ionAuthModel, $method], $arguments);
+		return call_user_func_array([$this->atomicAuthModel, $method], $arguments);
 	}
 
 	/**
@@ -115,14 +115,14 @@ class IonAuth
 	public function forgottenPassword(string $identity)
 	{
 		// Retrieve user information
-		$user = $this->where($this->ionAuthModel->identityColumn, $identity)
+		$user = $this->where($this->atomicAuthModel->identityColumn, $identity)
 					 ->where('active', 1)
 					 ->users()->row();
 
 		if ($user)
 		{
 			// Generate code
-			$code = $this->ionAuthModel->forgottenPassword($identity);
+			$code = $this->atomicAuthModel->forgottenPassword($identity);
 
 			if ($code)
 			{
@@ -133,7 +133,7 @@ class IonAuth
 
 				if (! $this->config->useCiEmail)
 				{
-					$this->setMessage('IonAuth.forgot_password_successful');
+					$this->setMessage('AtomicAuth.forgot_password_successful');
 					return $data;
 				}
 				else
@@ -142,18 +142,18 @@ class IonAuth
 					$this->email->clear();
 					$this->email->setFrom($this->config->adminEmail, $this->config->siteTitle);
 					$this->email->setTo($user->email);
-					$this->email->setSubject($this->config->siteTitle . ' - ' . lang('IonAuth.email_forgotten_password_subject'));
+					$this->email->setSubject($this->config->siteTitle . ' - ' . lang('AtomicAuth.email_forgotten_password_subject'));
 					$this->email->setMessage($message);
 					if ($this->email->send())
 					{
-						$this->setMessage('IonAuth.forgot_password_successful');
+						$this->setMessage('AtomicAuth.forgot_password_successful');
 						return true;
 					}
 				}
 			}
 		}
 
-		$this->setError('IonAuth.forgot_password_unsuccessful');
+		$this->setError('AtomicAuth.forgot_password_unsuccessful');
 		return false;
 	}
 
@@ -167,11 +167,11 @@ class IonAuth
 	 */
 	public function forgottenPasswordCheck(string $code)
 	{
-		$user = $this->ionAuthModel->getUserByForgottenPasswordCode($code);
+		$user = $this->atomicAuthModel->getUserByForgottenPasswordCode($code);
 
 		if (! is_object($user))
 		{
-			$this->setError('IonAuth.password_change_unsuccessful');
+			$this->setError('AtomicAuth.password_change_unsuccessful');
 			return false;
 		}
 		else
@@ -184,8 +184,8 @@ class IonAuth
 				{
 					//it has expired
 					$identity = $user->{$this->config->identity};
-					$this->ionAuthModel->clearForgottenPasswordCode($identity);
-					$this->setError('IonAuth.password_change_unsuccessful');
+					$this->atomicAuthModel->clearForgottenPasswordCode($identity);
+					$this->setError('AtomicAuth.password_change_unsuccessful');
 					return false;
 				}
 			}
@@ -210,24 +210,24 @@ class IonAuth
 	 */
 	public function register(string $identity, string $password, string $email, array $additionalData = [], array $groupIds = [])
 	{
-		$this->ionAuthModel->triggerEvents('pre_account_creation');
+		$this->atomicAuthModel->triggerEvents('pre_account_creation');
 
 		$emailActivation = $this->config->emailActivation;
 
-		$id = $this->ionAuthModel->register($identity, $password, $email, $additionalData, $groupIds);
+		$id = $this->atomicAuthModel->register($identity, $password, $email, $additionalData, $groupIds);
 
 		if (! $emailActivation)
 		{
 			if ($id !== false)
 			{
-				$this->setMessage('IonAuth.account_creation_successful');
-				$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful']);
+				$this->setMessage('AtomicAuth.account_creation_successful');
+				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful']);
 				return $id;
 			}
 			else
 			{
-				$this->setError('IonAuth.account_creation_unsuccessful');
-				$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful']);
+				$this->setError('AtomicAuth.account_creation_unsuccessful');
+				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful']);
 				return false;
 			}
 		}
@@ -235,26 +235,26 @@ class IonAuth
 		{
 			if (! $id)
 			{
-				$this->setError('IonAuth.account_creation_unsuccessful');
+				$this->setError('AtomicAuth.account_creation_unsuccessful');
 				return false;
 			}
 
 			// deactivate so the user must follow the activation flow
-			$deactivate = $this->ionAuthModel->deactivate($id);
+			$deactivate = $this->atomicAuthModel->deactivate($id);
 
 			// the deactivate method call adds a message, here we need to clear that
-			$this->ionAuthModel->clearMessages();
+			$this->atomicAuthModel->clearMessages();
 
 			if (! $deactivate)
 			{
-				$this->setError('IonAuth.deactivate_unsuccessful');
-				$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful']);
+				$this->setError('AtomicAuth.deactivate_unsuccessful');
+				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful']);
 				return false;
 			}
 
-			$activationCode = $this->ionAuthModel->activationCode;
+			$activationCode = $this->atomicAuthModel->activationCode;
 			$identity       = $this->config->identity;
-			$user           = $this->ionAuthModel->user($id)->row();
+			$user           = $this->atomicAuthModel->user($id)->row();
 
 			$data = [
 				'identity'   => $user->{$identity},
@@ -264,8 +264,8 @@ class IonAuth
 			];
 			if (! $this->config->useCiEmail)
 			{
-				$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful', 'activation_email_successful']);
-				$this->setMessage('IonAuth.activation_email_successful');
+				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful', 'activation_email_successful']);
+				$this->setMessage('AtomicAuth.activation_email_successful');
 				return $data;
 			}
 			else
@@ -275,19 +275,19 @@ class IonAuth
 				$this->email->clear();
 				$this->email->setFrom($this->config->adminEmail, $this->config->siteTitle);
 				$this->email->setTo($email);
-				$this->email->setSubject($this->config->siteTitle . ' - ' . lang('IonAuth.emailActivation_subject'));
+				$this->email->setSubject($this->config->siteTitle . ' - ' . lang('AtomicAuth.emailActivation_subject'));
 				$this->email->setMessage($message);
 
 				if ($this->email->send() === true)
 				{
-					$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful', 'activation_email_successful']);
-					$this->setMessage('IonAuth.activation_email_successful');
+					$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful', 'activation_email_successful']);
+					$this->setMessage('AtomicAuth.activation_email_successful');
 					return $id;
 				}
 			}
 
-			$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful', 'activation_email_unsuccessful']);
-			$this->setError('IonAuth.activation_email_unsuccessful');
+			$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful', 'activation_email_unsuccessful']);
+			$this->setError('AtomicAuth.activation_email_unsuccessful');
 			return false;
 		}
 	}
@@ -300,7 +300,7 @@ class IonAuth
 	 */
 	public function logout(): bool
 	{
-		$this->ionAuthModel->triggerEvents('logout');
+		$this->atomicAuthModel->triggerEvents('logout');
 
 		$identity = $this->config->identity;
 
@@ -310,8 +310,8 @@ class IonAuth
 		delete_cookie($this->config->rememberCookieName);
 
 		// Clear all codes
-		$this->ionAuthModel->clearForgottenPasswordCode($identity);
-		$this->ionAuthModel->clearRememberCode($identity);
+		$this->atomicAuthModel->clearForgottenPasswordCode($identity);
+		$this->atomicAuthModel->clearRememberCode($identity);
 
 		// Destroy the session
 		$this->session->destroy();
@@ -321,7 +321,7 @@ class IonAuth
 
 		session_regenerate_id(true);
 
-		$this->setMessage('IonAuth.logout_successful');
+		$this->setMessage('AtomicAuth.logout_successful');
 		return true;
 	}
 
@@ -334,14 +334,14 @@ class IonAuth
 	 */
 	public function loggedIn(): bool
 	{
-		$this->ionAuthModel->triggerEvents('logged_in');
+		$this->atomicAuthModel->triggerEvents('logged_in');
 
-		$recheck = $this->ionAuthModel->recheckSession();
+		$recheck = $this->atomicAuthModel->recheckSession();
 
 		// auto-login the user if they are remembered
 		if (! $recheck && get_cookie($this->config->rememberCookieName))
 		{
-			$recheck = $this->ionAuthModel->loginRememberedUser();
+			$recheck = $this->atomicAuthModel->loginRememberedUser();
 		}
 
 		return $recheck;
@@ -373,11 +373,11 @@ class IonAuth
 	 */
 	public function isAdmin(int $id=0): bool
 	{
-		$this->ionAuthModel->triggerEvents('is_admin');
+		$this->atomicAuthModel->triggerEvents('is_admin');
 
 		$adminGroup = $this->config->adminGroup;
 
-		return $this->ionAuthModel->inGroup($adminGroup, $id);
+		return $this->atomicAuthModel->inGroup($adminGroup, $id);
 	}
 
 	/**

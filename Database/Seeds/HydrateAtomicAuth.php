@@ -1,11 +1,11 @@
 <?php
-namespace IonAuth\Database\Seeds;
+namespace AtomicAuth\Database\Seeds;
 
 /**
  * @package CodeIgniter-Ion-Auth
  */
 
-class IonAuthSeeder extends \CodeIgniter\Database\Seeder
+class AtomicAuthSeeder extends \CodeIgniter\Database\Seeder
 {
 	/**
 	 * Dumping data for table 'groups', 'users, 'users_groups'
@@ -14,7 +14,7 @@ class IonAuthSeeder extends \CodeIgniter\Database\Seeder
 	 */
 	public function run()
 	{
-		$config = config('IonAuth\\Config\\IonAuth');
+		$config = config('AtomicAuth\\Config\\AtomicAuth');
 		$this->DBGroup = empty($config->databaseGroupName) ? '' : $config->databaseGroupName;
 		$tables        = $config->tables;
 
