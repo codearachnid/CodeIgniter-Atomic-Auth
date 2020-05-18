@@ -100,56 +100,56 @@ class AtomicAuthModel
 	 *
 	 * @var array
 	 */
-	protected $ionWhere = [];
+	protected $atomicWhere = [];
 
 	/**
 	 * Select
 	 *
 	 * @var array
 	 */
-	protected $ionSelect = [];
+	protected $atomicSelect = [];
 
 	/**
 	 * Like
 	 *
 	 * @var array
 	 */
-	protected $ionLike = [];
+	protected $atomicLike = [];
 
 	/**
 	 * Limit
 	 *
 	 * @var string
 	 */
-	protected $ionLimit = null;
+	protected $atomicLimit = null;
 
 	/**
 	 * Offset
 	 *
 	 * @var string
 	 */
-	protected $ionOffset = null;
+	protected $atomicOffset = null;
 
 	/**
 	 * Order By
 	 *
 	 * @var string
 	 */
-	protected $ionOrderBy = null;
+	protected $atomicOrderBy = null;
 
 	/**
 	 * Order
 	 *
 	 * @var string
 	 */
-	protected $ionOrder = null;
+	protected $atomicOrder = null;
 
 	/**
 	 * Hooks
 	 *
 	 * @var object
 	 */
-	protected $ionHooks;
+	protected $atomicHooks;
 
 	/**
 	 * Response
