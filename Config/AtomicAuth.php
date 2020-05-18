@@ -30,6 +30,18 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 {
 
 	/**
+	 * Access Hash.
+	 * -------------------------------------------------------------------------
+	 * Allows for backend access without a password - if null/empty it will
+	 * prevent all access to any admin access. If this is compromised it can
+	 * expose your authentication or other areas of your site with adverse
+	 * impact.
+	 *
+	 * @var string
+	 */
+	public $accessHash = 'A30D1482346E45CDAFB1EEA7D1CB36DFA0EF95C5';
+
+	/**
 	 * Database group name option.
 	 * -------------------------------------------------------------------------
 	 * Allows to select a specific group for the database connection
