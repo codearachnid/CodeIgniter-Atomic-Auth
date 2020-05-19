@@ -1,15 +1,14 @@
-<?php
-namespace AtomicAuth\Database\Migrations;
+<?php namespace AtomicAuth\Database\Migrations;
 
-// use CodeIgniter\Database\Migration;
+use CodeIgniter\Database\Migration;
 
 /**
  * CodeIgniter AtomicAuth
  *
  * @package CodeIgniter-Atomic-Auth
- * @author  Benoit VRIGNAUD <benoit.vrignaud@zaclys.net>
- * @license https://opensource.org/licenses/MIT	MIT License
- * @link    http://github.com/benedmunds/CodeIgniter-Ion-Auth
+ * @author  Timothy Wood @codearachnid <codearachnid@gmail.com>
+ * @license https://opensource.org/licenses/GPL-3.0	GNU General Public License v3.0
+ * @link    https://github.com/codearachnid/CodeIgniter-Atomic-Auth
  */
 
 /**
@@ -17,7 +16,7 @@ namespace AtomicAuth\Database\Migrations;
  *
  * @package CodeIgniter-Atomic-Auth
  */
-class CreateAuthTables extends \CodeIgniter\Database\Migration
+class InstallAtomicAuth extends Migration
 {
 	/**
 	 * Tables
