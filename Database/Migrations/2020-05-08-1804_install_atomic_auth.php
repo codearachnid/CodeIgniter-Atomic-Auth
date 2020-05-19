@@ -1,6 +1,8 @@
 <?php
 namespace AtomicAuth\Database\Migrations;
 
+// use CodeIgniter\Database\Migration;
+
 /**
  * CodeIgniter AtomicAuth
  *
@@ -15,7 +17,7 @@ namespace AtomicAuth\Database\Migrations;
  *
  * @package CodeIgniter-Atomic-Auth
  */
-class Migration_Install_atomic_auth extends \CodeIgniter\Database\Migration
+class CreateAuthTables extends \CodeIgniter\Database\Migration
 {
 	/**
 	 * Tables

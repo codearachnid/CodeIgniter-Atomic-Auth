@@ -26,6 +26,7 @@ class Admin extends \CodeIgniter\Controller
   	 * @var string
   	 */
     protected $pathMigrate = 'AtomicAuth\Database\Migrations';
+    protected $runNamespace = 'AtomicAuth';
 
   	/**
   	 * Constructor
@@ -53,11 +54,15 @@ class Admin extends \CodeIgniter\Controller
 
     public function install()
     {
+      // load up the default migration runner
       $migrate = \Config\Services::migrations();
-      echo 'migrate';
+
       try
       {
-        $migrate->setNamespace($this->pathMigrate)->latest();
+        // echo $this->runNamespace . '<br />';
+        // print_r($migrate->setNamespace($this->runNamespace)->findMigrations());
+        // $migrate->setNamespace($this->runNamespace)->latest();
+        // print_r($migrate->findNamespaceMigrations($this->runNamespace));
         echo 'migrated';
       }
       catch (\Exception $e)
