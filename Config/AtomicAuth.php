@@ -39,7 +39,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 *
 	 * @var string
 	 */
-	public $accessHash = '05280ab04558085de8c9c1b7a55bd8efa625cdcda1602351';
+	public $accessHash = '4bb42e373b9b4320324603c9b67a0a577dbc8ca04ee34010230f3f3fab7d06c1';
 
 	/**
 	 * Database group name option.

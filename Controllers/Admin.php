@@ -1,5 +1,4 @@
-<?php
-namespace AtomicAuth\Controllers;
+<?php namespace AtomicAuth\Controllers;
 
 /**
  * Class Auth
@@ -19,6 +18,13 @@ class Admin extends \CodeIgniter\Controller
   	 * @var \AtomicAuth\Libraries\AtomicAuth
   	 */
   	protected $atomicAuth;
+
+    /**
+  	 * Configuration
+  	 *
+  	 * @var \AtomicAuth\Config\AtomicAuth
+  	 */
+  	protected $configAtomicAuth;
 
   	/**
   	 * Migrations folder
@@ -47,32 +53,72 @@ class Admin extends \CodeIgniter\Controller
       return $hex;
     }
 
+    /**
+    *
+    */
     public function go_away()
     {
+      // TODO clear all the things before kick them to the base
       return redirect()->to('/');
     }
 
     public function install()
     {
-      // load up the default migration runner
+
+      // ensure we can proceed
+      if( ! $this->has_access() )
+      {
+        return $this->go_away();
+      }
+
+      // load up the MigrationRunner
       $migrate = \Config\Services::migrations();
 
       try
       {
-        // echo $this->runNamespace . '<br />';
-        // print_r($migrate->setNamespace($this->runNamespace)->findMigrations());
-        // $migrate->setNamespace($this->runNamespace)->latest();
-        // print_r($migrate->findNamespaceMigrations($this->runNamespace));
-        echo 'migrated';
+        $migrate->setNamespace($this->runNamespace)->latest();
       }
       catch (\Exception $e)
       {
         // Do something with the error here...
       }
+
+      return view('welcome_message');
     }
 
     public function uninstall()
     {
+      // ensure we can proceed
+      if( ! $this->has_access() )
+      {
+        return $this->go_away();
+      }
 
+      // load up the MigrationRunner
+      $migrate = \Config\Services::migrations();
+
+      try
+      {
+        $migrate->setNamespace($this->runNamespace)->regress();
+      }
+      catch (\Exception $e)
+      {
+        // Do something with the error here...
+      }
+
+      return view('welcome_message');
+    }
+
+    private function has_access()
+    {
+      $access_check = false;
+
+      // compare url hash to config hash
+      if( ! empty( $this->request->uri->getQuery(['only' => [ $this->configAtomicAuth->accessHash ]]) ) )
+      {
+        $access_check = true;
+      }
+
+      return $access_check;
     }
 }
