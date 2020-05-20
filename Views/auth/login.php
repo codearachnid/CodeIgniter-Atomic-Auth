@@ -25,4 +25,5 @@
 
 <?php echo form_close();?>
 
-<p><a href="forgot_password"><?php echo lang('Auth.login_forgot_password');?></a></p>
+<p><a href="create"><?php echo lang('Auth.login_user_create');?></a></p>
+<p><a href="forgot"><?php echo lang('Auth.login_forgot_password');?></a></p>

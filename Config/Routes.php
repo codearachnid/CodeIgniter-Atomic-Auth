@@ -10,7 +10,7 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
   // ...
 
   // ... user centric
-  $routes->put('create', 'User::create');
+  $routes->add('create', 'User::create');
   $routes->patch('edit/(:hash)', 'User::edit/$1');
   $routes->add('activate/(:hash)', 'User::activate/$1');
   // $routes->get('activate/(:num)/(:hash)', 'Auth::activate/$1/$2');

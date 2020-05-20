@@ -46,12 +46,12 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 * -------------------------------------------------------------------------
 	 * Allows to select a specific group for the database connection
 	 *
-	 * Default is empty: uses default group defined in CI's configuration
+	 * Default is null: uses default group defined in CI's configuration
 	 * (see application/config/database.php, $active_group variable)
 	 *
 	 * @var string
 	 */
-	public $databaseGroupName = '';
+	public $databaseGroupName = null;
 
 	/**
 	 * Tables (Database table names)
@@ -59,11 +59,24 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 * @var array
 	 */
 	public $tables = [
-		'users'          => 'atomicauth_users',
-		'groups'         => 'atomicauth_groups',
-		'users_groups'   => 'atomicauth_users_groups',
-		'login_attempts' => 'atomicauth_login_attempts',
+		'config'						=> 'atomicauth_config',
+		'users'							=> 'atomicauth_users',
+		'groups'						=> 'atomicauth_groups',
+		'track_login'				=> 'atomicauth_track_logins',
+		'reset_attempts'		=> 'atomicauth_reset_attempts',
+		'tokens'						=> 'atomicauth_tokens',
+		'permissions'				=> 'atomicauth_permissions',
+		'users_permissions'	=> 'atomicauth_users_permissions',
+		'groups_users'			=> 'atomicauth_groups_users',
+		'groups_permissions'=> 'atomicauth_groups_permissions',
 	];
+
+	/**
+	 * Set the unique column for user unique identity when registering or editing.
+	 * IMPORTANT: If you are changing it from the default (email), update the
+	 * UNIQUE constraint in your DB
+	 */
+	public $identity = 'email';
 
 	/**
 	 * Users table column and Group table column you want to join WITH.
@@ -73,8 +86,8 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 * @var array
 	 */
 	public $join = [
-		'atomicauth_users'  => 'user_id',
-		'atomicauth_groups' => 'group_id',
+		'users'  => 'user_id',
+		'groups' => 'group_id',
 	];
 
 	/*
@@ -157,11 +170,10 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 */
 	public $siteTitle                = 'Example.com';       // Site Title, example.com
 	public $adminEmail               = 'admin@example.com'; // Admin Email, admin@example.com
+	public $forceAuthorizedUserCreate = false;
+	public $redirectOnSuccess				 = false;
 	public $defaultGroup             = 'members';           // Default group, use name
 	public $adminGroup               = 'admin';             // Default administrators group, use name
-	public $identity                 = 'email';             /* You can use any unique column in your table as identity column.
-																	IMPORTANT: If you are changing it from the default (email),
-																				update the UNIQUE constraint in your DB */
 	public $minPasswordLength        = 8;                   // Minimum Required Length of Password (not enforced by lib - see note above)
 	public $emailActivation          = false;               // Email Activation for registration
 	public $manualActivation         = false;               // Manual Activation for registration

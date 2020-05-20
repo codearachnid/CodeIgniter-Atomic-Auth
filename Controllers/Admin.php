@@ -71,19 +71,37 @@ class Admin extends \CodeIgniter\Controller
         return $this->go_away();
       }
 
+      $data['messages'] = [];
+
       // load up the MigrationRunner
       $migrate = \Config\Services::migrations();
 
+      // load up seeding
+      $seeder = \Config\Database::seeder();
+
       try
       {
-        $migrate->setNamespace($this->runNamespace)->latest();
+
+        if( $migrate->setNamespace($this->runNamespace)->latest() )
+        {
+          $data['messages'][] = 'Atomic Auth creation completed.';
+        }
+
+        if( $seeder->call('AtomicAuth\Database\Seeds\AtomicAuthGroups') )
+        {
+          $data['messages'][] = 'Atomic Auth data seeding completed.';
+        }
+
       }
       catch (\Exception $e)
       {
         // Do something with the error here...
+        // d($e);
+        d($e->getLine());
+        dd($e);
       }
 
-      return view('welcome_message');
+      return $this->response->setJSON($data);
     }
 
     public function uninstall()
@@ -99,14 +117,17 @@ class Admin extends \CodeIgniter\Controller
 
       try
       {
-        $migrate->setNamespace($this->runNamespace)->regress();
+        if( $migrate->setNamespace($this->runNamespace)->regress() )
+        {
+          $data['messages'][] = 'Atomic Auth regression completed.';
+        }
       }
       catch (\Exception $e)
       {
         // Do something with the error here...
       }
 
-      return view('welcome_message');
+      return $this->response->setJSON($data);
     }
 
     private function has_access()

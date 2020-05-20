@@ -1,4 +1,4 @@
-# codeigniter-atomic-auth
+# CodeIgniter Atomic Auth
 A performant and rich user authentication library. Fully extensible and portable, secure auth package for CodeIgniter 4.
 
 [![](https://github.com/codearachnid/CodeIgniter-Atomic-Auth/workflows/PHP%20Tests/badge.svg)](https://github.com/codearachnid/CodeIgniter-Atomic-Auth/actions?query=workflow%3A%22PHP+Tests%22)

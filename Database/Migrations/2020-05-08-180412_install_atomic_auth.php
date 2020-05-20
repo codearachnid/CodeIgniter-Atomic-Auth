@@ -39,6 +39,7 @@ class InstallAtomicAuth extends Migration
 
 		parent::__construct();
 
+		// import the custom table names
 		$this->tables = $config->tables;
 	}
 
@@ -49,191 +50,203 @@ class InstallAtomicAuth extends Migration
 	 */
 	public function up()
 	{
-		// Drop table 'groups' if it exists
-		$this->forge->dropTable($this->tables['groups'], true);
 
-		// Table structure for table 'groups'
+		/*
+     * Configuration
+     */
+		// TODO create a database driven configuration?
+		// $this->forge->addField([
+    //       'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+    //       'option_name'      => ['type' => 'varchar', 'constraint' => 64],
+    //       'option_value'     => ['type' => 'longtext', 'null' => true],
+    //       'created_at'       => ['type' => 'datetime', 'null' => true],
+    //       'updated_at'       => ['type' => 'datetime', 'null' => true],
+    //   ]);
+    //   $this->forge->addKey('id', true);
+    //   $this->forge->createTable($this->tables['config'], true);
+
+		/*
+     * Users
+     */
 		$this->forge->addField([
-			'id' => [
-				'type'           => 'MEDIUMINT',
-				'constraint'     => '8',
-				'unsigned'       => true,
-				'auto_increment' => true,
-			],
-			'name' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '20',
-			],
-			'description' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '100',
-			],
-		]);
-		$this->forge->addKey('id', true);
-		$this->forge->createTable($this->tables['groups']);
+        'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+        'email'            => ['type' => 'varchar', 'constraint' => 255],
+        'password_hash'    => ['type' => 'varchar', 'constraint' => 255],
+        'reset_hash'       => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+        'reset_at'         => ['type' => 'datetime', 'null' => true],
+        'reset_expires'    => ['type' => 'datetime', 'null' => true],
+        'activate_hash'    => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+        'status'           => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+        'status_message'   => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+        'active'           => ['type' => 'tinyint', 'constraint' => 1, 'null' => 0, 'default' => 0],
+        'force_pass_reset' => ['type' => 'tinyint', 'constraint' => 1, 'null' => 0, 'default' => 0],
+        'created_at'       => ['type' => 'datetime', 'null' => true],
+        'updated_at'       => ['type' => 'datetime', 'null' => true],
+        'deleted_at'       => ['type' => 'datetime', 'null' => true],
+    ]);
+    $this->forge->addKey('id', true);
+    $this->forge->addUniqueKey('email');
+    $this->forge->createTable($this->tables['users'], true);
 
-		// Drop table 'users' if it exists
-		$this->forge->dropTable($this->tables['users'], true);
-
-		// Table structure for table 'users'
+		/*
+     * Users
+     */
 		$this->forge->addField([
-			'id' => [
-				'type'           => 'MEDIUMINT',
-				'constraint'     => '8',
-				'unsigned'       => true,
-				'auto_increment' => true,
-			],
-			'ip_address' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '45',
-			],
-			'username' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '100',
-			],
-			'password' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '80',
-			],
-			'email' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '254',
-				'unique'     => true,
-			],
-			'activation_selector' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '255',
-				'null'       => true,
-				'unique'     => true,
-			],
-			'activation_code' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '255',
-				'null'       => true,
-			],
-			'forgotten_password_selector' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '255',
-				'null'       => true,
-				'unique'     => true,
-			],
-			'forgotten_password_code' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '255',
-				'null'       => true,
-			],
-			'forgotten_password_time' => [
-				'type'       => 'INT',
-				'constraint' => '11',
-				'unsigned'   => true,
-				'null'       => true,
-			],
-			'remember_selector' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '255',
-				'null'       => true,
-				'unique'     => true,
-			],
-			'remember_code' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '255',
-				'null'       => true,
-			],
-			'created_on' => [
-				'type'       => 'INT',
-				'constraint' => '11',
-				'unsigned'   => true,
-			],
-			'last_login' => [
-				'type'       => 'INT',
-				'constraint' => '11',
-				'unsigned'   => true,
-				'null'       => true,
-			],
-			'active' => [
-				'type'       => 'TINYINT',
-				'constraint' => '1',
-				'unsigned'   => true,
-				'null'       => true,
-			],
-			'first_name' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '50',
-				'null'       => true,
-			],
-			'last_name' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '50',
-				'null'       => true,
-			],
-			'company' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '100',
-				'null'       => true,
-			],
-			'phone' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '20',
-				'null'       => true,
-			],
-		]);
-		$this->forge->addKey('id', true);
-		$this->forge->createTable($this->tables['users'], false);
+	        'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+	        'email'            => ['type' => 'varchar', 'constraint' => 255],
+	        'password_hash'    => ['type' => 'varchar', 'constraint' => 255],
+	        'reset_hash'       => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+	        'reset_at'         => ['type' => 'datetime', 'null' => true],
+	        'reset_expires'    => ['type' => 'datetime', 'null' => true],
+	        'activate_hash'    => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+	        'status'           => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+	        'status_message'   => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+	        'active'           => ['type' => 'tinyint', 'constraint' => 1, 'null' => 0, 'default' => 0],
+	        'force_pass_reset' => ['type' => 'tinyint', 'constraint' => 1, 'null' => 0, 'default' => 0],
+	        'created_at'       => ['type' => 'datetime', 'null' => true],
+	        'updated_at'       => ['type' => 'datetime', 'null' => true],
+	        'deleted_at'       => ['type' => 'datetime', 'null' => true],
+	    ]);
+			$this->forge->addKey('id', true);
+	    $this->forge->addUniqueKey('email');
+	    $this->forge->createTable($this->tables['users'], true);
 
-		// Drop table 'users_groups' if it exists
-		$this->forge->dropTable($this->tables['users_groups'], true);
+			/*
+       * Track Logins
+       */
+      $this->forge->addField([
+          'id'         => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+          'ip_address' => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+          'email'      => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+          'user_id'    => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'null' => true], // Only for successful logins
+          'status'    => ['type' => 'tinyint', 'constraint' => 1],
+					'created_at'       => ['type' => 'datetime', 'null' => true],
+      ]);
+      $this->forge->addKey('id', true);
+      $this->forge->addKey('email');
+      $this->forge->addKey('user_id');
+      // NOTE: Do NOT delete the user_id or email when the user is deleted for security audits
+      $this->forge->createTable($this->tables['track_login'], true);
 
-		// Table structure for table 'users_groups'
-		$this->forge->addField([
-			'id' => [
-				'type'           => 'MEDIUMINT',
-				'constraint'     => '8',
-				'unsigned'       => true,
-				'auto_increment' => true,
-			],
-			'user_id' => [
-				'type'       => 'MEDIUMINT',
-				'constraint' => '8',
-				'unsigned'   => true,
-			],
-			'group_id' => [
-				'type'       => 'MEDIUMINT',
-				'constraint' => '8',
-				'unsigned'   => true,
-			],
-		]);
-		$this->forge->addKey('id', true);
-		$this->forge->createTable($this->tables['users_groups']);
+      /*
+       * Auth Tokens
+       * @see https://paragonie.com/blog/2015/04/secure-authentication-php-with-long-term-persistence
+       */
+      $this->forge->addField([
+          'id'              => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+          'selector'        => ['type' => 'varchar', 'constraint' => 255],
+          'hashedValidator' => ['type' => 'varchar', 'constraint' => 255],
+          'user_id'         => ['type' => 'int', 'constraint' => 11, 'unsigned' => true],
+					'created_at'       => ['type' => 'datetime', 'null' => true],
+					'expires_at'			=> ['type' => 'datetime'],
+      ]);
+      $this->forge->addKey('id', true);
+      $this->forge->addKey('selector');
+      $this->forge->addForeignKey('user_id', $this->tables['users'], 'id', false, 'CASCADE');
+      $this->forge->createTable($this->tables['tokens'], true);
 
-		// Drop table 'login_attempts' if it exists
-		$this->forge->dropTable($this->tables['login_attempts'], true);
+      /*
+       * Password Reset Table
+       */
+      $this->forge->addField([
+          'id'         => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+          'email'      => ['type' => 'varchar', 'constraint' => 255],
+          'ip_address' => ['type' => 'varchar', 'constraint' => 255],
+          'user_agent' => ['type' => 'varchar', 'constraint' => 255],
+          'token'      => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+          'created_at' => ['type' => 'datetime', 'null' => true],
+					'expires_at' => ['type' => 'datetime', 'null' => true],
+      ]);
+      $this->forge->addKey('id', true);
+      $this->forge->createTable($this->tables['reset_attempts'], true);
 
-		// Table structure for table 'login_attempts'
-		$this->forge->addField([
-			'id' => [
-				'type'           => 'MEDIUMINT',
-				'constraint'     => '8',
-				'unsigned'       => true,
-				'auto_increment' => true,
-			],
-			'ip_address' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '45',
-			],
-			'login' => [
-				'type'       => 'VARCHAR',
-				'constraint' => '100',
-				'null'       => true,
-			],
-			'time' => [
-				'type'       => 'INT',
-				'constraint' => '11',
-				'unsigned'   => true,
-				'null'       => true,
-			]
-		]);
-		$this->forge->addKey('id', true);
-		$this->forge->createTable($this->tables['login_attempts']);
+      /*
+       * Activation Attempts Table
+       */
+      // $this->forge->addField([
+      //     'id'         => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+      //     'ip_address' => ['type' => 'varchar', 'constraint' => 255],
+      //     'user_agent' => ['type' => 'varchar', 'constraint' => 255],
+      //     'token'      => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+      //     'created_at' => ['type' => 'datetime', 'null' => false],
+      // ]);
+      // $this->forge->addKey('id', true);
+      // $this->forge->createTable($this->tables['activation_attempts']);
+
+      /*
+       * Groups Table
+       */
+      $fields = [
+          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+          'name'        => ['type' => 'varchar', 'constraint' => 255],
+          'description' => ['type' => 'varchar', 'constraint' => 255],
+					'created_at'       => ['type' => 'datetime', 'null' => true],
+          'updated_at'       => ['type' => 'datetime', 'null' => true],
+          'deleted_at'       => ['type' => 'datetime', 'null' => true],
+      ];
+
+      $this->forge->addField($fields);
+      $this->forge->addKey('id', true);
+      $this->forge->createTable($this->tables['groups'], true);
+
+      /*
+       * Permissions Table
+       */
+      $fields = [
+          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+          'name'        => ['type' => 'varchar', 'constraint' => 255],
+          'description' => ['type' => 'varchar', 'constraint' => 255],
+					'created_at'       => ['type' => 'datetime', 'null' => true],
+          'updated_at'       => ['type' => 'datetime', 'null' => true],
+          'deleted_at'       => ['type' => 'datetime', 'null' => true],
+      ];
+
+      $this->forge->addField($fields);
+      $this->forge->addKey('id', true);
+      $this->forge->createTable($this->tables['permissions'], true);
+
+      /*
+       * Groups/Permissions Table
+       */
+      $fields = [
+          'group_id'      => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+          'permission_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+      ];
+
+      $this->forge->addField($fields);
+      $this->forge->addKey(['group_id', 'permission_id']);
+      $this->forge->addForeignKey('group_id', $this->tables['groups'], 'id', false, 'CASCADE');
+      $this->forge->addForeignKey('permission_id', $this->tables['permissions'], 'id', false, 'CASCADE');
+      $this->forge->createTable($this->tables['groups_permissions'], true);
+
+      /*
+       * Users/Groups Table
+       */
+      $fields = [
+          'group_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+          'user_id'  => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+      ];
+
+      $this->forge->addField($fields);
+      $this->forge->addKey(['group_id', 'user_id']);
+      $this->forge->addForeignKey('group_id', $this->tables['groups'], 'id', false, 'CASCADE');
+      $this->forge->addForeignKey('user_id', $this->tables['users'], 'id', false, 'CASCADE');
+      $this->forge->createTable($this->tables['groups_users'], true);
+
+      /*
+       * Users/Permissions Table
+       */
+      $fields = [
+          'user_id'       => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+          'permission_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+      ];
+
+      $this->forge->addField($fields);
+      $this->forge->addKey(['user_id', 'permission_id']);
+      $this->forge->addForeignKey('user_id', $this->tables['users'], 'id', false, 'CASCADE');
+      $this->forge->addForeignKey('permission_id', $this->tables['permissions'], 'id', false, 'CASCADE');
+      $this->forge->createTable($this->tables['users_permissions'], true);
+
 	}
 
 	/**
@@ -243,9 +256,8 @@ class InstallAtomicAuth extends Migration
 	 */
 	public function down()
 	{
-		$this->forge->dropTable($this->tables['users'], true);
-		$this->forge->dropTable($this->tables['groups'], true);
-		$this->forge->dropTable($this->tables['users_groups'], true);
-		$this->forge->dropTable($this->tables['login_attempts'], true);
+		foreach( $this->tables as $table ){
+				$this->forge->dropTable($table, true);
+		}
 	}
 }

@@ -1,11 +1,10 @@
-<?php
-namespace AtomicAuth\Database\Seeds;
+<?php namespace AtomicAuth\Database\Seeds;
 
 /**
  * @package CodeIgniter-Atomic-Auth
  */
 
-class AtomicAuthSeeder extends \CodeIgniter\Database\Seeder
+class AtomicAuthGroupsSeeder extends \CodeIgniter\Database\Seeder
 {
 	/**
 	 * Dumping data for table 'groups', 'users, 'users_groups'
@@ -18,20 +17,6 @@ class AtomicAuthSeeder extends \CodeIgniter\Database\Seeder
 		$this->DBGroup = empty($config->databaseGroupName) ? '' : $config->databaseGroupName;
 		$tables        = $config->tables;
 
-		$groups = [
-			[
-				'id'          => 1,
-				'name'        => 'admin',
-				'description' => 'Administrator',
-			],
-			[
-				'id'          => 2,
-				'name'        => 'members',
-				'description' => 'General User',
-			],
-		];
-		$this->db->table($tables['groups'])->insertBatch($groups);
-
 		$users = [
 			[
 				'ip_address'              => '127.0.0.1',
@@ -40,13 +25,7 @@ class AtomicAuthSeeder extends \CodeIgniter\Database\Seeder
 				'email'                   => 'admin@admin.com',
 				'activation_code'         => '',
 				'forgotten_password_code' => null,
-				'created_on'              => '1268889823',
-				'last_login'              => '1268889823',
 				'active'                  => '1',
-				'first_name'              => 'Admin',
-				'last_name'               => 'istrator',
-				'company'                 => 'ADMIN',
-				'phone'                   => '0',
 			],
 		];
 		$this->db->table($tables['users'])->insertBatch($users);

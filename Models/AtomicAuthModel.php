@@ -783,7 +783,7 @@ class AtomicAuthModel
 	 */
 	public function register(string $identity, string $password, string $email, array $additionalData=[], array $groups=[])
 	{
-		$this->triggerEvents('pre_register');
+		$this->triggerEvents('auth_pre_register_user');
 
 		$manualActivation = $this->config->manualActivation;
 
@@ -809,9 +809,6 @@ class AtomicAuthModel
 		// capture default group details
 		$defaultGroup = $query;
 
-		// IP Address
-		$ipAddress = \Config\Services::request()->getIPAddress();
-
 		// Do not pass $identity as user is not known yet so there is no need
 		$password = $this->hashPassword($password);
 
@@ -824,11 +821,9 @@ class AtomicAuthModel
 		// Users table.
 		$data = [
 			$this->identityColumn => $identity,
-			'username'            => $identity,
-			'password'            => $password,
+			'password_hash'       => $password,
 			'email'               => $email,
-			'ip_address'          => $ipAddress,
-			'created_on'          => time(),
+			'created_at'          => time(),
 			'active'              => ($manualActivation === false ? 1 : 0),
 		];
 
@@ -857,7 +852,7 @@ class AtomicAuthModel
 			}
 		}
 
-		$this->triggerEvents('post_register');
+		$this->triggerEvents('auth_post_register_user');
 
 		return $id ?? false;
 	}
@@ -1232,7 +1227,7 @@ class AtomicAuthModel
 			$where = [$where => $value];
 		}
 
-		array_push($this->ionWhere, $where);
+		array_push($this->atomicWhere, $where);
 
 		return $this;
 	}
@@ -1449,14 +1444,14 @@ class AtomicAuthModel
 		$this->triggerEvents('extra_where');
 
 		// run each where that was passed
-		if (! empty($this->ionWhere))
+		if (! empty($this->atomicWhere))
 		{
-			foreach ($this->ionWhere as $where)
+			foreach ($this->atomicWhere as $where)
 			{
 				$builder->where($where);
 			}
 
-			$this->ionWhere = [];
+			$this->atomicWhere = [];
 		}
 
 		if (! empty($this->ionLike))
@@ -1630,7 +1625,7 @@ class AtomicAuthModel
 		foreach ($groupIds as $groupId)
 		{
 			// Cast to float to support bigint data type
-			if ($this->db->table($this->tables['users_groups'])->insert([
+			if ($this->db->table($this->tables['groups_users'])->insert([
 																	$this->join['groups'] => (float)$groupId,
 																	$this->join['users']  => (float)$userId  ]))
 			{
@@ -1719,13 +1714,13 @@ class AtomicAuthModel
 		$builder = $this->db->table($this->tables['groups']);
 
 		// run each where that was passed
-		if (isset($this->ionWhere) && ! empty($this->ionWhere))
+		if (isset($this->atomicWhere) && ! empty($this->atomicWhere))
 		{
-			foreach ($this->ionWhere as $where)
+			foreach ($this->atomicWhere as $where)
 			{
 				$builder->where($where);
 			}
-			$this->ionWhere = [];
+			$this->atomicWhere = [];
 		}
 
 		if (isset($this->ionLimit) && isset($this->ionOffset))
