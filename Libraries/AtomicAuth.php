@@ -292,23 +292,23 @@ class AtomicAuth
 	{
 		$this->atomicAuthModel->triggerEvents('logout');
 
-		$identity = $this->config->identity;
+		$activeUser = $this->session->get('activeUser');
+		if( $activeUser ) {
+			// TODO make these methods work
+			// $this->atomicAuthModel->clearForgottenPasswordCode($activeUser['user_id']);
+			// $this->atomicAuthModel->resetRememberToken($activeUser['user_id']);
+		}
 
-		$this->session->remove([$identity, 'id', 'user_id']);
+		$this->setSession(null);
 
 		// delete the remember me cookies if they exist
 		delete_cookie($this->config->rememberCookieName);
-
-		// Clear all codes
-		$this->atomicAuthModel->clearForgottenPasswordCode($identity);
-		$this->atomicAuthModel->clearRememberCode($identity);
 
 		// Destroy the session
 		$this->session->destroy();
 
 		// Recreate the session
 		session_start();
-
 		session_regenerate_id(true);
 
 		$this->setMessage('AtomicAuth.logout_successful');

@@ -141,6 +141,7 @@ class Auth extends \CodeIgniter\Controller
 				//if the login is successful
 				//redirect them back to the home page
 				$this->session->setFlashdata('message', $this->atomicAuth->messages());
+				// TODO better handling of redirect (if useful)
 				return redirect()->to('/');
 			}
 			else
@@ -185,8 +186,6 @@ class Auth extends \CodeIgniter\Controller
 	 */
 	public function logout()
 	{
-		$this->data['title'] = 'Logout';
-
 		// log the user out
 		$this->atomicAuth->logout();
 
