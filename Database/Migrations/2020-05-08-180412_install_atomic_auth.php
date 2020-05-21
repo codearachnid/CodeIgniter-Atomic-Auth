@@ -57,6 +57,7 @@ class InstallAtomicAuth extends Migration
 		// TODO create a database driven configuration?
 		// $this->forge->addField([
     //       'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+		//			 'guid'        			=> ['type' => 'varchar', 'constraint' => 36, 'null' => false],
     //       'option_name'      => ['type' => 'varchar', 'constraint' => 64],
     //       'option_value'     => ['type' => 'longtext', 'null' => true],
     //       'created_at'       => ['type' => 'datetime', 'null' => true],
@@ -65,34 +66,13 @@ class InstallAtomicAuth extends Migration
     //   $this->forge->addKey('id', true);
     //   $this->forge->createTable($this->tables['config'], true);
 
-		/*
-     * Users
-     */
-		$this->forge->addField([
-        'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-        'email'            => ['type' => 'varchar', 'constraint' => 255],
-        'password_hash'    => ['type' => 'varchar', 'constraint' => 255],
-        'reset_hash'       => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-        'reset_at'         => ['type' => 'datetime', 'null' => true],
-        'reset_expires'    => ['type' => 'datetime', 'null' => true],
-        'activate_hash'    => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-        'status'           => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-        'status_message'   => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
-        'active'           => ['type' => 'tinyint', 'constraint' => 1, 'null' => 0, 'default' => 0],
-        'force_pass_reset' => ['type' => 'tinyint', 'constraint' => 1, 'null' => 0, 'default' => 0],
-        'created_at'       => ['type' => 'datetime', 'null' => true],
-        'updated_at'       => ['type' => 'datetime', 'null' => true],
-        'deleted_at'       => ['type' => 'datetime', 'null' => true],
-    ]);
-    $this->forge->addKey('id', true);
-    $this->forge->addUniqueKey('email');
-    $this->forge->createTable($this->tables['users'], true);
 
 		/*
      * Users
      */
 		$this->forge->addField([
 	        'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+					'guid'        		 => ['type' => 'varchar', 'constraint' => 36, 'null' => false],
 	        'email'            => ['type' => 'varchar', 'constraint' => 255],
 	        'password_hash'    => ['type' => 'varchar', 'constraint' => 255],
 	        'reset_hash'       => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
@@ -109,7 +89,46 @@ class InstallAtomicAuth extends Migration
 	    ]);
 			$this->forge->addKey('id', true);
 	    $this->forge->addUniqueKey('email');
+			$this->forge->addUniqueKey('guid');
 	    $this->forge->createTable($this->tables['users'], true);
+
+
+			      /*
+			       * Groups Table
+			       */
+			      $fields = [
+			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+								'guid'        => ['type' => 'varchar', 'constraint' => 36, 'null' => false],
+			          'name'        => ['type' => 'varchar', 'constraint' => 255],
+			          'description' => ['type' => 'varchar', 'constraint' => 255],
+								'created_at'       => ['type' => 'datetime', 'null' => true],
+			          'updated_at'       => ['type' => 'datetime', 'null' => true],
+			          'deleted_at'       => ['type' => 'datetime', 'null' => true],
+			      ];
+
+			      $this->forge->addField($fields);
+			      $this->forge->addKey('id', true);
+						// $this->forge->addUniqueKey('guid');
+			      $this->forge->createTable($this->tables['groups'], true);
+
+			      /*
+			       * Permissions Table
+			       */
+			      $fields = [
+			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
+								'guid'        => ['type' => 'varchar', 'constraint' => 36, 'null' => false],
+			          'name'        => ['type' => 'varchar', 'constraint' => 255, 'null' => false],
+			          'description' => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+								'created_at'       => ['type' => 'datetime', 'null' => true],
+			          'updated_at'       => ['type' => 'datetime', 'null' => true],
+			          'deleted_at'       => ['type' => 'datetime', 'null' => true],
+			      ];
+
+			      $this->forge->addField($fields);
+			      $this->forge->addKey('id', true);
+						// $this->forge->addUniqueKey('guid');
+			      $this->forge->createTable($this->tables['permissions'], true);
+
 
 			/*
        * Track Logins
@@ -172,38 +191,6 @@ class InstallAtomicAuth extends Migration
       // ]);
       // $this->forge->addKey('id', true);
       // $this->forge->createTable($this->tables['activation_attempts']);
-
-      /*
-       * Groups Table
-       */
-      $fields = [
-          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-          'name'        => ['type' => 'varchar', 'constraint' => 255],
-          'description' => ['type' => 'varchar', 'constraint' => 255],
-					'created_at'       => ['type' => 'datetime', 'null' => true],
-          'updated_at'       => ['type' => 'datetime', 'null' => true],
-          'deleted_at'       => ['type' => 'datetime', 'null' => true],
-      ];
-
-      $this->forge->addField($fields);
-      $this->forge->addKey('id', true);
-      $this->forge->createTable($this->tables['groups'], true);
-
-      /*
-       * Permissions Table
-       */
-      $fields = [
-          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-          'name'        => ['type' => 'varchar', 'constraint' => 255],
-          'description' => ['type' => 'varchar', 'constraint' => 255],
-					'created_at'       => ['type' => 'datetime', 'null' => true],
-          'updated_at'       => ['type' => 'datetime', 'null' => true],
-          'deleted_at'       => ['type' => 'datetime', 'null' => true],
-      ];
-
-      $this->forge->addField($fields);
-      $this->forge->addKey('id', true);
-      $this->forge->createTable($this->tables['permissions'], true);
 
       /*
        * Groups/Permissions Table

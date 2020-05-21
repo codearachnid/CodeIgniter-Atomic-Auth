@@ -6,11 +6,6 @@
 
 class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 {
-	/**
-	 * Dumping data for table 'groups', 'users, 'users_groups'
-	 *
-	 * @return void
-	 */
 	public function run()
 	{
 		$config = config('AtomicAuth\\Config\\AtomicAuth');
@@ -19,12 +14,14 @@ class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 
 		$groups = [
 			[
-				'id'          => 1,
+				// 'id'					=> 1,
+				'guid'				=> 'e7cb8966-b553-4ee1-8bfe-cb2b873697ff',
 				'name'        => 'admin',
 				'description' => 'Administrator',
 			],
 			[
-				'id'          => 2,
+				// 'id'					=> 2,
+				'guid'				=> '1b351ef4-c395-455e-bd0c-455a7d80781b',
 				'name'        => 'members',
 				'description' => 'General User',
 			],
