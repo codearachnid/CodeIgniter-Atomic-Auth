@@ -894,9 +894,7 @@ class AtomicAuthModel
 				else
 				{
 					$this->triggerEvents('logout');
-
 					$identity = $this->config->identity;
-
 					$this->session->remove([$identity, 'id', 'user_id']);
 
 					return false;
@@ -904,7 +902,7 @@ class AtomicAuthModel
 			}
 		}
 
-		return (bool)session('activeUser');
+		return (bool) $activeUser;
 	}
 
 	/**
@@ -1806,7 +1804,8 @@ class AtomicAuthModel
 		$this->db->table($this->config->tables['track_login'])->insert([
 			$this->config->identity => $identity,
 			'user_id' => $id,
-			'status' => $status
+			'status' => $status,
+			'created_at' => date('Y-m-d H:i:s'),
 		]);
 		return $this->db->affectedRows() === 1;
 	}
