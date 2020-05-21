@@ -12,7 +12,6 @@
  * Requirements: PHP 7.2 or above
  *
  * @package    CodeIgniter-Atomic-Auth
- * @Author		 Timothy Wood <codearachnid@gmail.com>
  * @author     Ben Edmunds <ben.edmunds@gmail.com>
  * @author     Phil Sturgeon
  * @author     Benoit VRIGNAUD <benoit.vrignaud@tangue.fr>
@@ -55,12 +54,11 @@ class AtomicAuthModel
 	protected $session;
 
 	/**
-	 * AtomicAuth model
+	 * Holds an array of tables used
 	 *
-	 * @var \AtomicAuth\Models\*
+	 * @var array
 	 */
-	protected $userModel;
-	protected $groupModel;
+	public $tables = [];
 
 	/**
 	 * Activation code
@@ -89,6 +87,12 @@ class AtomicAuthModel
 	 */
 	public $activationCode;
 
+	/**
+	 * Identity column
+	 *
+	 * @var string
+	 */
+	public $identityColumn;
 
 	/**
 	 * Where
@@ -218,11 +222,21 @@ class AtomicAuthModel
 			$this->db = \Config\Database::connect($this->config->databaseGroupName);
 		}
 
+		// initialize db tables data
+		$this->tables = $this->config->tables;
+
+		// initialize data
+		$this->identityColumn = $this->config->identity;
+		$this->join           = $this->config->join;
+
+		// initialize hash method options (Bcrypt)
+		$this->hashMethod = $this->config->hashMethod;
+
+		// load the messages template from the config file
+		$this->messagesTemplates = $this->config->templates['messages'];
+
 		// initialize our hooks object
 		$this->authHooks = new \stdClass();
-
-		$this->userModel = model('AtomicAuth\Models\UserModel');
-		$this->groupModel = model('AtomicAuth\Models\GroupModel');
 
 		$this->triggerEvents('model_constructor');
 	}
@@ -290,6 +304,7 @@ class AtomicAuthModel
 		{
 			return false;
 		}
+
 		return password_verify($password, $hashPasswordDb);
 	}
 
@@ -383,7 +398,7 @@ class AtomicAuthModel
 			];
 
 			$this->triggerEvents('extra_where');
-			$this->db->table($this->config->tables['users'])->update($data, ['id' => $id]);
+			$this->db->table($this->tables['users'])->update($data, ['id' => $id]);
 
 			if ($this->db->affectedRows() === 1)
 			{
@@ -431,7 +446,7 @@ class AtomicAuthModel
 		];
 
 		$this->triggerEvents('extra_where');
-		$this->db->table($this->config->tables['users'])->update($data, ['id' => $id]);
+		$this->db->table($this->tables['users'])->update($data, ['id' => $id]);
 
 		$return = $this->db->affectedRows() === 1;
 		if ($return)
@@ -466,7 +481,7 @@ class AtomicAuthModel
 			'forgotten_password_time'     => null,
 		];
 
-		return $this->db->table($this->config->tables['users'])->update($data, [$this->config->identity => $identity]);
+		return $this->db->table($this->tables['users'])->update($data, [$this->identityColumn => $identity]);
 	}
 
 	/**
@@ -488,7 +503,7 @@ class AtomicAuthModel
 			'remember_code'     => null,
 		];
 
-		return $this->db->table($this->config->tables['users'])->update($data, [$this->config->identity => $identity]);
+		return $this->db->table($this->tables['users'])->update($data, [$this->identityColumn => $identity]);
 	}
 
 	/**
@@ -542,10 +557,10 @@ class AtomicAuthModel
 
 		$this->triggerEvents('extra_where');
 
-		$builder = $this->db->table($this->config->tables['users']);
+		$builder = $this->db->table($this->tables['users']);
 		$query   = $builder
 					   ->select('id, password')
-					   ->where($this->config->identity, $identity)
+					   ->where($this->identityColumn, $identity)
 					   ->limit(1)
 					   ->get()->getResult();
 
@@ -601,7 +616,7 @@ class AtomicAuthModel
 
 		return $this->db->where('username', $username)
 						->limit(1)
-						->count_all_results($this->config->tables['users']) > 0;
+						->count_all_results($this->tables['users']) > 0;
 	}
 
 	/**
@@ -623,7 +638,7 @@ class AtomicAuthModel
 
 		$this->triggerEvents('extra_where');
 
-		return $this->db->table($this->config->tables['users'])
+		return $this->db->table($this->tables['users'])
 						->where('email', $email)
 						->limit(1)
 						->countAllResults() > 0;
@@ -646,8 +661,8 @@ class AtomicAuthModel
 			return false;
 		}
 
-		$builder = $this->db->table($this->config->tables['users']);
-		return $builder->where($this->config->identity, $identity)
+		$builder = $this->db->table($this->tables['users']);
+		return $builder->where($this->identityColumn, $identity)
 					   ->limit(1)
 					   ->countAllResults() > 0;
 	}
@@ -666,9 +681,9 @@ class AtomicAuthModel
 			return false;
 		}
 
-		$builder = $this->db->table($this->config->tables['users']);
+		$builder = $this->db->table($this->tables['users']);
 		$query = $builder->select('id')
-						 ->where($this->config->identity, $identity)
+						 ->where($this->identityColumn, $identity)
 						 ->limit(1)
 						 ->get();
 
@@ -710,7 +725,7 @@ class AtomicAuthModel
 		];
 
 		$this->triggerEvents('extra_where');
-		$this->db->table($this->config->tables['users'])->update($update, [$this->config->identity => $identity]);
+		$this->db->table($this->tables['users'])->update($update, [$this->identityColumn => $identity]);
 
 		if ($this->db->affectedRows() === 1)
 		{
@@ -754,6 +769,94 @@ class AtomicAuthModel
 	}
 
 	/**
+	 * Register (create) a new user
+	 *
+	 * @param string $identity       This must be the value that uniquely identifies the user when he is registered
+	 * @param string $password       Password
+	 * @param string $email          Email
+	 * @param array  $additionalData Multidimensional array
+	 * @param array  $groups         If not passed the default group name set in the config will be used
+	 *
+	 * @return integer|boolean
+	 * @author Mathew
+	 */
+	public function register(string $identity, string $password, string $email, array $additionalData=[], array $groups=[])
+	{
+		$this->triggerEvents('auth_pre_register_user');
+
+		$manualActivation = $this->config->manualActivation;
+
+		if ($this->identityCheck($identity))
+		{
+			$this->setError('AtomicAuth.account_creation_duplicate_identity');
+			return false;
+		}
+		else if (! $this->config->defaultGroup && empty($groups))
+		{
+			$this->setError('AtomicAuth.account_creation_missing_defaultGroup');
+			return false;
+		}
+
+		// check if the default set in config exists in database
+		$query = $this->db->table($this->tables['groups'])->where(['name' => $this->config->defaultGroup], 1)->get()->getRow();
+		if (! isset($query->id) && empty($groups))
+		{
+			$this->setError('AtomicAuth.account_creation_invalid_defaultGroup');
+			return false;
+		}
+
+		// capture default group details
+		$defaultGroup = $query;
+
+		// Do not pass $identity as user is not known yet so there is no need
+		$password = $this->hashPassword($password);
+
+		if ($password === false)
+		{
+			$this->setError('AtomicAuth.account_creation_unsuccessful');
+			return false;
+		}
+
+		// Users table.
+		$data = [
+			$this->identityColumn => $identity,
+			'password_hash'       => $password,
+			'email'               => $email,
+			'created_at'          => time(),
+			'active'              => ($manualActivation === false ? 1 : 0),
+		];
+
+		// filter out any data passed that doesnt have a matching column in the users table
+		// and merge the set user data and the additional data
+		$userData = array_merge($this->filterData($this->tables['users'], $additionalData), $data);
+
+		$this->triggerEvents('extra_set');
+
+		$this->db->table($this->tables['users'])->insert($userData);
+
+		$id = $this->db->insertId($this->tables['users'] . '_id_seq');
+
+		// add in groups array if it doesn't exists and stop adding into default group if default group ids are set
+		if (isset($defaultGroup->id) && empty($groups))
+		{
+			$groups[] = $defaultGroup->id;
+		}
+
+		if (! empty($groups))
+		{
+			// add to groups
+			foreach ($groups as $group)
+			{
+				$this->addToGroup($group, $id);
+			}
+		}
+
+		$this->triggerEvents('auth_post_register_user');
+
+		return $id ?? false;
+	}
+
+	/**
 	 * Logs the user into the system
 	 *
 	 * @param string  $identity Username, email or any unique value in your users table, depending on your configuration
@@ -770,94 +873,82 @@ class AtomicAuthModel
 		if (empty($identity) || empty($password))
 		{
 			$this->setError('AtomicAuth.login_unsuccessful');
-			$this->setSession(null);
 			return false;
 		}
 
 		$this->triggerEvents('extra_where');
-		$user = $this->db->table($this->config->tables['users'])
-						  ->select([
-								$this->config->identity,
-								'email',
-								'id',
-								'password_hash',
-								// 'status',
-						  ])->where([
-								$this->config->identity => $identity,
-								'status' => 1, // TODO should get any user other than active?
-								'force_pass_reset' => 0, // TODO should user be able to login without a password reset?
-							])->limit(1)
+		$query = $this->db->table($this->tables['users'])
+						  ->select($this->identityColumn . ', email, id, password_hash, active, last_login')
+						  ->where($this->identityColumn, $identity)
+						  ->limit(1)
 						  ->orderBy('id', 'desc')
-							->get()
-							->getRow();
+						  ->get();
 
-		// if ($this->isMaxLoginAttemptsExceeded($identity))
-		// {
+		if ($this->isMaxLoginAttemptsExceeded($identity))
+		{
 			// Hash something anyway, just to take up time
-			// $this->hashPassword($password);
-		//
-		// 	$this->triggerEvents('post_login_unsuccessful');
-		// 	$this->setError('AtomicAuth.login_timeout');
-		//
-		// 	return false;
-		// }
+			$this->hashPassword($password);
 
-
-		if(empty($user)){
 			$this->triggerEvents('post_login_unsuccessful');
-			$this->setError('AtomicAuth.login_unsuccessful_not_exists');
-			$this->setSession(null);
-			$this->setLoginAttempt($identity);
+			$this->setError('AtomicAuth.login_timeout');
+
 			return false;
 		}
 
-		if ($this->verifyPassword($password, $user->password_hash, $identity))
+		$user = $query->getRow();
+
+		if (isset($user))
 		{
-				// TODO should user know they aren't active?
-				// if ($user->status != 1)
-				// {
-				// 	$this->triggerEvents('post_login_unsuccessful');
-				// 	$this->setError('AtomicAuth.login_unsuccessful_not_active');
-				//
-				// 	return false;
-				// }
+			if ($this->verifyPassword($password, $user->password, $identity))
+			{
+				if ($user->active == 0)
+				{
+					$this->triggerEvents('post_login_unsuccessful');
+					$this->setError('AtomicAuth.login_unsuccessful_not_active');
+
+					return false;
+				}
 
 				$this->setSession($user);
-				$this->setLoginAttempt($user->email, $user->id, 1);
 
-				// $this->clearLoginAttempts($user->email);
-				// $this->clearForgottenPasswordCode($user->email);
+				$this->updateLastLogin($user->id);
 
-				// if ($this->config->rememberUsers)
-				// {
-				// 	if ($remember)
-				// 	{
-				// 		$this->rememberUser($identity);
-				// 	}
-				// 	else
-				// 	{
-				// 		$this->clearRememberCode($identity);
-				// 	}
-				// }
+				$this->clearLoginAttempts($identity);
+				$this->clearForgottenPasswordCode($identity);
+
+				if ($this->config->rememberUsers)
+				{
+					if ($remember)
+					{
+						$this->rememberUser($identity);
+					}
+					else
+					{
+						$this->clearRememberCode($identity);
+					}
+				}
 
 				// Rehash if needed
-				// $this->rehashPasswordIfNeeded($user->password, $identity, $password);
+				$this->rehashPasswordIfNeeded($user->password, $identity, $password);
+
+				// Regenerate the session (for security purpose: to avoid session fixation)
+				$this->session->regenerate(false);
 
 				$this->triggerEvents(['post_login', 'post_login_successful']);
 				$this->setMessage('AtomicAuth.login_successful');
 
 				return true;
+			}
 		}
 
 		// Hash something anyway, just to take up time
-		// $this->hashPassword($password);
+		$this->hashPassword($password);
 
-		// $this->increaseLoginAttempts($identity);
+		$this->increaseLoginAttempts($identity);
 
 		$this->triggerEvents('post_login_unsuccessful');
 		$this->setError('AtomicAuth.login_unsuccessful');
-		$this->setLoginAttempt($identity);
-		$this->setSession(null);
+
 		return false;
 	}
 
@@ -869,24 +960,21 @@ class AtomicAuthModel
 	 */
 	public function recheckSession(): bool
 	{
-		$sessionExpiration = (null !== $this->config->sessionExpiration) ? $this->config->sessionExpiration : 0;
-		$activeUser = $this->session->get('activeUser');
+		$recheck = (null !== $this->config->recheckTimer) ? $this->config->recheckTimer : 0;
 
-		if ($sessionExpiration !== 0)
+		if ($recheck !== 0)
 		{
-
-			dd($userSession);
 			$lastLogin = $this->session->get('last_check');
 			if ($lastLogin + $recheck < time())
 			{
 				$query = $this->db->select('id')
 								  ->where([
-									  $this->config->identity => $this->session->get('identity'),
-									  'status'              => '1',
+									  $this->identityColumn => $this->session->get('identity'),
+									  'active'              => '1',
 								  ])
 								  ->limit(1)
 								  ->orderBy('id', 'desc')
-								  ->get($this->config->tables['users']);
+								  ->get($this->tables['users']);
 				if ($query->numRows() === 1)
 				{
 					$this->session->set('last_check', time());
@@ -904,7 +992,7 @@ class AtomicAuthModel
 			}
 		}
 
-		return (bool)session('activeUser');
+		return (bool)session('identity');
 	}
 
 	/**
@@ -949,7 +1037,7 @@ class AtomicAuthModel
 	{
 		if ($this->config->trackLoginAttempts)
 		{
-			$builder = $this->db->table($this->config->tables['login_attempts']);
+			$builder = $this->db->table($this->tables['login_attempts']);
 			$builder->where('login', $identity);
 			if ($this->config->trackLoginIpAddress)
 			{
@@ -980,7 +1068,7 @@ class AtomicAuthModel
 	{
 		if ($this->config->trackLoginAttempts)
 		{
-			$builder = $this->db->table($this->config->tables['login_attempts']);
+			$builder = $this->db->table($this->tables['login_attempts']);
 			$builder->select('time');
 			$builder->where('login', $identity);
 			if ($this->config->trackLoginIpAddress)
@@ -1017,7 +1105,7 @@ class AtomicAuthModel
 			$this->db->select('ip_address');
 			$this->db->where('login', $identity);
 			$this->db->orderBy('id', 'desc');
-			$qres = $this->db->get($this->config->tables['login_attempts'], 1);
+			$qres = $this->db->get($this->tables['login_attempts'], 1);
 
 			if ($qres->numRows() > 0)
 			{
@@ -1046,7 +1134,7 @@ class AtomicAuthModel
 			{
 				$data['ip_address'] = \Config\Services::request()->getIPAddress();
 			}
-			$builder = $this->db->table($this->config->tables['login_attempts']);
+			$builder = $this->db->table($this->tables['login_attempts']);
 			$builder->insert($data);
 			return true;
 		}
@@ -1075,7 +1163,7 @@ class AtomicAuthModel
 			// Make sure $oldAttemptsAxpirePeriod is at least equals to lockoutTime
 			$oldAttemptsAxpirePeriod = max($oldAttemptsAxpirePeriod, $this->config->lockoutTime);
 
-			$builder = $this->db->table($this->config->tables['login_attempts']);
+			$builder = $this->db->table($this->tables['login_attempts']);
 			$builder->where('login', $identity);
 			if ($this->config->trackLoginIpAddress)
 			{
@@ -1284,7 +1372,7 @@ class AtomicAuthModel
 	{
 		$this->triggerEvents('users');
 
-		$builder = $this->db->table($this->config->tables['users']);
+		$builder = $this->db->table($this->tables['users']);
 
 		if (! empty($this->ionSelect))
 		{
@@ -1299,9 +1387,9 @@ class AtomicAuthModel
 		{
 			// default selects
 			$builder->select([
-				$this->config->tables['users'] . '.*',
-				$this->config->tables['users'] . '.id as id',
-				$this->config->tables['users'] . '.id as user_id',
+				$this->tables['users'] . '.*',
+				$this->tables['users'] . '.id as id',
+				$this->tables['users'] . '.id as user_id',
 			]);
 		}
 
@@ -1319,8 +1407,8 @@ class AtomicAuthModel
 			{
 				$builder->distinct();
 				$builder->join(
-					$this->config->tables['users_groups'],
-					$this->config->tables['users_groups'] . '.' . $this->config->join['users'] . '=' . $this->config->tables['users'] . '.id',
+					$this->tables['users_groups'],
+					$this->tables['users_groups'] . '.' . $this->join['users'] . '=' . $this->tables['users'] . '.id',
 					'inner'
 				);
 			}
@@ -1343,12 +1431,12 @@ class AtomicAuthModel
 			// if group name was used we do one more join with groups
 			if (! empty($groupNames))
 			{
-				$builder->join($this->config->tables['groups'], $this->config->tables['users_groups'] . '.' . $this->config->join['groups'] . ' = ' . $this->config->tables['groups'] . '.id', 'inner');
-				$builder->whereIn($this->config->tables['groups'] . '.name', $groupNames);
+				$builder->join($this->tables['groups'], $this->tables['users_groups'] . '.' . $this->join['groups'] . ' = ' . $this->tables['groups'] . '.id', 'inner');
+				$builder->whereIn($this->tables['groups'] . '.name', $groupNames);
 			}
 			if (! empty($groupIds))
 			{
-				$builder->{$orWhereIn}($this->config->tables['users_groups'] . '.' . $this->config->join['groups'], $groupIds);
+				$builder->{$orWhereIn}($this->tables['users_groups'] . '.' . $this->join['groups'], $groupIds);
 			}
 		}
 
@@ -1419,8 +1507,8 @@ class AtomicAuthModel
 		$id = $id ?: $this->session->get('user_id');
 
 		$this->limit(1);
-		$this->orderBy($this->config->tables['users'] . '.id', 'desc');
-		$this->where($this->config->tables['users'] . '.id', $id);
+		$this->orderBy($this->tables['users'] . '.id', 'desc');
+		$this->where($this->tables['users'] . '.id', $id);
 
 		$this->users();
 
@@ -1442,10 +1530,10 @@ class AtomicAuthModel
 		// if no id was passed use the current users id
 		$id || $id = $this->session->get('user_id');
 
-		$builder = $this->db->table($this->config->tables['users_groups']);
-		return $builder->select($this->config->tables['users_groups'] . '.' . $this->config->join['groups'] . ' as id, ' . $this->config->tables['groups'] . '.name, ' . $this->config->tables['groups'] . '.description')
-					   ->where($this->config->tables['users_groups'] . '.' . $this->config->join['users'], $id)
-					   ->join($this->config->tables['groups'], $this->config->tables['users_groups'] . '.' . $this->config->join['groups'] . '=' . $this->config->tables['groups'] . '.id')
+		$builder = $this->db->table($this->tables['users_groups']);
+		return $builder->select($this->tables['users_groups'] . '.' . $this->join['groups'] . ' as id, ' . $this->tables['groups'] . '.name, ' . $this->tables['groups'] . '.description')
+					   ->where($this->tables['users_groups'] . '.' . $this->join['users'], $id)
+					   ->join($this->tables['groups'], $this->tables['users_groups'] . '.' . $this->join['groups'] . '=' . $this->tables['groups'] . '.id')
 					   ->get();
 	}
 
@@ -1518,12 +1606,11 @@ class AtomicAuthModel
 	 * @return integer The number of groups added
 	 * @author Ben Edmunds
 	 */
-	public function addUserToGroup($groupIds, int $userId=0): int
+	public function addToGroup($groupIds, int $userId=0): int
 	{
-		$this->triggerEvents('add_user_to_group');
+		$this->triggerEvents('add_to_group');
 
 		// if no id was passed use the current users id
-		// TODO need security check to ensure user can add themselves to a group
 		$userId || $userId = $this->session->get('user_id');
 
 		if (! is_array($groupIds))
@@ -1531,33 +1618,34 @@ class AtomicAuthModel
 			$groupIds = [$groupIds];
 		}
 
-		$groupsUsers = [];
+		$return = 0;
 
-		foreach ($groupIds as $group)
+		// Then insert each into the database
+		foreach ($groupIds as $groupId)
 		{
-			if( is_object( $group ) && ! is_null( $group->id ) ) {
-				// $group is an Group Entity
-				$groupId = $group->id;
-			} else if ( is_int($group) || is_float($group)){
-				// $group is just a group id
-				$groupId = $group;
-			} else {
-				// could not determine the type of data for $group silent ignore
-				continue;
-			}
-
 			// Cast to float to support bigint data type
-			$groupsUsers[] = [
-				$this->config->join['groups'] => (float)$groupId, // assumed Group exists
-				$this->config->join['users']  => (float)$userId, // assumed User exists
-			];
+			if ($this->db->table($this->tables['groups_users'])->insert([
+																	$this->join['groups'] => (float)$groupId,
+																	$this->join['users']  => (float)$userId  ]))
+			{
+				if (isset($this->cacheGroups[$groupId]))
+				{
+					$groupName = $this->cacheGroups[$groupId];
+				}
+				else
+				{
+					$group                       = $this->group($groupId)->result();
+					$groupName                   = $group[0]->name;
+					$this->cacheGroups[$groupId] = $groupName;
+				}
+				$this->cacheUserInGroup[$userId][$groupId] = $groupName;
 
-			// TODO should this be cached?
+				// Return the number of groups added
+				$return++;
+			}
 		}
 
-		$this->db->table($this->config->tables['groups_users'])->insertBatch($groupsUsers);
-
-		return count($groupsUsers);
+		return $return;
 	}
 
 	/**
@@ -1579,7 +1667,7 @@ class AtomicAuthModel
 			return false;
 		}
 
-		$builder = $this->db->table($this->config->tables['users_groups']);
+		$builder = $this->db->table($this->tables['users_groups']);
 
 		// if group id(s) are passed remove user from the group(s)
 		if (! empty($groupIds))
@@ -1591,7 +1679,7 @@ class AtomicAuthModel
 
 			foreach ($groupIds as $groupId)
 			{
-				$builder->delete([$this->config->join['groups'] => (int)$groupId, $this->config->join['users'] => $userId]);
+				$builder->delete([$this->join['groups'] => (int)$groupId, $this->join['users'] => $userId]);
 				if (isset($this->cacheUserInGroup[$userId]) && isset($this->cacheUserInGroup[$userId][$groupId]))
 				{
 					unset($this->cacheUserInGroup[$userId][$groupId]);
@@ -1603,7 +1691,7 @@ class AtomicAuthModel
 		// otherwise remove user from all groups
 		else
 		{
-			if ($return = $builder->delete([$this->config->join['users'] => $userId]))
+			if ($return = $builder->delete([$this->join['users'] => $userId]))
 			{
 				$this->cacheUserInGroup[$userId] = [];
 				$return = true;
@@ -1622,7 +1710,7 @@ class AtomicAuthModel
 	{
 		$this->triggerEvents('groups');
 
-		$builder = $this->db->table($this->config->tables['groups']);
+		$builder = $this->db->table($this->tables['groups']);
 
 		// run each where that was passed
 		if (isset($this->atomicWhere) && ! empty($this->atomicWhere))
@@ -1673,7 +1761,7 @@ class AtomicAuthModel
 
 		if ($id)
 		{
-			$this->where($this->config->tables['groups'] . '.id', $id);
+			$this->where($this->tables['groups'] . '.id', $id);
 		}
 
 		$this->limit(1);
@@ -1699,7 +1787,7 @@ class AtomicAuthModel
 
 		$this->db->transBegin();
 
-		if (array_key_exists($this->config->identity, $data) && $this->identityCheck($data[$this->config->identity]) && $user->{$this->config->identity} !== $data[$this->config->identity])
+		if (array_key_exists($this->identityColumn, $data) && $this->identityCheck($data[$this->identityColumn]) && $user->{$this->identityColumn} !== $data[$this->identityColumn])
 		{
 			$this->db->transRollback();
 			$this->setError('AtomicAuth.account_creation_duplicate_identity');
@@ -1711,15 +1799,15 @@ class AtomicAuthModel
 		}
 
 		// Filter the data passed
-		$data = $this->filterData($this->config->tables['users'], $data);
+		$data = $this->filterData($this->tables['users'], $data);
 
-		if (array_key_exists($this->config->identity, $data) || array_key_exists('password', $data) || array_key_exists('email', $data))
+		if (array_key_exists($this->identityColumn, $data) || array_key_exists('password', $data) || array_key_exists('email', $data))
 		{
 			if (array_key_exists('password', $data))
 			{
 				if (! empty($data['password']))
 				{
-					$data['password'] = $this->hashPassword($data['password'], $user->{$this->config->identity});
+					$data['password'] = $this->hashPassword($data['password'], $user->{$this->identityColumn});
 					if ($data['password'] === false)
 					{
 						$this->db->transRollback();
@@ -1738,7 +1826,7 @@ class AtomicAuthModel
 		}
 
 		$this->triggerEvents('extra_where');
-		$this->db->table($this->config->tables['users'])->update($data, ['id' => $user->id]);
+		$this->db->table($this->tables['users'])->update($data, ['id' => $user->id]);
 
 		if ($this->db->transStatus() === false)
 		{
@@ -1774,7 +1862,7 @@ class AtomicAuthModel
 		$this->removeFromGroup(null, $id);
 
 		// delete user from users table should be placed after remove from group
-		$this->db->table($this->config->tables['users'])->delete(['id' => $id]);
+		$this->db->table($this->tables['users'])->delete(['id' => $id]);
 
 		if ($this->db->transStatus() === false)
 		{
@@ -1799,15 +1887,14 @@ class AtomicAuthModel
 	 * @return boolean
 	 * @author Ben Edmunds
 	 */
-	public function setLoginAttempt(string $identity, int $id = null, int $status = 0): bool
+	public function updateLastLogin(int $id): bool
 	{
 		$this->triggerEvents('update_last_login');
+
 		$this->triggerEvents('extra_where');
-		$this->db->table($this->config->tables['track_login'])->insert([
-			$this->config->identity => $identity,
-			'user_id' => $id,
-			'status' => $status
-		]);
+
+		$this->db->table($this->tables['users'])->update(['last_login' => time()], ['id' => $id]);
+
 		return $this->db->affectedRows() === 1;
 	}
 
@@ -1851,26 +1938,23 @@ class AtomicAuthModel
 	 * @return boolean
 	 * @author jrmadsen67
 	 */
-	public function setSession(\stdClass $user = null): bool
+	public function setSession(\stdClass $user): bool
 	{
 		$this->triggerEvents('pre_set_session');
-		if( $user && ! is_null( $user->id ) ){
-			$sessionData['activeUser'] = [
-				$this->config->identity => $user->{$this->config->identity},
-				'email'               => $user->email,
-				'user_id'             => $user->id, //everyone likes to overwrite id so we'll use user_id
-				// 'last_login'      		=> $user->last_login,
-				'last_check'          => time(),
-			];
-			$this->session->set($sessionData);
-		} else {
-			$this->session->remove('activeUser');
-		}
 
-		// Regenerate the session (for security purpose: to avoid session fixation)
-		$this->session->regenerate(false);
+		$sessionData = [
+			'identity'            => $user->{$this->identityColumn},
+			$this->identityColumn => $user->{$this->identityColumn},
+			'email'               => $user->email,
+			'user_id'             => $user->id, //everyone likes to overwrite id so we'll use user_id
+			'old_last_login'      => $user->last_login,
+			'last_check'          => time(),
+		];
+
+		$this->session->set($sessionData);
 
 		$this->triggerEvents('post_set_session');
+
 		return true;
 	}
 
@@ -1899,9 +1983,9 @@ class AtomicAuthModel
 
 		if ($token->validatorHashed)
 		{
-			$this->db->table($this->config->tables['users'])->update(['remember_selector' => $token->selector,
+			$this->db->table($this->tables['users'])->update(['remember_selector' => $token->selector,
 								  			   'remember_code' => $token->validatorHashed],
-											   [$this->config->identity => $identity]);
+											   [$this->identityColumn => $identity]);
 
 			if ($this->db->affectedRows() > -1)
 			{
@@ -1955,8 +2039,8 @@ class AtomicAuthModel
 
 		// get the user with the selector
 		$this->triggerEvents('extra_where');
-		$query = $this->db->table($this->config->tables['users'])
-						  ->select($this->config->identity . ', id, email, remember_code, last_login')
+		$query = $this->db->table($this->tables['users'])
+						  ->select($this->identityColumn . ', id, email, remember_code, last_login')
 						  ->where('remember_selector', $token->selector)
 						  ->where('active', 1)
 						  ->limit(1)
@@ -1969,10 +2053,10 @@ class AtomicAuthModel
 			$user = $query->row();
 
 			// Check the code against the validator
-			$identity = $user->{$this->config->identity};
+			$identity = $user->{$this->identityColumn};
 			if ($this->verifyPassword($token->validator, $user->remember_code, $identity))
 			{
-				$this->trackLoginAttempts($user->id);
+				$this->updateLastLogin($user->id);
 
 				$this->setSession($user);
 
@@ -2017,7 +2101,7 @@ class AtomicAuthModel
 		}
 
 		// bail if the group name already exists
-		$existingGroup = $this->db->table($this->config->tables['groups'])->where(['name' => $groupName])->countAllResults();
+		$existingGroup = $this->db->table($this->tables['groups'])->where(['name' => $groupName])->countAllResults();
 		if ($existingGroup !== 0)
 		{
 			$this->setError('AtomicAuth.group_already_exists');
@@ -2033,14 +2117,14 @@ class AtomicAuthModel
 		// and merge the set group data and the additional data
 		if (! empty($additionalData))
 		{
-			$data = array_merge($this->filterData($this->config->tables['groups'], $additionalData), $data);
+			$data = array_merge($this->filterData($this->tables['groups'], $additionalData), $data);
 		}
 
 		$this->triggerEvents('extra_group_set');
 
 		// insert the new group
-		$this->db->table($this->config->tables['groups'])->insert($data);
-		$groupId = $this->db->insertId($this->config->tables['groups'] . '_id_seq');
+		$this->db->table($this->tables['groups'])->insert($data);
+		$groupId = $this->db->insertId($this->tables['groups'] . '_id_seq');
 
 		// report success
 		$this->setMessage('AtomicAuth.group_creation_successful');
@@ -2072,7 +2156,7 @@ class AtomicAuthModel
 			// we are changing the name, so do some checks
 
 			// bail if the group name already exists
-			$existingGroup = $this->db->table($this->config->tables['groups'])->getWhere(['name' => $groupName])->getRow();
+			$existingGroup = $this->db->table($this->tables['groups'])->getWhere(['name' => $groupName])->getRow();
 			if (isset($existingGroup->id) && (int)$existingGroup->id !== $groupId)
 			{
 				$this->setError('AtomicAuth.group_already_exists');
@@ -2083,7 +2167,7 @@ class AtomicAuthModel
 		}
 
 		// restrict change of name of the admin group
-		$group = $this->db->table($this->config->tables['groups'])->getWhere(['id' => $groupId])->getRow();
+		$group = $this->db->table($this->tables['groups'])->getWhere(['id' => $groupId])->getRow();
 		if ($this->config->adminGroup === $group->name && $groupName !== $group->name)
 		{
 			$this->setError('AtomicAuth.groupName_admin_not_alter');
@@ -2094,10 +2178,10 @@ class AtomicAuthModel
 		// and merge the set group data and the additional data
 		if (! empty($additionalData))
 		{
-			$data = array_merge($this->filterData($this->config->tables['groups'], $additionalData), $data);
+			$data = array_merge($this->filterData($this->tables['groups'], $additionalData), $data);
 		}
 
-		$this->db->table($this->config->tables['groups'])->update($data, ['id' => $groupId]);
+		$this->db->table($this->tables['groups'])->update($data, ['id' => $groupId]);
 
 		$this->setMessage('AtomicAuth.group_update_successful');
 
@@ -2132,9 +2216,9 @@ class AtomicAuthModel
 		$this->db->transBegin();
 
 		// remove all users from this group
-		$this->db->table($this->config->tables['users_groups'])->delete([$this->config->join['groups'] => $groupId]);
+		$this->db->table($this->tables['users_groups'])->delete([$this->join['groups'] => $groupId]);
 		// remove the group itself
-		$this->db->table($this->config->tables['groups'])->delete(['id' => $groupId]);
+		$this->db->table($this->tables['groups'])->delete(['id' => $groupId]);
 
 		if ($this->db->transStatus() === false)
 		{
@@ -2149,28 +2233,6 @@ class AtomicAuthModel
 		$this->triggerEvents(['post_delete_group', 'post_delete_group_successful']);
 		$this->setMessage('group_delete_successful');
 		return true;
-	}
-
-	/**
-	 * expose the Auth Group Model
-	 *
-	 * @return string
-	 * @author Timothy Wood
-	 */
-	public function groupModel() //: class
-	{
-		return $this->groupModel;
-	}
-
-	/**
-	 * expose the Auth User Model
-	 *
-	 * @return string
-	 * @author Timothy Wood
-	 */
-	public function userModel() //: class
-	{
-		return $this->userModel;
 	}
 
 	/**
@@ -2285,12 +2347,12 @@ class AtomicAuthModel
 	{
 		if (! empty($single))
 		{
-			$this->config->templates['messages']['single'] = $single;
+			$this->messagesTemplates['single'] = $single;
 		}
 
 		if (! empty($list))
 		{
-			$this->config->templates['messages']['list'] = $list;
+			$this->messagesTemplates['list'] = $list;
 		}
 
 		return true;
@@ -2329,7 +2391,7 @@ class AtomicAuthModel
 		{
 			$messageLang[] = lang($message) !== $message ? lang($message) : '##' . $message . '##';
 		}
-		return view($this->config->templates['messages']['list'], ['messages' => $messageLang]);
+		return view($this->messagesTemplates['list'], ['messages' => $messageLang]);
 	}
 
 	/**
@@ -2348,7 +2410,7 @@ class AtomicAuthModel
 			foreach ($this->messages as $message)
 			{
 				$messageLang = lang($message) !== $message ? lang($message) : '##' . $message . '##';
-				$output[]    = view($this->config->templates['messages']['single'], ['message' => $messageLang]);
+				$output[]    = view($this->messagesTemplates['single'], ['message' => $messageLang]);
 			}
 			return $output;
 		}
@@ -2475,58 +2537,6 @@ class AtomicAuthModel
 		return true;
 	}
 
-
-
-		  /**
-			 * Identity Exists : Check to see if the identity is already registered
-			 *
-			 * @param string $identity Identity
-			 *
-			 * @return boolean
-			 * @author Mathew
-			 */
-			public function identityExists(string $identity=''): bool
-			{
-				$this->triggerEvents('identity_exists');
-
-				if (empty($identity))
-				{
-					return false;
-				}
-				// check against identity
-				return $this->userModel->where($this->config->identity, $identity)->limit(1)->countAllResults() > 0;
-			}
-
-
-			public function groupExists( string $group = null, string $lookupColumn = 'guid'): bool
-			{
-				$this->triggerEvents('group_exists');
-
-				if (empty($group))
-				{
-					return false;
-				}
-// dd($this->groupModel->where('name', $group)->limit(1)->first());
-				// TRUE: we expect that the size of found group to be greater than 0
-				return ($this->groupModel->where($lookupColumn, $group)->limit(1)->findAll() > 0);
-			}
-
-			public function groupsExist(array $groups = []): bool
-			{
-				$this->triggerEvents('groups_exists');
-
-				if (empty($groups))
-				{
-					return false;
-				} else if( ! is_array( $groups ) )
-				{
-					$groups = [ $groups ];
-				}
-
-				// TRUE: we expect that the size of provided $groups should be the same as those found
-				return ($this->groupModel->whereIn('name', $groups)->countAllResults() == count( $groups ));
-			}
-
 	/**
 	 * Internal function to set a password in the database
 	 *
@@ -2554,7 +2564,7 @@ class AtomicAuthModel
 
 		$this->triggerEvents('extra_where');
 
-		$this->db->table($this->config->tables['users'])->update($data, [$this->config->identity => $identity]);
+		$this->db->table($this->tables['users'])->update($data, [$this->identityColumn => $identity]);
 
 		return $this->db->affectedRows() === 1;
 	}
@@ -2632,7 +2642,7 @@ class AtomicAuthModel
 		}
 
 		$params = false;
-		switch ($this->config->hashMethod)
+		switch ($this->hashMethod)
 		{
 			case 'bcrypt':
 				$params = [
@@ -2661,7 +2671,7 @@ class AtomicAuthModel
 	protected function getHashAlgo()
 	{
 		$algo = false;
-		switch ($this->config->hashMethod)
+		switch ($this->hashMethod)
 		{
 			case 'bcrypt':
 				$algo = PASSWORD_BCRYPT;

@@ -172,8 +172,8 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $adminEmail               = 'admin@example.com'; // Admin Email, admin@example.com
 	public $forceAuthorizedUserCreate = false;
 	public $redirectOnSuccess				 = false;
-	public $defaultGroup             = 'members';           // Default group, use name
-	public $adminGroup               = 'admin';             // Default administrators group, use name
+	public $defaultGroup             = '1b351ef4-c395-455e-bd0c-455a7d80781b';           // Default group, use guid
+	public $adminGroup               = 'e7cb8966-b553-4ee1-8bfe-cb2b873697ff';             // Default administrators group, use guid
 	public $minPasswordLength        = 8;                   // Minimum Required Length of Password (not enforced by lib - see note above)
 	public $emailActivation          = false;               // Email Activation for registration
 	public $manualActivation         = false;               // Manual Activation for registration
@@ -188,7 +188,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $forgotPasswordExpiration = 1800;                /* The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
 																	30 minutes to 1 hour are good values (enough for a user to receive the email and reset its password)
 																	You should not set a value too high, as it would be a security issue! */
-	public $recheckTimer             = 0;                   /* The number of seconds after which the session is checked again against database to see if the user still exists and is active.
+	public $sessionExpiration        = 0;                   /* The number of seconds after which the session is checked again against database to see if the user still exists and is active.
 																	Leave 0 if you don't want session recheck. if you really think you need to recheck the session against database, we would
 																	recommend a higher value, as this would affect performance */
 

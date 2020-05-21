@@ -124,6 +124,7 @@ class Auth extends \CodeIgniter\Controller
 	public function login()
 	{
 		$this->data['title'] = lang('Auth.login_heading');
+		$this->data['message'] = $this->session->getFlashdata('message');
 
 		// validate form input
 		$this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
@@ -150,28 +151,31 @@ class Auth extends \CodeIgniter\Controller
 				// use redirects instead of loading views for compatibility with MY_Controller libraries
 				return redirect()->back()->withInput();
 			}
+
 		}
 		else
 		{
 			// the user is not logging in so display the login page
 			// set the flash data error message if there is one
-			$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-
-			$this->data['identity'] = [
-				'name'  => 'identity',
-				'id'    => 'identity',
-				'type'  => 'text',
-				'value' => set_value('identity'),
-			];
-
-			$this->data['password'] = [
-				'name' => 'password',
-				'id'   => 'password',
-				'type' => 'password',
-			];
-
-			return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'login', $this->data);
+			$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->data['message'];
 		}
+
+		$this->data['identity'] = [
+			'name'  => 'identity',
+			'id'    => 'identity',
+			'type'  => 'text',
+			'value' => set_value('identity'),
+		];
+
+		$this->data['password'] = [
+			'name' => 'password',
+			'id'   => 'password',
+			'type' => 'password',
+		];
+
+		// render response vs redirect
+		return view('AtomicAuth\Views\Auth\login', $this->data);
+
 	}
 
 	/**
@@ -907,28 +911,4 @@ class Auth extends \CodeIgniter\Controller
 		return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'edit_group', $this->data);
 	}
 
-	/**
-	 * Render the specified view
-	 *
-	 * @param string     $view       The name of the file to load
-	 * @param array|null $data       An array of key/value pairs to make available within the view.
-	 * @param boolean    $returnHtml If true return html string
-	 *
-	 * @return string|void
-	 */
-	protected function renderPage(string $view, $data = null, bool $returnHtml = true): string
-	{
-		$viewdata = $data ?: $this->data;
-
-		$viewHtml = view($view, $viewdata);
-
-		if ($returnHtml)
-		{
-			return $viewHtml;
-		}
-		else
-		{
-			echo $viewHtml;
-		}
-	}
 }

@@ -48,6 +48,13 @@ class AtomicAuth
 	protected $email;
 
 	/**
+	 * Max cookie lifetime constant
+	 */
+	const MAX_COOKIE_LIFETIME = 63072000; // 2 years = 60*60*24*365*2 = 63072000 seconds;
+
+
+
+	/**
 	 * __construct
 	 *
 	 * @author Ben
@@ -58,6 +65,7 @@ class AtomicAuth
 		$this->checkCompatibility();
 
 		$this->config = config('AtomicAuth');
+		// $config = config('AtomicAuth\\Config\\AtomicAuth');
 
 		$this->email = \Config\Services::email();
 		helper('cookie');
@@ -87,6 +95,7 @@ class AtomicAuth
 	 * @return mixed
 	 * @throws Exception When $method is undefined.
 	 */
+			// TODO update this to reflect new models
 	public function __call(string $method, array $arguments)
 	{
 		if (! method_exists( $this->atomicAuthModel, $method))
@@ -208,88 +217,69 @@ class AtomicAuth
 	 *                               if the operation failed.
 	 * @author Mathew
 	 */
-	public function register(string $identity, string $password, string $email, array $additionalData = [], array $groupIds = [])
+	public function register(string $identity, string $password, string $email, array $userMeta = [], array $groups = [])
 	{
-		$this->atomicAuthModel->triggerEvents('pre_account_creation');
+		// $this->atomicAuthModel->triggerEvents('pre_account_creation');
 
-		$emailActivation = $this->config->emailActivation;
-
-		$id = $this->atomicAuthModel->register($identity, $password, $email, $additionalData, $groupIds);
-
-		if (! $emailActivation)
+		// check if user exists
+		if ($this->identityExists($identity))
 		{
-			if ($id !== false)
-			{
-				$this->setMessage('AtomicAuth.account_creation_successful');
-				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful']);
-				return $id;
-			}
-			else
-			{
-				$this->setError('AtomicAuth.account_creation_unsuccessful');
-				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful']);
-				return false;
-			}
+			$this->setError('AtomicAuth.account_creation_duplicate_identity');
+			return false;
+		}
+
+		// check default group exists for failback
+		if (! $this->config->defaultGroup && empty($groups))
+		{
+			$this->setError('AtomicAuth.account_creation_missing_defaultGroup');
+			return false;
+		}
+
+		// check if the default group exists in database
+		if ( empty($groups) && ! $this->atomicAuthModel->groupExists($this->config->defaultGroup))
+		{
+			$this->setError('AtomicAuth.account_creation_invalid_defaultGroup');
+			return false;
+		}
+
+		if( ! empty($groups) )
+		{
+			// TODO check for if specified group(s) exist in db too
 		}
 		else
 		{
-			if (! $id)
-			{
-				$this->setError('AtomicAuth.account_creation_unsuccessful');
-				return false;
-			}
+			// no groups supplied, use a default group to associate to user
+			$groups[] = $this->atomicAuthModel->groupModel()->getGroupByGuid( $this->config->defaultGroup );
+		}
+		// register User Entity to begin insert
+		$user = new \AtomicAuth\Entities\User();
 
-			// deactivate so the user must follow the activation flow
-			$deactivate = $this->atomicAuthModel->deactivate($id);
+		$user->{$this->config->identity} = $identity;
 
-			// the deactivate method call adds a message, here we need to clear that
-			$this->atomicAuthModel->clearMessages();
+		// Do not pass $identity as user is not known yet
+		$user->password_hash = $this->atomicAuthModel->hashPassword($password, $identity);
 
-			if (! $deactivate)
-			{
-				$this->setError('AtomicAuth.deactivate_unsuccessful');
-				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful']);
-				return false;
-			}
-
-			$activationCode = $this->atomicAuthModel->activationCode;
-			$identity       = $this->config->identity;
-			$user           = $this->atomicAuthModel->user($id)->row();
-
-			$data = [
-				'identity'   => $user->{$identity},
-				'id'         => $user->id,
-				'email'      => $email,
-				'activation' => $activationCode,
-			];
-			if (! $this->config->useCiEmail)
-			{
-				$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful', 'activation_email_successful']);
-				$this->setMessage('AtomicAuth.activation_email_successful');
-				return $data;
-			}
-			else
-			{
-				$message = view($this->config->emailTemplates . $this->config->emailActivate, $data);
-
-				$this->email->clear();
-				$this->email->setFrom($this->config->adminEmail, $this->config->siteTitle);
-				$this->email->setTo($email);
-				$this->email->setSubject($this->config->siteTitle . ' - ' . lang('AtomicAuth.emailActivation_subject'));
-				$this->email->setMessage($message);
-
-				if ($this->email->send() === true)
-				{
-					$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful', 'activation_email_successful']);
-					$this->setMessage('AtomicAuth.activation_email_successful');
-					return $id;
-				}
-			}
-
-			$this->atomicAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_unsuccessful', 'activation_email_unsuccessful']);
-			$this->setError('AtomicAuth.activation_email_unsuccessful');
+		if ($user->password === false)
+		{
+			$this->setError('AtomicAuth.account_creation_unsuccessful');
 			return false;
 		}
+
+		// submit user entity to model
+				$newUserId = $this->atomicAuthModel->userModel()->insert($user);
+
+				if ( ! $newUserId)
+				{
+					$this->setError('AtomicAuth.account_creation_unsuccessful');
+					return false;
+				}
+
+				// add user to group association
+				$this->atomicAuthModel->addUserToGroup($groups, $newUserId);
+
+				$this->setMessage('AtomicAuth.account_creation_successful');
+
+				return $newUserId;
 	}
 
 	/**
@@ -325,6 +315,8 @@ class AtomicAuth
 		return true;
 	}
 
+
+
 	/**
 	 * Auto logs-in the user if they are remembered
 	 *
@@ -339,10 +331,10 @@ class AtomicAuth
 		$recheck = $this->atomicAuthModel->recheckSession();
 
 		// auto-login the user if they are remembered
-		if (! $recheck && get_cookie($this->config->rememberCookieName))
-		{
-			$recheck = $this->atomicAuthModel->loginRememberedUser();
-		}
+		// if (! $recheck && get_cookie($this->config->rememberCookieName))
+		// {
+		// 	$recheck = $this->atomicAuthModel->loginRememberedUser();
+		// }
 
 		return $recheck;
 	}
@@ -356,7 +348,7 @@ class AtomicAuth
 	public function getUserId()
 	{
 		$userId = $this->session->get('user_id');
-		if (! empty($userId))
+		if (! empty($userId) )
 		{
 			return $userId;
 		}
@@ -412,5 +404,8 @@ class AtomicAuth
 		}
 		*/
 	}
+
+
+
 
 }

@@ -392,32 +392,34 @@ class User extends \CodeIgniter\Controller
 		$this->data['identity_column'] = $this->configAtomicAuth->identity;
 		$this->data['message'] = $this->session->getFlashdata('message');
 
+		// set validation rules
+		if ($this->configAtomicAuth->identity !== 'email')
+		{
+			$this->validation->setRule('identity', lang('Auth.create_user_validation_identity_label'), 'trim|required|is_unique[' . $this->configAtomicAuth->tables['users'] . '.' . $this->configAtomicAuth->identity . ']');
+			$this->validation->setRule('email', lang('Auth.create_user_validation_email_label'), 'trim|required|valid_email');
+		}
+		else
+		{
+			$this->validation->setRule('email', lang('Auth.create_user_validation_email_label'), 'trim|required|valid_email|is_unique[' . $this->configAtomicAuth->tables['users'] . '.email]');
+		}
+		$this->validation->setRule('password', lang('Auth.create_user_validation_password_label'), 'required|min_length[' . $this->configAtomicAuth->minPasswordLength . ']|matches[password_confirm]');
+		$this->validation->setRule('password_confirm', lang('Auth.create_user_validation_password_confirm_label'), 'required');
+
+
 		// parse submitted request
 		if ( $this->request->getPost() ){
-
-				// set validation rules
-				if ($this->configAtomicAuth->identity !== 'email')
-				{
-					$this->validation->setRule('identity', lang('Auth.create_user_validation_identity_label'), 'trim|required|is_unique[' . $this->configAtomicAuth->tables['users'] . '.' . $this->configAtomicAuth->identity . ']');
-					$this->validation->setRule('email', lang('Auth.create_user_validation_email_label'), 'trim|required|valid_email');
-				}
-				else
-				{
-					$this->validation->setRule('email', lang('Auth.create_user_validation_email_label'), 'trim|required|valid_email|is_unique[' . $this->configAtomicAuth->tables['users'] . '.email]');
-				}
-				$this->validation->setRule('password', lang('Auth.create_user_validation_password_label'), 'required|min_length[' . $this->configAtomicAuth->minPasswordLength . ']|matches[password_confirm]');
-				$this->validation->setRule('password_confirm', lang('Auth.create_user_validation_password_confirm_label'), 'required');
 
 				// run validation
 				if($this->validation->withRequest($this->request)->run())
 				{
 					$email    = strtolower($this->request->getPost('email'));
-					$identity = ($this->configAtomicAuth->identity === 'email') ? $email : $this->request->getPost('identity');
+					$identity = strtolower($this->request->getPost($this->configAtomicAuth->identity));
 					$password = $this->request->getPost('password');
 					$userMeta = []; // TODO flesh out user meta data
+					$userGroups = []; // TODO flesh out user group associations
 
-					// user_model:register the user
-					if( $this->atomicAuth->register($identity, $password, $email, $userMeta) )
+					// user entity register the user
+					if( $this->atomicAuth->register($identity, $password, $email, $userMeta, $userGroups) )
 					{
 						// check to see if we are creating the user
 						// redirect them back to the admin page
