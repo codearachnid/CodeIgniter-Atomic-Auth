@@ -779,6 +779,7 @@ class AtomicAuthModel
 						  ->select([
 								$this->config->identity,
 								'email',
+								'guid',
 								'id',
 								'password_hash',
 								// 'status',
@@ -1270,6 +1271,23 @@ class AtomicAuthModel
 		return $result;
 	}
 
+	public function createUser( string $identity, string $password, string $email, array $userMeta = [] )
+	{
+		// register User Entity to begin insert
+		$user = new \AtomicAuth\Entities\User();
+
+		$user->{$this->config->identity} = $identity;
+		$user->password_hash = $this->hashPassword($password, $identity);
+		$user->status = 1; // TODO there needs to be a better way to activate a user
+		// TODO I have a dream that this will work one day *** see after insert for bandaid
+		// $builder->set('guid', 'UUID_TO_BIN(UUID())', FALSE);
+		$user->guid = $this->userModel->generateGuid();
+		$user->id = $this->userModel->insert( $user );
+
+		return $user;
+	}
+
+
 	/**
 	 * Get the users
 	 *
@@ -1553,7 +1571,10 @@ class AtomicAuthModel
 			// TODO should this be cached?
 		}
 
-		$this->db->table($this->config->tables['groups_users'])->insertBatch($groupsUsers);
+		if( ! empty( $groupsUsers ) )
+		{
+			$this->db->table($this->config->tables['groups_users'])->insertBatch($groupsUsers);
+		}
 
 		return count($groupsUsers);
 	}
@@ -1795,7 +1816,6 @@ class AtomicAuthModel
 	 * @param integer $id User id
 	 *
 	 * @return boolean
-	 * @author Ben Edmunds
 	 */
 	public function setLoginAttempt(string $identity, int $id = null, int $status = 0): bool
 	{
@@ -1810,36 +1830,10 @@ class AtomicAuthModel
 		return $this->db->affectedRows() === 1;
 	}
 
-	/**
-	 * Set lang
-	 *
-	 * @param string $lang Lang
-	 *
-	 * @return boolean
-	 * @author Ben Edmunds
-	 */
-	public function setLang(string $lang='en'): bool
+	public function getSession( string $key = null )
 	{
-		$this->triggerEvents('set_lang');
-
-		// if the userExpire is set to zero we'll set the expiration two years from now.
-		if ($this->config->userExpire === 0)
-		{
-			$expire = self::MAX_COOKIE_LIFETIME;
-		}
-		// otherwise use what is set
-		else
-		{
-			$expire = $this->config->userExpire;
-		}
-
-		set_cookie([
-			'name'   => 'lang_code',
-			'value'  => $lang,
-			'expire' => $expire,
-		]);
-
-		return true;
+		$activeUser = $this->session->get('activeUser');
+		return !is_null( $key ) && !is_null( $activeUser ) && $activeUser[ $key ] ? $activeUser[ $key ] : null;
 	}
 
 	/**
@@ -1848,7 +1842,6 @@ class AtomicAuthModel
 	 * @param \stdClass $user User
 	 *
 	 * @return boolean
-	 * @author jrmadsen67
 	 */
 	public function setSession(\stdClass $user = null): bool
 	{
@@ -1858,6 +1851,7 @@ class AtomicAuthModel
 				$this->config->identity => $user->{$this->config->identity},
 				'email'               => $user->email,
 				'user_id'             => $user->id, //everyone likes to overwrite id so we'll use user_id
+				'user_guid'						=> $user->guid,
 				// 'last_login'      		=> $user->last_login,
 				'last_check'          => time(),
 			];
@@ -1994,6 +1988,29 @@ class AtomicAuthModel
 
 		$this->triggerEvents(['post_login_remembered_user', 'post_login_remembered_user_unsuccessful']);
 		return false;
+	}
+
+	public function getUserProfile( string $guid = null, string $identifier = 'user_guid' ){
+
+		// if no guid then look to see if we have one for the session
+		$guid = is_null($guid) ? $this->getSession( $identifier ) : $guid ;
+
+		if( $identifier == 'user_guid' )
+		{
+			$user = $this->userModel->getUserByGuid( $guid );
+		}
+		else if ( $identifier == 'user_id' )
+		{
+			$user = $this->userModel->get( $guid )->findAll()->first();
+		}
+
+		if( !$user )
+		{
+			return null;
+		}
+
+		return $user;
+
 	}
 
 	/**

@@ -57,7 +57,7 @@ class InstallAtomicAuth extends Migration
 		// TODO create a database driven configuration?
 		// $this->forge->addField([
     //       'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-		//			 'guid'        			=> ['type' => 'varchar', 'constraint' => 36, 'null' => false],
+		//			 'guid'        			=> ['type' => 'varchar', 'constraint' => 32, 'null' => false],
     //       'option_name'      => ['type' => 'varchar', 'constraint' => 64],
     //       'option_value'     => ['type' => 'longtext', 'null' => true],
     //       'created_at'       => ['type' => 'datetime', 'null' => true],
@@ -72,7 +72,7 @@ class InstallAtomicAuth extends Migration
      */
 		$this->forge->addField([
 	        'id'               => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-					'guid'        		 => ['type' => 'varchar', 'constraint' => 36, 'null' => false],
+					'guid'        		 => ['type' => 'varchar', 'constraint' => 32, 'null' => false],
 	        'email'            => ['type' => 'varchar', 'constraint' => 255],
 	        'password_hash'    => ['type' => 'varchar', 'constraint' => 255],
 	        'reset_hash'       => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
@@ -97,7 +97,7 @@ class InstallAtomicAuth extends Migration
 			       */
 			      $fields = [
 			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-								'guid'        => ['type' => 'varchar', 'constraint' => 36, 'null' => false],
+								'guid'        => ['type' => 'varchar', 'constraint' => 32, 'null' => false],
 			          'name'        => ['type' => 'varchar', 'constraint' => 255],
 			          'description' => ['type' => 'varchar', 'constraint' => 255],
 								'created_at'       => ['type' => 'datetime', 'null' => true],
@@ -115,7 +115,7 @@ class InstallAtomicAuth extends Migration
 			       */
 			      $fields = [
 			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-								'guid'        => ['type' => 'varchar', 'constraint' => 36, 'null' => false],
+								'guid'        => ['type' => 'varchar', 'constraint' => 32, 'null' => false],
 			          'name'        => ['type' => 'varchar', 'constraint' => 255, 'null' => false],
 			          'description' => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
 								'created_at'       => ['type' => 'datetime', 'null' => true],

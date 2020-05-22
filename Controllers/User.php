@@ -450,8 +450,6 @@ class User extends \CodeIgniter\Controller
 
 				}
 
-
-
 						}
 
 				$this->data['email'] = [
@@ -499,26 +497,30 @@ class User extends \CodeIgniter\Controller
 	 *
 	 * @return string string|\CodeIgniter\HTTP\RedirectResponse
 	 */
-	public function edit(int $id)
+	public function edit(string $guid = null)
 	{
 		$this->data['title'] = lang('Auth.edit_user_heading');
 
-		if (! $this->atomicAuth->loggedIn() || (! $this->atomicAuth->isAdmin() && ! ($this->atomicAuth->user()->row()->id == $id)))
+		// TODO secure this page
+		if (! $this->atomicAuth->loggedIn() ) // || (! $this->atomicAuth->isAdmin() && ! ($this->atomicAuth->user()->row()->id == $id)))
 		{
 			return redirect()->to('/auth');
 		}
 
-		$user          = $this->atomicAuth->user($id)->row();
-		$groups        = $this->atomicAuth->groups()->resultArray();
-		$currentGroups = $this->atomicAuth->getUsersGroups($id)->getResult();
+		$user          = $this->atomicAuth->getUserProfile( $guid );
+		// $groups        = $this->atomicAuth->groups()->resultArray();
+		// $currentGroups = $this->atomicAuth->getUsersGroups($id)->getResult();
+
+		if(is_null($user))
+		{
+			// TODO better handling if user doesn't exist
+			return redirect()->to('/auth/create');
+		}
+
+		dd($user);
 
 		if (! empty($_POST))
 		{
-			// validate form input
-			$this->validation->setRule('first_name', lang('Auth.edit_user_validation_fname_label'), 'trim|required');
-			$this->validation->setRule('last_name', lang('Auth.edit_user_validation_lname_label'), 'trim|required');
-			$this->validation->setRule('phone', lang('Auth.edit_user_validation_phone_label'), 'trim|required');
-			$this->validation->setRule('company', lang('Auth.edit_user_validation_company_label'), 'trim|required');
 
 			// do we have a valid request?
 			if ($id !== $this->request->getPost('id', FILTER_VALIDATE_INT))

@@ -251,35 +251,22 @@ class AtomicAuth
 			// no groups supplied, use a default group to associate to user
 			$groups[] = $this->atomicAuthModel->groupModel()->getGroupByGuid( $this->config->defaultGroup );
 		}
-		// register User Entity to begin insert
-		$user = new \AtomicAuth\Entities\User();
 
-		$user->{$this->config->identity} = $identity;
+		// setup user to model
+				$user = (object) $this->atomicAuthModel->createUser($identity, $password, $email, $userMeta)->toArray();
 
-		// Do not pass $identity as user is not known yet
-		$user->password_hash = $this->atomicAuthModel->hashPassword($password, $identity);
-
-		if ($user->password === false)
-		{
-			$this->setError('AtomicAuth.account_creation_unsuccessful');
-			return false;
-		}
-
-		// submit user entity to model
-				$newUserId = $this->atomicAuthModel->userModel()->insert($user);
-
-				if ( ! $newUserId)
+				if ( ! $user->id )
 				{
 					$this->setError('AtomicAuth.account_creation_unsuccessful');
 					return false;
 				}
 
 				// add user to group association
-				$this->atomicAuthModel->addUserToGroup($groups, $newUserId);
+				$this->atomicAuthModel->addUserToGroup($groups, $user->id);
 
 				$this->setMessage('AtomicAuth.account_creation_successful');
 
-				return $newUserId;
+				return $user;
 	}
 
 	/**

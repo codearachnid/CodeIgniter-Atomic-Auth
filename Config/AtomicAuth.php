@@ -172,8 +172,8 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $adminEmail               = 'admin@example.com'; // Admin Email, admin@example.com
 	public $forceAuthorizedUserCreate = false;
 	public $redirectOnSuccess				 = false;
-	public $defaultGroup             = '1b351ef4-c395-455e-bd0c-455a7d80781b';           // Default group, use guid
-	public $adminGroup               = 'e7cb8966-b553-4ee1-8bfe-cb2b873697ff';             // Default administrators group, use guid
+	public $defaultGroup             = '342bf19ff862494828bfa7c8cb20926a';           // Default group, use guid
+	public $adminGroup               = '5bb7a9e7db3e29a2032bd1c5010561ff';             // Default administrators group, use guid
 	public $minPasswordLength        = 8;                   // Minimum Required Length of Password (not enforced by lib - see note above)
 	public $emailActivation          = false;               // Email Activation for registration
 	public $manualActivation         = false;               // Manual Activation for registration

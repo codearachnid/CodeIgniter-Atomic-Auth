@@ -15,13 +15,13 @@ class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 		$groups = [
 			[
 				// 'id'					=> 1,
-				'guid'				=> 'e7cb8966-b553-4ee1-8bfe-cb2b873697ff',
+				'guid'				=> '5bb7a9e7db3e29a2032bd1c5010561ff',
 				'name'        => 'admin',
 				'description' => 'Administrator',
 			],
 			[
 				// 'id'					=> 2,
-				'guid'				=> '1b351ef4-c395-455e-bd0c-455a7d80781b',
+				'guid'				=> '342bf19ff862494828bfa7c8cb20926a',
 				'name'        => 'members',
 				'description' => 'General User',
 			],
