@@ -2009,6 +2009,13 @@ class AtomicAuthModel
 			return null;
 		}
 
+		$user->groups = $this->db
+			->table($this->config->tables['groups_users'])
+			->select('id, guid, name, description, status')
+			->join($this->config->tables['groups'], $this->config->tables['groups'] . '.id = ' . $this->config->tables['groups_users'] . '.group_id')
+			->where('user_id', $user->id)
+			->get()->getResult('AtomicAuth\Entities\Group');
+
 		return $user;
 
 	}

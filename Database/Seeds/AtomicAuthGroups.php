@@ -10,7 +10,6 @@ class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 	{
 		$config = config('AtomicAuth\\Config\\AtomicAuth');
 		$this->DBGroup = empty($config->databaseGroupName) ? '' : $config->databaseGroupName;
-		$tables        = $config->tables;
 
 		$groups = [
 			[
@@ -18,15 +17,18 @@ class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 				'guid'				=> '5bb7a9e7db3e29a2032bd1c5010561ff',
 				'name'        => 'admin',
 				'description' => 'Administrator',
+				'status'			=> 1,
 			],
 			[
 				// 'id'					=> 2,
 				'guid'				=> '342bf19ff862494828bfa7c8cb20926a',
 				'name'        => 'members',
 				'description' => 'General User',
+				'status'			=> 1,
 			],
 		];
-		$this->db->table($tables['groups'])->insertBatch($groups);
+
+		$this->db->table($config->tables['groups'])->insertBatch($groups);
 
 	}
 }

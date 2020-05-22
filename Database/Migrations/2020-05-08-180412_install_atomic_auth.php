@@ -100,6 +100,7 @@ class InstallAtomicAuth extends Migration
 								'guid'        => ['type' => 'varchar', 'constraint' => 32, 'null' => false],
 			          'name'        => ['type' => 'varchar', 'constraint' => 255],
 			          'description' => ['type' => 'varchar', 'constraint' => 255],
+								'status'           => ['type' => 'tinyint', 'constraint' => 1, 'null' => false, 'default' => 0],
 								'created_at'       => ['type' => 'datetime', 'null' => true],
 			          'updated_at'       => ['type' => 'datetime', 'null' => true],
 			          'deleted_at'       => ['type' => 'datetime', 'null' => true],
@@ -115,7 +116,6 @@ class InstallAtomicAuth extends Migration
 			       */
 			      $fields = [
 			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-								'guid'        => ['type' => 'varchar', 'constraint' => 32, 'null' => false],
 			          'name'        => ['type' => 'varchar', 'constraint' => 255, 'null' => false],
 			          'description' => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
 								'created_at'       => ['type' => 'datetime', 'null' => true],
@@ -125,7 +125,7 @@ class InstallAtomicAuth extends Migration
 
 			      $this->forge->addField($fields);
 			      $this->forge->addKey('id', true);
-						// $this->forge->addUniqueKey('guid');
+						$this->forge->addUniqueKey('name');
 			      $this->forge->createTable($this->tables['permissions'], true);
 
 

@@ -89,7 +89,11 @@ class Admin extends \CodeIgniter\Controller
 
         if( $seeder->call('AtomicAuth\Database\Seeds\AtomicAuthGroups') )
         {
-          $data['messages'][] = 'Atomic Auth data seeding completed.';
+          $data['messages'][] = 'Atomic Auth groups seeding completed.';
+        }
+        if( $seeder->call('AtomicAuth\Database\Seeds\AtomicAuthPermissions') )
+        {
+          $data['messages'][] = 'Atomic Auth permissions seeding completed.';
         }
 
       }

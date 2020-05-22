@@ -508,8 +508,7 @@ class User extends \CodeIgniter\Controller
 		}
 
 		$user          = $this->atomicAuth->getUserProfile( $guid );
-		// $groups        = $this->atomicAuth->groups()->resultArray();
-		// $currentGroups = $this->atomicAuth->getUsersGroups($id)->getResult();
+		$groups        = $this->atomicAuth->groupModel()->where('status', 1)->findAll();
 
 		if(is_null($user))
 		{
@@ -517,8 +516,7 @@ class User extends \CodeIgniter\Controller
 			return redirect()->to('/auth/create');
 		}
 
-		dd($user);
-
+/*
 		if (! empty($_POST))
 		{
 
@@ -581,7 +579,7 @@ class User extends \CodeIgniter\Controller
 				return $this->redirect();
 			}
 		}
-
+*/
 		// display the edit user form
 
 		// set the flash data error message if there is one
@@ -590,32 +588,12 @@ class User extends \CodeIgniter\Controller
 		// pass the user to the view
 		$this->data['user']          = $user;
 		$this->data['groups']        = $groups;
-		$this->data['currentGroups'] = $currentGroups;
+		$this->data['userInGroups'] = [];
+		foreach( $user->groups as $group ){
+			$this->data['userInGroups'][] = $group->id;
+		}
 
-		$this->data['first_name'] = [
-			'name'  => 'first_name',
-			'id'    => 'first_name',
-			'type'  => 'text',
-			'value' => set_value('first_name', $user->first_name ?: ''),
-		];
-		$this->data['last_name'] = [
-			'name'  => 'last_name',
-			'id'    => 'last_name',
-			'type'  => 'text',
-			'value' => set_value('last_name', $user->last_name ?: ''),
-		];
-		$this->data['company'] = [
-			'name'  => 'company',
-			'id'    => 'company',
-			'type'  => 'text',
-			'value' => set_value('company', empty($user->company) ? '' : $user->company),
-		];
-		$this->data['phone'] = [
-			'name'  => 'phone',
-			'id'    => 'phone',
-			'type'  => 'text',
-			'value' => set_value('phone', empty($user->phone) ? '' : $user->phone),
-		];
+
 		$this->data['password'] = [
 			'name' => 'password',
 			'id'   => 'password',
@@ -628,6 +606,7 @@ class User extends \CodeIgniter\Controller
 		];
 		$this->data['atomicAuth'] = $this->atomicAuth;
 
-		return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'edit_user', $this->data);
+		// render response vs redirect
+		return view('AtomicAuth\Views\Auth\user_edit', $this->data);
 	}
 }

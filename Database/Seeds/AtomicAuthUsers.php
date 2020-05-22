@@ -10,7 +10,6 @@ class AtomicAuthGroupsSeeder extends \CodeIgniter\Database\Seeder
 	{
 		$config = config('AtomicAuth\\Config\\AtomicAuth');
 		$this->DBGroup = empty($config->databaseGroupName) ? '' : $config->databaseGroupName;
-		$tables        = $config->tables;
 
 		$users = [
 			[
@@ -23,7 +22,7 @@ class AtomicAuthGroupsSeeder extends \CodeIgniter\Database\Seeder
 				'active'                  => '1',
 			],
 		];
-		$this->db->table($tables['users'])->insertBatch($users);
+		$this->db->table($config->tables['users'])->insertBatch($users);
 
 		$usersGroups = [
 			[
@@ -35,6 +34,6 @@ class AtomicAuthGroupsSeeder extends \CodeIgniter\Database\Seeder
 				'group_id' => '2',
 			],
 		];
-		$this->db->table($tables['users_groups'])->insertBatch($usersGroups);
+		$this->db->table($config->tables['users_groups'])->insertBatch($usersGroups);
 	}
 }

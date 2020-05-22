@@ -9,5 +9,6 @@ class Group extends Entity
   protected $guid;
   protected $name;
   protected $description;
+  protected $status;
 
 }
