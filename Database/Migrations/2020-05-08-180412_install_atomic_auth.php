@@ -116,7 +116,7 @@ class InstallAtomicAuth extends Migration
 			       */
 			      $fields = [
 			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
-			          'name'        => ['type' => 'varchar', 'constraint' => 255, 'null' => false],
+			          'key'        => ['type' => 'varchar', 'constraint' => 255, 'null' => false],
 			          'description' => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
 								'created_at'       => ['type' => 'datetime', 'null' => true],
 			          'updated_at'       => ['type' => 'datetime', 'null' => true],

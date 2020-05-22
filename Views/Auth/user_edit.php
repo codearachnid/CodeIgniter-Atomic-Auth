@@ -17,7 +17,7 @@
             <?php echo form_input($password_confirm);?>
       </p>
 
-      <?php if ($atomicAuth->isAdmin()): ?>
+      <?php if ($atomicAuth->userCan('promote_user')): ?>
 
           <h3><?php echo lang('Auth.edit_user_groups_heading');?></h3>
           <?php foreach ($groups as $group):?>

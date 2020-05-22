@@ -13,11 +13,11 @@ class AtomicAuthPermissions extends \CodeIgniter\Database\Seeder
 		$tables        = $config->tables;
 
 		$permissions = [
-			[ 'name' => 'list_user', 'description' => 'Can list users', ],
-			[ 'name' => 'create_user', 'description' => 'Can create user', ],
-			[ 'name' => 'edit_user', 'description' => 'Can edit user', ],
-			[ 'name' => 'delete_user', 'description' => 'Can delete user', ],
-			[ 'name' => 'promote_user', 'description' => 'Can add/remove user to groups', ],
+			[ 'key' => 'list_user', 'description' => 'Can list users', ],
+			[ 'key' => 'create_user', 'description' => 'Can create user', ],
+			[ 'key' => 'edit_user', 'description' => 'Can edit user', ],
+			[ 'key' => 'delete_user', 'description' => 'Can delete user', ],
+			[ 'key' => 'promote_user', 'description' => 'Can add/remove user to groups', ],
 		];
 
 		if($this->db->tableExists($config->tables['permissions']))
@@ -28,8 +28,8 @@ class AtomicAuthPermissions extends \CodeIgniter\Database\Seeder
 
 		if($this->db->tableExists($config->tables['groups_permissions'])  && !empty($config->adminGroup) )
 		{
-			$permKeys = array_column($permissions, 'name');
-			$permIds = $this->db->table($config->tables['permissions'])->select('id')->where( "name='" . implode( "' OR name='", $permKeys) . "'", NULL, FALSE )->get()->getResultArray();
+			$permKeys = array_column($permissions, 'key');
+			$permIds = $this->db->table($config->tables['permissions'])->select('id')->where( "key='" . implode( "' OR key='", $permKeys) . "'", NULL, FALSE )->get()->getResultArray();
 			$adminGroup = $this->db->table($config->tables['groups'])->where('guid', $config->adminGroup )->get()->getRow();
 			foreach( $permIds as $permId)
 			{
