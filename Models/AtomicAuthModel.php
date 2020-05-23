@@ -1854,7 +1854,16 @@ class AtomicAuthModel
 				'user_guid'						=> $user->guid,
 				// 'last_login'      		=> $user->last_login,
 				'last_check'          => time(),
+				'permissions'					=> [],
 			];
+			if( !empty($user->permissions) ){
+				$sessionData['activeUser']['permissions'] = $user->permissions;
+			}
+			else
+			{
+				$sessionData['activeUser']['permissions'] = $this->getUserPermissions( $user->id );
+			}
+
 			$this->session->set($sessionData);
 		} else {
 			$this->session->remove('activeUser');
@@ -1865,6 +1874,31 @@ class AtomicAuthModel
 
 		$this->triggerEvents('post_set_session');
 		return true;
+	}
+	/**
+	 * Get User permissions (includes permissions tied to group user is in)
+	 */
+	public function getUserPermissions( int $userId = null )
+	{
+		/**
+		 * This was pretty complex - saving the raw query for later debugging if needed
+		 * select perm.id, perm.key  from atomicauth_permissions perm
+		 * left join `atomicauth_groups_permissions` gperm on gperm.`permission_id` = perm.id
+		 * left join atomicauth_groups groups on groups.id = gperm.group_id
+		 * left join atomicauth_groups_users ugroups on ugroups.group_id = groups.id
+		 * left join atomicauth_users_permissions uperm on uperm.`permission_id` = perm.id
+		 * where ugroups.user_id = 1 OR uperm.user_id = 1
+		 */
+		$permissions = $this->db->table($this->config->tables['permissions'])
+			->select($this->config->tables['permissions'] . '.id,' . $this->config->tables['permissions'] .'.key')
+			->join($this->config->tables['groups_permissions'], $this->config->tables['groups_permissions'] . '.permission_id = ' . $this->config->tables['permissions'] . '.id', 'left')
+			->join($this->config->tables['groups'], $this->config->tables['groups'] . '.id = ' . $this->config->tables['groups_permissions'] . '.group_id', 'left')
+			->join($this->config->tables['groups_users'], $this->config->tables['groups_users'] . '.group_id = ' . $this->config->tables['groups'] . '.id', 'left')
+			->join($this->config->tables['users_permissions'], $this->config->tables['users_permissions'] . '.permission_id = ' . $this->config->tables['permissions'] . '.id', 'left')
+			->where($this->config->tables['groups_users'] . '.user_id', $userId)
+			->orWhere($this->config->tables['users_permissions'] . '.user_id', $userId)
+			->get()->getResult();
+		return $permissions;
 	}
 
 	/**
@@ -2018,6 +2052,31 @@ class AtomicAuthModel
 
 		return $user;
 
+	}
+	/**
+	 * Can a user do ""
+	 *
+	 */
+	public function userCan( string $key = null, int $userId = null ) : bool
+	{
+		if(is_null($key))
+		{
+			return false;
+		}
+		if( is_null( $userId ) )
+		{
+			$permissions = $this->getSession( 'permissions' );
+		}
+		else
+		{
+			$permissions = $this->getUserPermissions( $user->id );
+		}
+		if( !empty($permissions) )
+		{
+			$permissions = array_column($permissions, 'key');
+			return in_array( $key, $permissions );
+		}
+		return false;
 	}
 
 	/**
