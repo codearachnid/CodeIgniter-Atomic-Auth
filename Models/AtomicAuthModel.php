@@ -785,7 +785,7 @@ class AtomicAuthModel
 								// 'status',
 						  ])->where([
 								$this->config->identity => $identity,
-								'status' => 1, // TODO should get any user other than active?
+								'status' => 'active', // TODO should get any user other than active?
 								'force_pass_reset' => 0, // TODO should user be able to login without a password reset?
 							])->limit(1)
 						  ->orderBy('id', 'desc')
@@ -808,7 +808,7 @@ class AtomicAuthModel
 			$this->triggerEvents('post_login_unsuccessful');
 			$this->setError('AtomicAuth.login_unsuccessful_not_exists');
 			$this->setSession(null);
-			$this->setLoginAttempt($identity);
+			$this->setLoginAttempt($identity, 'failed');
 			return false;
 		}
 
@@ -824,7 +824,7 @@ class AtomicAuthModel
 				// }
 
 				$this->setSession($user);
-				$this->setLoginAttempt($user->email, $user->id, 1);
+				$this->setLoginAttempt($user->email, 'success', $user->id);
 
 				// $this->clearLoginAttempts($user->email);
 				// $this->clearForgottenPasswordCode($user->email);
@@ -857,7 +857,7 @@ class AtomicAuthModel
 
 		$this->triggerEvents('post_login_unsuccessful');
 		$this->setError('AtomicAuth.login_unsuccessful');
-		$this->setLoginAttempt($identity);
+		$this->setLoginAttempt($identity, 'failed');
 		$this->setSession(null);
 		return false;
 	}
@@ -1289,7 +1289,7 @@ class AtomicAuthModel
 
 	public function users()
 	{
-		
+
 	}
 
 
@@ -1826,7 +1826,7 @@ class AtomicAuthModel
 	 *
 	 * @return boolean
 	 */
-	public function setLoginAttempt(string $identity, int $id = null, int $status = 0): bool
+	public function setLoginAttempt(string $identity, int $status = 'failed', int $id = null): bool
 	{
 		$this->triggerEvents('update_last_login');
 		$this->triggerEvents('extra_where');

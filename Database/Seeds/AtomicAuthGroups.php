@@ -17,14 +17,14 @@ class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 				'guid'				=> '5bb7a9e7db3e29a2032bd1c5010561ff',
 				'name'        => 'admin',
 				'description' => 'Administrator',
-				'status'			=> 1,
+				'status'			=> 'active',
 			],
 			[
 				// 'id'					=> 2,
 				'guid'				=> '342bf19ff862494828bfa7c8cb20926a',
 				'name'        => 'member',
 				'description' => 'General User',
-				'status'			=> 1,
+				'status'			=> 'active',
 			],
 		];
 

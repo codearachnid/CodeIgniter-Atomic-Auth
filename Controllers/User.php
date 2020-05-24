@@ -513,7 +513,7 @@ class User extends \CodeIgniter\Controller
 
 		$refreshUser = false;
 		$user          = $this->atomicAuth->getUserProfile( $guid );
-		$groups        = $this->atomicAuth->groupModel()->where('status', 1)->findAll();
+		$groups        = $this->atomicAuth->groupModel()->where('status', 'active')->findAll();
 
 		if(is_null($user))
 		{
