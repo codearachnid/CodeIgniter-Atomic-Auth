@@ -11,13 +11,13 @@ class GroupModel extends Model
   protected $returnType    = 'AtomicAuth\Entities\Group';
   protected $useTimestamps = true;
 
-  public function getPermissionByKey( string $key = null )
+  public function getPermissionByName( string $name = null )
   {
-    if( empty ( $key ) )
+    if( empty ( $name ) )
     {
       return null;
     }
-    return $this->asObject()->where('guid', $key)->limit(1)->first();
+    return $this->asObject()->where('name', $name)->limit(1)->first();
   }
 
 }

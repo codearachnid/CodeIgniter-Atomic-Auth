@@ -1287,6 +1287,11 @@ class AtomicAuthModel
 		return $user;
 	}
 
+	public function users()
+	{
+		
+	}
+
 
 	/**
 	 * Get the users
@@ -1296,7 +1301,8 @@ class AtomicAuthModel
 	 * @return static
 	 * @author Ben Edmunds
 	 */
-	public function users($groups=null): self
+	 public function users_old($groups=null):self
+	// public function users($groups=null): self
 	{
 		$this->triggerEvents('users');
 
@@ -1534,7 +1540,7 @@ class AtomicAuthModel
 	 * @return integer The number of groups added
 	 * @author Ben Edmunds
 	 */
-	public function addUserToGroup($groupIds, int $userId=0): int
+	public function addUserToGroup($groupIds, int $userId=0, $force = false ): int
 	{
 		$this->triggerEvents('add_user_to_group');
 
@@ -1554,14 +1560,13 @@ class AtomicAuthModel
 			if( is_object( $group ) && ! is_null( $group->id ) ) {
 				// $group is an Group Entity
 				$groupId = $group->id;
-			} else if ( is_int($group) || is_float($group)){
+			} else if ( is_int($group) || is_float($group) || is_string($group) ){
 				// $group is just a group id
 				$groupId = $group;
 			} else {
 				// could not determine the type of data for $group silent ignore
 				continue;
 			}
-
 			// Cast to float to support bigint data type
 			$groupsUsers[] = [
 				$this->config->join['groups'] => (float)$groupId, // assumed Group exists
@@ -1573,6 +1578,10 @@ class AtomicAuthModel
 
 		if( ! empty( $groupsUsers ) )
 		{
+			if( $force )
+			{
+				$this->db->table($this->config->tables['groups_users'])->delete(['user_id' => $userId]);
+			}
 			$this->db->table($this->config->tables['groups_users'])->insertBatch($groupsUsers);
 		}
 
@@ -1882,7 +1891,7 @@ class AtomicAuthModel
 	{
 		/**
 		 * This was pretty complex - saving the raw query for later debugging if needed
-		 * select perm.id, perm.key  from atomicauth_permissions perm
+		 * select perm.id, perm.name  from atomicauth_permissions perm
 		 * left join `atomicauth_groups_permissions` gperm on gperm.`permission_id` = perm.id
 		 * left join atomicauth_groups groups on groups.id = gperm.group_id
 		 * left join atomicauth_groups_users ugroups on ugroups.group_id = groups.id
@@ -1890,7 +1899,7 @@ class AtomicAuthModel
 		 * where ugroups.user_id = 1 OR uperm.user_id = 1
 		 */
 		$permissions = $this->db->table($this->config->tables['permissions'])
-			->select($this->config->tables['permissions'] . '.id,' . $this->config->tables['permissions'] .'.key')
+			->select($this->config->tables['permissions'] . '.id,' . $this->config->tables['permissions'] .'.name')
 			->join($this->config->tables['groups_permissions'], $this->config->tables['groups_permissions'] . '.permission_id = ' . $this->config->tables['permissions'] . '.id', 'left')
 			->join($this->config->tables['groups'], $this->config->tables['groups'] . '.id = ' . $this->config->tables['groups_permissions'] . '.group_id', 'left')
 			->join($this->config->tables['groups_users'], $this->config->tables['groups_users'] . '.group_id = ' . $this->config->tables['groups'] . '.id', 'left')
@@ -2055,11 +2064,12 @@ class AtomicAuthModel
 	}
 	/**
 	 * Can a user do ""
-	 *
+	 * @param $key string or array can accept multiple keys to filter against
+	 * if user has any matches will allow user "can"
 	 */
-	public function userCan( string $key = null, int $userId = null ) : bool
+	public function userCan( $key = null, int $userId = null ) : bool
 	{
-		if(is_null($key))
+		if(empty($key))
 		{
 			return false;
 		}
@@ -2073,7 +2083,12 @@ class AtomicAuthModel
 		}
 		if( !empty($permissions) )
 		{
-			$permissions = array_column($permissions, 'key');
+			$permissions = array_column($permissions, 'name');
+			if(is_array($key))
+			{
+				// Check if ANY of the needles exist
+				return !empty(array_intersect($key, $permissions));
+			}
 			return in_array( $key, $permissions );
 		}
 		return false;

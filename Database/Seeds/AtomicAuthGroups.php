@@ -22,7 +22,7 @@ class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 			[
 				// 'id'					=> 2,
 				'guid'				=> '342bf19ff862494828bfa7c8cb20926a',
-				'name'        => 'members',
+				'name'        => 'member',
 				'description' => 'General User',
 				'status'			=> 1,
 			],

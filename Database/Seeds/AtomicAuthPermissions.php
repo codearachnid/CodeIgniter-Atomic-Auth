@@ -12,28 +12,39 @@ class AtomicAuthPermissions extends \CodeIgniter\Database\Seeder
 		$this->DBGroup = empty($config->databaseGroupName) ? '' : $config->databaseGroupName;
 		$tables        = $config->tables;
 
-		$permissions = [
-			[ 'key' => 'list_user', 'description' => 'Can list users', ],
-			[ 'key' => 'create_user', 'description' => 'Can create user', ],
-			[ 'key' => 'edit_user', 'description' => 'Can edit user', ],
-			[ 'key' => 'delete_user', 'description' => 'Can delete user', ],
-			[ 'key' => 'promote_user', 'description' => 'Can add/remove user to groups', ],
+		$adminPermissions = [
+			[ 'name' => 'list_user', 'description' => 'Can list users', ],
+			[ 'name' => 'create_user', 'description' => 'Can create user', ],
+			[ 'name' => 'edit_user', 'description' => 'Can edit user', ],
+			[ 'name' => 'delete_user', 'description' => 'Can delete user', ],
+			[ 'name' => 'promote_user', 'description' => 'Can add/remove user to groups', ],
+		];
+
+		$memberPermissions = [
+			[ 'name' => 'edit_self', 'description' => 'Allow user to edit themself', ],
 		];
 
 		if($this->db->tableExists($config->tables['permissions']))
 		{
-			$this->db->table($config->tables['permissions'])->insertBatch($permissions);
+			$this->db->table($config->tables['permissions'])->insertBatch($adminPermissions);
+			$this->db->table($config->tables['permissions'])->insertBatch($memberPermissions);
 		}
 
 
 		if($this->db->tableExists($config->tables['groups_permissions'])  && !empty($config->adminGroup) )
 		{
-			$permKeys = array_column($permissions, 'key');
-			$permIds = $this->db->table($config->tables['permissions'])->select('id')->where( "key='" . implode( "' OR key='", $permKeys) . "'", NULL, FALSE )->get()->getResultArray();
-			$adminGroup = $this->db->table($config->tables['groups'])->where('guid', $config->adminGroup )->get()->getRow();
-			foreach( $permIds as $permId)
+			$groups = $this->db->table($config->tables['groups'])->select('id, name')->where('guid', $config->adminGroup )->orWhere('guid', $config->defaultGroup )->get()->getResult();
+			foreach( $groups as $group )
 			{
-				$groups_permissions[] = [ 'group_id' => $adminGroup->id, 'permission_id' => $permId ];
+				$permissionsList = $group->name . 'Permissions';
+				$permNames = array_column($$permissionsList, 'name');
+				$permIds = $this->db->table($config->tables['permissions'])->select('id')->where( " name='" . implode( "' OR name='", $permNames) . "' ", NULL, FALSE )->get()->getResult();
+				foreach( $permIds as $permId)
+				{
+					$groups_permissions[] = [
+						'group_id' => (string) $group->id,
+						'permission_id' => (string) $permId->id ];
+				}
 			}
 
 			$this->db->table($config->tables['groups_permissions'])->insertBatch($groups_permissions);

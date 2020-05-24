@@ -107,12 +107,13 @@ class Auth extends \CodeIgniter\Controller
 			// set the flash data error message if there is one
 			$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 			//list the users
-			$this->data['users'] = $this->atomicAuth->users()->result();
-			foreach ($this->data['users'] as $k => $user)
+			if ( $atomicAuth->userCan('list_user') )
 			{
-				$this->data['users'][$k]->groups = $this->atomicAuth->getUsersGroups($user->id)->getResult();
+				$this->data['users'] = $this->atomicAuth->users()->result();
 			}
-			return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'index', $this->data);
+			dd($this->data['users']);
+			$this->data['atomicAuth'] = $this->atomicAuth;
+			return view('AtomicAuth\Views\Auth\index', $this->data);
 		}
 	}
 

@@ -502,11 +502,16 @@ class User extends \CodeIgniter\Controller
 		$this->data['title'] = lang('Auth.edit_user_heading');
 
 		// TODO secure this page
-		if (! $this->atomicAuth->loggedIn() ) // || (! $this->atomicAuth->isAdmin() && ! ($this->atomicAuth->user()->row()->id == $id)))
+		if (
+			! $this->atomicAuth->loggedIn()
+			|| ! $this->atomicAuth->userCan('edit_user')
+			|| ($this->atomicAuth->userCan('edit_self') && !is_null($guid))
+			)
 		{
 			return redirect()->to('/auth');
 		}
 
+		$refreshUser = false;
 		$user          = $this->atomicAuth->getUserProfile( $guid );
 		$groups        = $this->atomicAuth->groupModel()->where('status', 1)->findAll();
 
@@ -516,23 +521,93 @@ class User extends \CodeIgniter\Controller
 			return redirect()->to('/auth/create');
 		}
 
+
+		$this->data['atomicAuth'] = $this->atomicAuth;
+		$this->data['message'] = $this->session->getFlashdata('message');
+
+				// parse submitted request
+				if ( $this->request->getPost() ){
+
+					/* TODO throws errors on $id
+					// do we have a valid request?
+					if ($id !== $this->request->getPost('id', FILTER_VALIDATE_INT))
+					{
+						//show_error(lang('Auth.error_security'));
+						throw new \Exception(lang('Auth.error_security'));
+					}
+					*/
+
+
+					if ($atomicAuth->userCan('promote_user'))
+					{
+						// Update the groups user belongs to
+						$groupData = $this->request->getPost('groups');
+						if( !empty($groupData) && count($groupData) == $this->atomicAuth->addUserToGroup( $groupData, $user->id, TRUE ) )
+						{
+							$refreshUser = true;
+						}
+					}
+
+					$password = $this->request->getPost('password');
+					// update the password if it was posted
+					if ($password)
+					{
+						$this->validation->setRule('password', lang('Auth.edit_user_validation_password_label'), 'required|min_length[' . $this->configAtomicAuth->minPasswordLength . ']|matches[password_confirm]');
+						$this->validation->setRule('password_confirm', lang('Auth.edit_user_validation_password_confirm_label'), 'required');
+					}
+
+
+						// run validation
+						if($this->validation->withRequest($this->request)->run())
+						{
+							// $email    = strtolower($this->request->getPost('email'));
+							// $identity = strtolower($this->request->getPost($this->configAtomicAuth->identity));
+
+							$userMeta = []; // TODO flesh out user meta data
+							// $userGroups = []; // TODO flesh out user group associations
+
+
+
+							// user entity register the user
+							// if( $this->atomicAuth->register($identity, $password, $email, $userMeta, $userGroups) )
+							// {
+							// 	// check to see if we are creating the user
+							// 	// redirect them back to the admin page
+							// 	$this->session->setFlashdata('message', $this->atomicAuth->messages());
+							//
+							// 	// redirect vs render response
+							// 	if( $this->configAtomicAuth->redirectOnSuccess ) {
+							// 		return redirect()->to('/auth');
+							// 	} else {
+							// 		$this->data['message'] = $this->session->getFlashdata('message');
+							// 	}
+							//
+							// }
+							// else
+							// {
+							// 	$this->data['message'] = $this->atomicAuth->errors($this->validationListTemplate) ?
+							// 		$this->atomicAuth->errors($this->validationListTemplate) :
+							// 		$this->data['message'];
+							// }
+						}
+						else
+						{
+							// display the create user form
+							// set the flash data error message if there is one
+							$this->data['message'] = $this->validation->getErrors() ?
+								$this->validation->listErrors($this->validationListTemplate) :
+								$this->data['message'];
+
+						}
+
+								}
 /*
 		if (! empty($_POST))
 		{
 
-			// do we have a valid request?
-			if ($id !== $this->request->getPost('id', FILTER_VALIDATE_INT))
-			{
-				//show_error(lang('Auth.error_security'));
-				throw new \Exception(lang('Auth.error_security'));
-			}
 
-			// update the password if it was posted
-			if ($this->request->getPost('password'))
-			{
-				$this->validation->setRule('password', lang('Auth.edit_user_validation_password_label'), 'required|min_length[' . $this->configAtomicAuth->minPasswordLength . ']|matches[password_confirm]');
-				$this->validation->setRule('password_confirm', lang('Auth.edit_user_validation_password_confirm_label'), 'required');
-			}
+
+
 
 			if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 			{
@@ -583,16 +658,16 @@ class User extends \CodeIgniter\Controller
 		// display the edit user form
 
 		// set the flash data error message if there is one
-		$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->atomicAuth->errors($this->validationListTemplate) ? $this->atomicAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
+		// $this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->atomicAuth->errors($this->validationListTemplate) ? $this->atomicAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
+
+		if( $refreshUser ){
+			$user          = $this->atomicAuth->getUserProfile( $guid );
+		}
 
 		// pass the user to the view
 		$this->data['user']          = $user;
 		$this->data['groups']        = $groups;
-		$this->data['userInGroups'] = [];
-		foreach( $user->groups as $group ){
-			$this->data['userInGroups'][] = $group->id;
-		}
-
+		$this->data['userInGroups']  = array_column($user->groups, 'id');
 
 		$this->data['password'] = [
 			'name' => 'password',
@@ -604,7 +679,7 @@ class User extends \CodeIgniter\Controller
 			'id'   => 'password_confirm',
 			'type' => 'password',
 		];
-		$this->data['atomicAuth'] = $this->atomicAuth;
+
 
 		// render response vs redirect
 		return view('AtomicAuth\Views\Auth\user_edit', $this->data);

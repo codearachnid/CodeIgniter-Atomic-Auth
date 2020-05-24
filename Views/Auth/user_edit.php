@@ -4,8 +4,11 @@
 <div id="infoMessage"><?php echo $message;?></div>
 
 <?php echo form_open(uri_string());?>
-      <p>GUID:</p>
-      <p>Username:</p>
+      <p><?php echo form_label(lang('Auth.edit_user_guid_label'), 'password');?> <br />
+         <?php echo $user->guid; ?></p>
+
+      <p><?php echo form_label(lang('Auth.edit_user_identiy_label'), 'password');?> <br />
+          <?php echo $user->email; ?></p>
 
       <p>
             <?php echo form_label(lang('Auth.edit_user_password_label'), 'password');?> <br />
