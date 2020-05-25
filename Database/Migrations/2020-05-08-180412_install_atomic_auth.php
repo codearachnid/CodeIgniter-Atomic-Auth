@@ -139,6 +139,7 @@ class InstallAtomicAuth extends Migration
           'user_id'    => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'null' => true], // Only for successful logins
           'activity'    => ['type' => 'varchar', 'constraint' => 15],
 					'created_at'       => ['type' => 'datetime', 'null' => true],
+					'deleted_at'       => ['type' => 'datetime', 'null' => true],
       ]);
       $this->forge->addKey('id', true);
       $this->forge->addKey('email');

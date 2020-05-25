@@ -10,24 +10,65 @@ class LoginModel extends Model
   ];
   protected $returnType    = 'AtomicAuth\Entities\Login';
   protected $useTimestamps = false;
-  protected $createdField  = 'created_at';
-  public $lockoutTime = 0;
+  protected $identity = null;
+  protected $lockoutTime = null;
+  protected $limit = 1;
 
-  public function getLoginsByIdentity( string $identity = null, int $limit = 20 )
+  public function getLoginsByIdentity( string $identity = null )
   {
-    if( empty ( $identity ) )
+    if( !is_null( $identity ) )
     {
-      return null;
+      $this->identity = $identity;
     }
-    $builder = $this->asObject()->where('identity', $identity);
-    $builder->where('created_at > ', date( "Y-m-d H:i:s", time() - $this->lockoutTime));
-    if( !is_null($limit) )
+    if( empty ( $this->identity ) )
     {
-      $builder->limit( $limit );  
+      return 0;
+    }
+    $builder = $this->asObject()->where('identity', $this->identity);
+    if( !is_null($this->lockoutTime) ){
+      $builder->where('created_at > ', date( "Y-m-d H:i:s", time() - $this->lockoutTime));
+    }
+    if( !is_null($this->limit) )
+    {
+      $builder->limit( $this->limit );
     }
     // consider opportunity for ip blocking
     $builder->orderBy('created_at', 'DESC');
     return $builder->findAll();
   }
+
+  public function purgeByIdentity( string $identity = null )
+  {
+    if( !is_null( $identity ) )
+    {
+      $this->identity = $identity;
+    }
+    if( empty ( $this->identity ) )
+    {
+      return 0;
+    }
+    $builder = $this->asObject()->where('identity', $this->identity);
+    if( !is_null($this->lockoutTime) ){
+      $builder->where('created_at > ', date( "Y-m-d H:i:s", time() - $this->lockoutTime));
+    }
+    $builder->delete();
+    // TODO build in records deleted return
+  }
+
+  public function __get($key)
+    {
+        if (property_exists($this, $key))
+        {
+            return $this->$key;
+        }
+    }
+
+    public function __set($key, $value)
+    {
+        if (property_exists($this, $key))
+        {
+            $this->$key = $value;
+        }
+    }
 
 }

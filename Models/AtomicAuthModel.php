@@ -912,18 +912,13 @@ class AtomicAuthModel
 	 * Based on code from Tank Auth, by Ilya Konyukhov (https://github.com/ilkon/Tank-Auth)
 	 *
 	 * @param string      $identity  User's identity
-	 * @param string|null $ipAddress IP address
-	 *                               Only used if trackLoginIpAddress is set to true.
-	 *                               If null (default value), the current IP address is used.
-	 *                               Use getLastAttemptIp($identity) to retrieve a user's last IP
-	 *
 	 * @return boolean
 	 */
-	public function isMaxAttemptsExceeded(string $identity, $ipAddress=null): bool
+	public function isMaxAttemptsExceeded(string $identity): bool
 	{
 		if ($this->config->trackAttempts && $this->config->maxAttempts > 0)
 		{
-			return (bool) ($this->getAttemptsNum($identity, $ipAddress) >= $this->config->maxAttempts);
+			return (bool) ($this->getAttemptsNum($identity) >= $this->config->maxAttempts);
 		}
 		return false;
 	}
@@ -933,19 +928,16 @@ class AtomicAuthModel
 	 * Based on code from Tank Auth, by Ilya Konyukhov (https://github.com/ilkon/Tank-Auth)
 	 *
 	 * @param string      $identity  User's identity
-	 * @param string|null $ipAddress IP address
-	 *                               Only used if trackLoginIpAddress is set to true.
-	 *                               If null (default value), the current IP address is used.
-	 *                               Use getLastAttemptIp($identity) to retrieve a user's last IP
-	 *
 	 * @return integer
 	 */
-	public function getAttemptsNum(string $identity, $ipAddress=null): int
+	public function getAttemptsNum(string $identity): int
 	{
 		if ($this->config->trackAttempts)
 		{
 			$this->loginModel->lockoutTime = $this->config->lockoutTime;
-			$logins = $this->loginModel->getLoginsByIdentity( $identity, $this->config->maxAttempts );
+			$this->loginModel->limit = $this->config->maxAttempts;
+			$this->loginModel->identity = $identity;
+			$logins = $this->loginModel->getLoginsByIdentity();
 			return count($logins);
 		}
 		return 0;
@@ -955,34 +947,16 @@ class AtomicAuthModel
 	 * Get the last time a login attempt occurred from given identity
 	 *
 	 * @param string      $identity  User's identity
-	 * @param string|null $ipAddress IP address
-	 *                               Only used if trackLoginIpAddress is set to true.
-	 *                               If null (default value), the current IP address is used.
-	 *                               Use getLastAttemptIp($identity) to retrieve a user's last IP
-	 *
 	 * @return integer The time of the last login attempt for a given IP-address or identity
 	 */
-	public function getLastAttemptTime(string $identity, $ipAddress=null): int
+	public function getLastAttemptTime(string $identity): datetime
 	{
 		if ($this->config->trackAttempts)
 		{
-			$builder = $this->db->table($this->config->tables['login_attempts']);
-			$builder->select('time');
-			$builder->where('login', $identity);
-			if ($this->config->trackLoginIpAddress)
+			$qres = $this->loginModel->getLoginsByIdentity($identity);
+			if (count($qres) > 0 )
 			{
-				if (! isset($ipAddress))
-				{
-					$ipAddress = \Config\Services::request()->getIPAddress();
-				}
-				$builder->where('ip_address', $ipAddress);
-			}
-			$builder->orderBy('id', 'desc');
-			$qres = $builder->get(1);
-
-			if ($qres->getRow())
-			{
-				return $qres->getRow()->time;
+				return $qres[0]->created_at;
 			}
 		}
 
@@ -998,16 +972,12 @@ class AtomicAuthModel
 	 */
 	public function getLastAttemptIp(string $identity)
 	{
-		if ($this->config->trackAttempts && $this->config->trackLoginIpAddress)
+		if ($this->config->trackAttempts)
 		{
-			$this->db->select('ip_address');
-			$this->db->where('login', $identity);
-			$this->db->orderBy('id', 'desc');
-			$qres = $this->db->get($this->config->tables['login_attempts'], 1);
-
-			if ($qres->numRows() > 0)
+			$qres = $this->loginModel->getLoginsByIdentity($identity);
+			if (count($qres) > 0 )
 			{
-				return $qres->row()->ip_address;
+				return $qres[0]->ip_address;
 			}
 		}
 
@@ -1047,19 +1017,16 @@ class AtomicAuthModel
 	 * @param integer     $oldAttemptsAxpirePeriod In seconds, any attempts older than this value will be removed.
 	 *                                                It is used for regularly purging the attempts table.
 	 *                                                (for security reason, minimum value is lockoutTime config value)
-	 * @param string|null $ipAddress               IP address
-	 *                                                Only used if track_login_ipAddress is set to true.
-	 *                                                If null (default value), the current IP address is used.
-	 *                                                Use getLastAttemptIp($identity) to retrieve a user's last IP
-	 *
 	 * @return boolean
 	 */
-	public function clearLoginAttempts(string $identity, int $oldAttemptsAxpirePeriod=86400, $ipAddress = null): bool
+	public function clearLoginAttempts(string $identity, int $oldAttemptsAxpirePeriod=86400): bool
 	{
 		if ($this->config->trackAttempts)
 		{
 			// Make sure $oldAttemptsAxpirePeriod is at least equals to lockoutTime
-			$oldAttemptsAxpirePeriod = max($oldAttemptsAxpirePeriod, $this->config->lockoutTime);
+			$this->loginModel->lockoutTime = max($oldAttemptsAxpirePeriod, $this->config->lockoutTime);
+			$this->loginModel->identity = $identity;
+			$logins = $this->loginModel->getLoginsByIdentity();
 
 			$builder = $this->db->table($this->config->tables['login_attempts']);
 			$builder->where('login', $identity);
