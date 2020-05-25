@@ -61,6 +61,7 @@ class AtomicAuthModel
 	 */
 	protected $userModel;
 	protected $groupModel;
+	protected $loginModel;
 
 	/**
 	 * Activation code
@@ -223,6 +224,7 @@ class AtomicAuthModel
 
 		$this->userModel = model('AtomicAuth\Models\UserModel');
 		$this->groupModel = model('AtomicAuth\Models\GroupModel');
+		$this->loginModel = model('AtomicAuth\Models\LoginModel');
 
 		$this->triggerEvents('model_constructor');
 	}
@@ -792,23 +794,22 @@ class AtomicAuthModel
 							->get()
 							->getRow();
 
-		// if ($this->isMaxLoginAttemptsExceeded($identity))
-		// {
+		if ($this->isMaxAttemptsExceeded($identity))
+		{
 			// Hash something anyway, just to take up time
 			// $this->hashPassword($password);
-		//
-		// 	$this->triggerEvents('post_login_unsuccessful');
-		// 	$this->setError('AtomicAuth.login_timeout');
-		//
-		// 	return false;
-		// }
+			$this->triggerEvents('post_login_unsuccessful');
+			$this->setError('AtomicAuth.login_timeout');
+			$this->setLoginAttempt($identity, 'max_attempts');
+			return false;
+		}
 
 
 		if(empty($user)){
 			$this->triggerEvents('post_login_unsuccessful');
 			$this->setError('AtomicAuth.login_unsuccessful_not_exists');
 			$this->setSession(null);
-			$this->setLoginAttempt($identity, 'failed');
+			$this->setLoginAttempt($identity, 'not_exist');
 			return false;
 		}
 
@@ -857,7 +858,7 @@ class AtomicAuthModel
 
 		$this->triggerEvents('post_login_unsuccessful');
 		$this->setError('AtomicAuth.login_unsuccessful');
-		$this->setLoginAttempt($identity, 'failed');
+		$this->setLoginAttempt($identity, 'failed_password');
 		$this->setSession(null);
 		return false;
 	}
@@ -918,16 +919,11 @@ class AtomicAuthModel
 	 *
 	 * @return boolean
 	 */
-	public function isMaxLoginAttemptsExceeded(string $identity, $ipAddress=null): bool
+	public function isMaxAttemptsExceeded(string $identity, $ipAddress=null): bool
 	{
-		if ($this->config->trackLoginAttempts)
+		if ($this->config->trackAttempts && $this->config->maxAttempts > 0)
 		{
-			$maxAttempts = $this->config->maximumLoginAttempts;
-			if ($maxAttempts > 0)
-			{
-				$attempts = $this->getAttemptsNum($identity, $ipAddress);
-				return $attempts >= $maxAttempts;
-			}
+			return (bool) ($this->getAttemptsNum($identity, $ipAddress) >= $this->config->maxAttempts);
 		}
 		return false;
 	}
@@ -946,20 +942,11 @@ class AtomicAuthModel
 	 */
 	public function getAttemptsNum(string $identity, $ipAddress=null): int
 	{
-		if ($this->config->trackLoginAttempts)
+		if ($this->config->trackAttempts)
 		{
-			$builder = $this->db->table($this->config->tables['login_attempts']);
-			$builder->where('login', $identity);
-			if ($this->config->trackLoginIpAddress)
-			{
-				if (! isset($ipAddress))
-				{
-					$ipAddress = \Config\Services::request()->getIPAddress();
-				}
-				$builder->where('ip_address', $ipAddress);
-			}
-			$builder->where('time >', time() - $this->config->lockoutTime, false);
-			return $builder->countAllResults();
+			$this->loginModel->lockoutTime = $this->config->lockoutTime;
+			$logins = $this->loginModel->getLoginsByIdentity( $identity, $this->config->maxAttempts );
+			return count($logins);
 		}
 		return 0;
 	}
@@ -977,7 +964,7 @@ class AtomicAuthModel
 	 */
 	public function getLastAttemptTime(string $identity, $ipAddress=null): int
 	{
-		if ($this->config->trackLoginAttempts)
+		if ($this->config->trackAttempts)
 		{
 			$builder = $this->db->table($this->config->tables['login_attempts']);
 			$builder->select('time');
@@ -1011,7 +998,7 @@ class AtomicAuthModel
 	 */
 	public function getLastAttemptIp(string $identity)
 	{
-		if ($this->config->trackLoginAttempts && $this->config->trackLoginIpAddress)
+		if ($this->config->trackAttempts && $this->config->trackLoginIpAddress)
 		{
 			$this->db->select('ip_address');
 			$this->db->where('login', $identity);
@@ -1038,7 +1025,7 @@ class AtomicAuthModel
 	 */
 	public function increaseLoginAttempts(string $identity): bool
 	{
-		if ($this->config->trackLoginAttempts)
+		if ($this->config->trackAttempts)
 		{
 			$data = ['ip_address' => '', 'login' => $identity, 'time' => time()];
 			if ($this->config->trackLoginIpAddress)
@@ -1069,7 +1056,7 @@ class AtomicAuthModel
 	 */
 	public function clearLoginAttempts(string $identity, int $oldAttemptsAxpirePeriod=86400, $ipAddress = null): bool
 	{
-		if ($this->config->trackLoginAttempts)
+		if ($this->config->trackAttempts)
 		{
 			// Make sure $oldAttemptsAxpirePeriod is at least equals to lockoutTime
 			$oldAttemptsAxpirePeriod = max($oldAttemptsAxpirePeriod, $this->config->lockoutTime);
@@ -1826,14 +1813,14 @@ class AtomicAuthModel
 	 *
 	 * @return boolean
 	 */
-	public function setLoginAttempt(string $identity, int $status = 'failed', int $id = null): bool
+	public function setLoginAttempt(string $identity, string $status = 'failed', int $id = null): bool
 	{
 		$this->triggerEvents('update_last_login');
 		$this->triggerEvents('extra_where');
 		$this->db->table($this->config->tables['track_login'])->insert([
-			$this->config->identity => $identity,
+			'identity' => $identity,
 			'user_id' => $id,
-			'status' => $status,
+			'activity' => $status,
 			'created_at' => date('Y-m-d H:i:s'),
 		]);
 		return $this->db->affectedRows() === 1;
@@ -2008,7 +1995,7 @@ class AtomicAuthModel
 			$identity = $user->{$this->config->identity};
 			if ($this->verifyPassword($token->validator, $user->remember_code, $identity))
 			{
-				$this->trackLoginAttempts($user->id);
+				$this->trackAttempts($user->id);
 
 				$this->setSession($user);
 

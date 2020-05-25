@@ -157,7 +157,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 | -------------------------------------------------------------------------
 	 | Authentication options.
 	 | -------------------------------------------------------------------------
-	 | maximumLoginAttempts: 	This maximum is not enforced by the library, but is used by
+	 | maxLoginAttempts: 	This maximum is not enforced by the library, but is used by
 	 | 							is_max_login_attempts_exceeded().
 	 | 							The controller should check this function and act appropriately.
 	 | 							If this variable set to 0, there is no maximum.
@@ -180,9 +180,9 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $rememberUsers            = true;                // Allow users to be remembered and enable auto-login
 	public $userExpire               = 86500;               // How long to remember the user (seconds). Set to zero for no expiration
 	public $userExtendonLogin        = false;               // Extend the users cookies every time they auto-login
-	public $trackLoginAttempts       = true;                // Track the number of failed login attempts for each user or ip.
-	public $trackLoginIpAddress      = true;                // Track login attempts by IP Address, if false will track based on identity. (Default: true)
-	public $maximumLoginAttempts     = 3;                   // The maximum number of failed login attempts.
+	public $trackAttempts       = true;                // Track the number of failed login attempts for each user or ip.
+	public $maxAttempts     = 3;                   // The maximum number of failed login attempts.
+	public $trackActivity = [0=>'failed', 1=>'success', 2=>'failed_password', 3=>'failed'];
 	public $lockoutTime              = 600;                 /* The number of seconds to lockout an account due to exceeded attempts
 																	You should not use a value below 60 (1 minute) */
 	public $forgotPasswordExpiration = 1800;                /* The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.

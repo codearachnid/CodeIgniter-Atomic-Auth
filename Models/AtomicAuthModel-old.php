@@ -1011,7 +1011,7 @@ class AtomicAuthModel
 	{
 		if ($this->config->trackLoginAttempts)
 		{
-			$maxAttempts = $this->config->maximumLoginAttempts;
+			$maxAttempts = $this->config->maxLoginAttempts;
 			if ($maxAttempts > 0)
 			{
 				$attempts = $this->getAttemptsNum($identity, $ipAddress);
