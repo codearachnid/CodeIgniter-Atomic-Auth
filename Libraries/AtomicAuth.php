@@ -373,7 +373,17 @@ class AtomicAuth
 	{
 		// I think we can remove this method
 
-		/*
+
+		if (version_compare(phpversion(), '7.0.0', '>=')) {
+		    // php version isn't high enough
+				show_error("Please update to PHP 7.0.0 to use this library.");
+		}
+
+		if (CI_VERSION && version_compare(CI_VERSION, '4.0.3', '>=')) {
+		    // php version isn't high enough
+				show_error("Please ensure you are using CodeIgniter4 or greater to use this library.");
+		}
+
 		// PHP password_* function sanity check
 		if (!function_exists('password_hash') || !function_exists('password_verify'))
 		{
@@ -382,9 +392,7 @@ class AtomicAuth
 				"Please upgrade to CI 3, or PHP >= 5.5 " .
 				"or use password_compat (https://github.com/ircmaxell/password_compat).");
 		}
-		*/
 
-		/*
 		// Compatibility check for CSPRNG
 		// See functions used in Atomic_auth_model::randomToken()
 		if (!function_exists('random_bytes') && !function_exists('mcrypt_create_iv') && !function_exists('openssl_random_pseudo_bytes'))
@@ -392,7 +400,6 @@ class AtomicAuth
 			show_error("No CSPRNG functions to generate random enough token. " .
 				"Please update to PHP 7 or use random_compat (https://github.com/paragonie/random_compat).");
 		}
-		*/
 	}
 
 
