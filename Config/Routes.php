@@ -10,18 +10,20 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
   // ...
 
   // ... user centric
+  $routes->add('list', 'User::list');
   $routes->add('create', 'User::create');
   $routes->add('edit', 'User::edit');
   $routes->add('edit/(:hash)', 'User::edit/$1');
   $routes->add('activate/(:hash)', 'User::activate/$1');
-  // $routes->get('activate/(:num)/(:hash)', 'Auth::activate/$1/$2');
-  $routes->delete('suspend/(:hash)', 'User::suspend/$1');
+  $routes->add('suspend/(:hash)', 'User::suspend/$1');
+  $routes->delete('delete/(:hash)', 'User::delete/$1');
   // ...
 
   // ... group/roles
   $routes->add('group/create', 'Group::create');
   $routes->patch('group/edit/(:hash)', 'Group::edit/$1');
-  $routes->delete('suspend/(:hash)', 'Group::suspend/$1');
+  $routes->add('suspend/(:hash)', 'Group::suspend/$1');
+  $routes->delete('delete/(:hash)', 'Group::delete/$1');
   // ...
 
   // ... be careful leaving these in if you aren't sure what they do

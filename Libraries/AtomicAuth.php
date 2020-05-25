@@ -327,19 +327,14 @@ class AtomicAuth
 	}
 
 	/**
-	 * Get user id
+	 * Get user profile details
 	 *
 	 * @return integer|null The user's ID from the session user data or NULL if not found
 	 * @author jrmadsen67
 	 **/
-	public function getUserId()
+	public function getUserProfile( $key = null )
 	{
-		$userId = $this->session->get('user_id');
-		if (! empty($userId) )
-		{
-			return $userId;
-		}
-		return null;
+		return $this->session->getSession( !is_null($key) ? $key : null );
 	}
 
 	/**
@@ -350,16 +345,19 @@ class AtomicAuth
 	 * @return boolean Whether the user is an administrator
 	 * @author Ben Edmunds
 	 */
-	public function isAdmin(int $id=0): bool
+	public function isAdmin($userOrId = null): bool
 	{
-		$this->atomicAuthModel->triggerEvents('is_admin');
+		$this->atomicAuthModel->triggerEvents('is_admin_check');
+		// TODO do a proper lookup of the user
+		$id = is_null($userOrId) ? $this->getSession( 'user_id' ) : $userOrId;
+		return $this->atomicAuthModel->inGroup($this->config->adminGroup, $id);
+	}
 
-		// TODO fix this!!!!
-		return true;
-
-		$adminGroup = $this->config->adminGroup;
-
-		return $this->atomicAuthModel->inGroup($adminGroup, $id);
+	public function isDefault($userOrId = null): bool
+	{
+		$this->atomicAuthModel->triggerEvents('is_default_check');
+		$id = is_null($userOrId) ? $this->getSession( 'user_id' ) : $userOrId;
+		return $this->atomicAuthModel->inGroup($this->config->defaultGroup, $id);
 	}
 
 	/**
@@ -371,15 +369,12 @@ class AtomicAuth
 	 */
 	protected function checkCompatibility()
 	{
-		// I think we can remove this method
-
-
-		if (version_compare(phpversion(), '7.0.0', '>=')) {
+		if (!version_compare(phpversion(), '7.0.0', '>=')) {
 		    // php version isn't high enough
 				show_error("Please update to PHP 7.0.0 to use this library.");
 		}
 
-		if (CI_VERSION && version_compare(CI_VERSION, '4.0.3', '>=')) {
+		if ( DEFINED('CI_VERSION') && version_compare(CI_VERSION, '4.0.3', '>=')) {
 		    // php version isn't high enough
 				show_error("Please ensure you are using CodeIgniter4 or greater to use this library.");
 		}

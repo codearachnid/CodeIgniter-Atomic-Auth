@@ -20,14 +20,14 @@ class AtomicAuthPermissions extends \CodeIgniter\Database\Seeder
 			[ 'name' => 'promote_user', 'description' => 'Can add/remove user to groups', ],
 		];
 
-		$memberPermissions = [
+		$defaultPermissions = [
 			[ 'name' => 'edit_self', 'description' => 'Allow user to edit themself', ],
 		];
 
 		if($this->db->tableExists($config->tables['permissions']))
 		{
 			$this->db->table($config->tables['permissions'])->insertBatch($adminPermissions);
-			$this->db->table($config->tables['permissions'])->insertBatch($memberPermissions);
+			$this->db->table($config->tables['permissions'])->insertBatch($defaultPermissions);
 		}
 
 
