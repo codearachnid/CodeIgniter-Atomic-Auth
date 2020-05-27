@@ -20,8 +20,8 @@ return [
 	'account_creation_unsuccessful' 	 	 	=> 'Nu am reușit să creez contul',
 	'account_creation_duplicate_email' 	 	=> 'Email deja folosit sau invalid',
 	'account_creation_duplicate_identity' 	=> 'Numele de utilizator este deja folosit sau este invalid',
-	'account_creation_missing_defaultGroup' => 'Grupul prestabilit nu a fost setat',
-	'account_creation_invalid_defaultGroup' => 'Ați setat un nume greșit pentru grupul prestabilit',
+	'account_creation_missing_defaultRole' => 'Grupul prestabilit nu a fost setat',
+	'account_creation_invalid_defaultRole' => 'Ați setat un nume greșit pentru grupul prestabilit',
 
 	// Password
 	'password_change_successful' 	 	 => 'Parolă schimbată cu succes',
@@ -51,15 +51,15 @@ return [
 	'delete_successful' 		 	         => 'Utilizator șters',
 	'delete_unsuccessful' 		 	     => 'Nu am reușit să șterg utilizatorul',
 
-	// Groups
-	'group_creation_successful'  		=> 'Grup creat cu succes',
-	'group_already_exists'       		=> 'Numele de grup a fost deja utilizat',
-	'group_update_successful'    		=> 'Detaliile grupului au fost actualizate',
-	'group_delete_successful'    		=> 'Grup șters cu succes',
-	'group_delete_unsuccessful' 			=> 'Nu am putut șterge grupul',
-	'group_delete_notallowed'    		=> 'Nu pot șterge grupul administratorilor',
-	'group_name_required' 				=> 'Este necesar un nume pentru grup',
-	'group_name_admin_not_alter' 		=> 'Numele grupului administratorilor nu poate fi schimbat',
+	// Roles
+	'role_creation_successful'  		=> 'Grup creat cu succes',
+	'role_already_exists'       		=> 'Numele de grup a fost deja utilizat',
+	'role_update_successful'    		=> 'Detaliile grupului au fost actualizate',
+	'role_delete_successful'    		=> 'Grup șters cu succes',
+	'role_delete_unsuccessful' 			=> 'Nu am putut șterge grupul',
+	'role_delete_notallowed'    		=> 'Nu pot șterge grupul administratorilor',
+	'role_name_required' 				=> 'Este necesar un nume pentru grup',
+	'role_name_admin_not_alter' 		=> 'Numele grupului administratorilor nu poate fi schimbat',
 
 	// Activation Email
 	'emailActivation_subject'           => 'Activarea contului',

@@ -24,8 +24,8 @@ return [
 	'account_creation_duplicate_identity'    => 'Ім`я користувача існує або некоректне',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Група за умовчанням не встановлена',
-	'account_creation_invalid_defaultGroup' => 'Група за умовчанням задана некоректно',
+	'account_creation_missing_defaultRole' => 'Група за умовчанням не встановлена',
+	'account_creation_invalid_defaultRole' => 'Група за умовчанням задана некоректно',
 
 	// Password
 	'password_change_successful'		=> 'Пароль успішно змінено',
@@ -55,15 +55,15 @@ return [
 	'delete_successful'		=> 'Обліковий запис видалено',
 	'delete_unsuccessful'		=> 'Неможливо видалити обліковий запис',
 
-	// Groups
-	'group_creation_successful'  => 'Група створена успішно',
-	'group_already_exists'       => 'Група з таким ім\'ям вже існує',
-	'group_update_successful'    => 'Дані групи оновлені успішно',
-	'group_delete_successful'    => 'Група видалена',
-	'group_delete_unsuccessful'  => 'Не вдалося видалити групу',
-	'group_delete_notallowed'    => 'Не можна видалити групу адміністраторів',
-	'group_name_required' 	    => 'Ім\'я групи обов\'язкове до заповнення',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'  => 'Група створена успішно',
+	'role_already_exists'       => 'Група з таким ім\'ям вже існує',
+	'role_update_successful'    => 'Дані групи оновлені успішно',
+	'role_delete_successful'    => 'Група видалена',
+	'role_delete_unsuccessful'  => 'Не вдалося видалити групу',
+	'role_delete_notallowed'    => 'Не можна видалити групу адміністраторів',
+	'role_name_required' 	    => 'Ім\'я групи обов\'язкове до заповнення',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'  => 'Активація облікового запису',

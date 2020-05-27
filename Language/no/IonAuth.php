@@ -25,8 +25,8 @@ return [
 	'account_creation_unsuccessful'			=> 'Klarte ikke å opprette konto',
 	'account_creation_duplicate_email'		=> 'E-posten er allerede i bruk eller ugyldig',
 	'account_creation_duplicate_identity'	=> 'Brukernavnet er allerede i bruk eller ugyldig',
-	'account_creation_missing_defaultGroup' => 'Standardgruppe er ikke valgt',
-	'account_creation_invalid_defaultGroup' => 'Ugyldig gruppenavn',
+	'account_creation_missing_defaultRole' => 'Standardgruppe er ikke valgt',
+	'account_creation_invalid_defaultRole' => 'Ugyldig gruppenavn',
 
 
 	// Password
@@ -57,15 +57,15 @@ return [
 	'delete_successful'	 => 'Konto slettet',
 	'delete_unsuccessful' => 'Klarte ikke å slette konto',
 
-	// Groups
-	'group_creation_successful' => 'Gruppe opprettet',
-	'group_already_exists'	   => 'Gruppenavnet finnes allerede',
-	'group_update_successful'   => 'Gruppeinformasjon oppdatert',
-	'group_delete_successful'   => 'Gruppe slettet',
-	'group_delete_unsuccessful' => 'Klarte ikke å slette gruppe',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required'	   => 'Gruppenavn må fylles inn',
-	'group_name_admin_not_alter' => 'Admingruppenavnet kan ikke endres',
+	// Roles
+	'role_creation_successful' => 'Gruppe opprettet',
+	'role_already_exists'	   => 'Gruppenavnet finnes allerede',
+	'role_update_successful'   => 'Gruppeinformasjon oppdatert',
+	'role_delete_successful'   => 'Gruppe slettet',
+	'role_delete_unsuccessful' => 'Klarte ikke å slette gruppe',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required'	   => 'Gruppenavn må fylles inn',
+	'role_name_admin_not_alter' => 'Admingruppenavnet kan ikke endres',
 
 	// Activation Email
 	'emailActivation_subject'  => 'Aktivering av konto',

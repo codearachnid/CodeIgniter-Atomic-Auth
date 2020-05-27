@@ -22,8 +22,8 @@ return [
 	'account_creation_duplicate_identity' => '이 계정명은 사용중이거나 올바르지 않습니다',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Default group is not set',
-	'account_creation_invalid_defaultGroup' => 'Invalid default group name set',
+	'account_creation_missing_defaultRole' => 'Default role is not set',
+	'account_creation_invalid_defaultRole' => 'Invalid default role name set',
 
 	// Password
 	'password_change_successful' 	 	 => '비밀번호를 바꾸었습니다',
@@ -53,15 +53,15 @@ return [
 	'delete_successful'               => '사용자를 삭제하였습니다',
 	'delete_unsuccessful'           => '사용자를 삭제할 수 없습니다',
 
-	// Groups
-	'group_creation_successful'  => '그룹을 생성하였습니다',
-	'group_already_exists'       => '이미 사용 중인 그룹명입니다',
-	'group_update_successful'    => '그룹에 대한 세부 정보를 업데이트 하였습니다',
-	'group_delete_successful'    => '그룹을 삭제했습니다',
-	'group_delete_unsuccessful' 	=> '그룹을 삭제할 수 없습니다',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required' 		=> '그룹 이름을 입력해 주십시오',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'  => '그룹을 생성하였습니다',
+	'role_already_exists'       => '이미 사용 중인 그룹명입니다',
+	'role_update_successful'    => '그룹에 대한 세부 정보를 업데이트 하였습니다',
+	'role_delete_successful'    => '그룹을 삭제했습니다',
+	'role_delete_unsuccessful' 	=> '그룹을 삭제할 수 없습니다',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required' 		=> '그룹 이름을 입력해 주십시오',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'            => '계정 활성화 방법을 보내드립니다',

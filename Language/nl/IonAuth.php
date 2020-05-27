@@ -23,8 +23,8 @@ return [
 	'account_creation_duplicate_identity' => 'Gebruikersnaam is al in gebruik of ongeldig',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Standaard groep is niet ingesteld',
-	'account_creation_invalid_defaultGroup' => 'Standaard groepsnaam is ongeldig',
+	'account_creation_missing_defaultRole' => 'Standaard groep is niet ingesteld',
+	'account_creation_invalid_defaultRole' => 'Standaard groepsnaam is ongeldig',
 
 
 	// Password
@@ -55,15 +55,15 @@ return [
 	'delete_successful' 		 	 => 'Gebruiker is verwijderd',
 	'delete_unsuccessful' 		 	 => 'Gebruiker verwijderen is mislukt',
 
-	// Groups
-	'group_creation_successful'  => 'Groep is succesvol aangemaakt',
-	'group_already_exists'       => 'Groepsnaam is reeds in gebruik',
-	'group_update_successful'    => 'Groepsinformatie is bijgewerkt',
-	'group_delete_successful'    => 'Groep is verwijderd',
-	'group_delete_unsuccessful' 	=> 'Groep verwijderen is mislukt',
-	'group_delete_notallowed'    => 'Het is niet mogelijk om de administrator groep te verwijderen',
-	'group_name_required' 		=> 'Groepsnaam is een verplicht veld',
-	'group_name_admin_not_alter' => 'De naam van de administrator groep is niet aanpasbaar',
+	// Roles
+	'role_creation_successful'  => 'Groep is succesvol aangemaakt',
+	'role_already_exists'       => 'Groepsnaam is reeds in gebruik',
+	'role_update_successful'    => 'Groepsinformatie is bijgewerkt',
+	'role_delete_successful'    => 'Groep is verwijderd',
+	'role_delete_unsuccessful' 	=> 'Groep verwijderen is mislukt',
+	'role_delete_notallowed'    => 'Het is niet mogelijk om de administrator groep te verwijderen',
+	'role_name_required' 		=> 'Groepsnaam is een verplicht veld',
+	'role_name_admin_not_alter' => 'De naam van de administrator groep is niet aanpasbaar',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Account activering',

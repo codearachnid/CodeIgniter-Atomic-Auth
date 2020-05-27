@@ -25,8 +25,8 @@ return [
 	'account_creation_unsuccessful'          => 'Impossible de créer le compte',
 	'account_creation_duplicate_email'       => 'Email déjà utilisé ou invalide',
 	'account_creation_duplicate_identity'    => 'Nom d\'utilisateur déjà utilisé ou invalide',
-	'account_creation_missing_defaultGroup' => 'Le groupe par défaut n\'est pas configuré',
-	'account_creation_invalid_defaultGroup' => 'Le nom du groupe par défaut n\'est pas valide',
+	'account_creation_missing_defaultRole' => 'Le rolee par défaut n\'est pas configuré',
+	'account_creation_invalid_defaultRole' => 'Le nom du rolee par défaut n\'est pas valide',
 
 	// Password
 	'password_change_successful'   => 'Le mot de passe a été changé avec succès',
@@ -56,15 +56,15 @@ return [
 	'delete_unsuccessful' => 'Impossible de supprimer l\'utilisateur',
 	'deactivate_current_user_unsuccessful'=> 'Vous ne pouvez pas vous désactiver vous-même.',
 
-	// Groups
-	'group_creation_successful' => 'Groupe créé avec succès',
-	'group_already_exists'      => 'Nom du groupe déjà pris',
-	'group_update_successful'   => 'Informations sur le groupe mis à jour',
-	'group_delete_successful'   => 'Groupe supprimé',
-	'group_delete_unsuccessful' => 'Impossible de supprimer le groupe',
-	'group_delete_notallowed'    => 'Le groupe Administrateur ne peut pas être supprimé',
-	'group_name_required'       => 'Le nom du groupe est un champ obligatoire',
-	'group_name_admin_not_alter' => 'Le nom du groupe Admin ne peut pas être modifié',
+	// Roles
+	'role_creation_successful' => 'Groupe créé avec succès',
+	'role_already_exists'      => 'Nom du rolee déjà pris',
+	'role_update_successful'   => 'Informations sur le rolee mis à jour',
+	'role_delete_successful'   => 'Groupe supprimé',
+	'role_delete_unsuccessful' => 'Impossible de supprimer le rolee',
+	'role_delete_notallowed'    => 'Le rolee Administrateur ne peut pas être supprimé',
+	'role_name_required'       => 'Le nom du rolee est un champ obligatoire',
+	'role_name_admin_not_alter' => 'Le nom du rolee Admin ne peut pas être modifié',
 
 	// Activation Email
 	'emailActivation_subject'  => 'Activation du compte',

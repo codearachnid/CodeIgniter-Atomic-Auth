@@ -209,7 +209,7 @@ class AtomicAuth
 	 * @param string $password       Password
 	 * @param string $email          Email
 	 * @param array  $additionalData Additional data
-	 * @param array  $groupIds       Groups id
+	 * @param array  $roleIds       Roles id
 	 *
 	 * @return integer|array|boolean The new user's ID if e-mail activation is disabled or Atomic-Auth e-mail activation
 	 *                               was completed;
@@ -217,7 +217,7 @@ class AtomicAuth
 	 *                               if the operation failed.
 	 * @author Mathew
 	 */
-	public function register(string $identity, string $password, string $email, array $userMeta = [], array $groups = [])
+	public function register(string $identity, string $password, string $email, array $userMeta = [], array $roles = [])
 	{
 		// $this->atomicAuthModel->triggerEvents('pre_account_creation');
 
@@ -228,28 +228,28 @@ class AtomicAuth
 			return false;
 		}
 
-		// check default group exists for failback
-		if (! $this->config->defaultGroup && empty($groups))
+		// check default role exists for failback
+		if (! $this->config->defaultRole && empty($roles))
 		{
-			$this->setError('AtomicAuth.account_creation_missing_defaultGroup');
+			$this->setError('AtomicAuth.account_creation_missing_defaultRole');
 			return false;
 		}
 
-		// check if the default group exists in database
-		if ( empty($groups) && ! $this->atomicAuthModel->groupExists($this->config->defaultGroup))
+		// check if the default role exists in database
+		if ( empty($roles) && ! $this->atomicAuthModel->roleExists($this->config->defaultRole))
 		{
-			$this->setError('AtomicAuth.account_creation_invalid_defaultGroup');
+			$this->setError('AtomicAuth.account_creation_invalid_defaultRole');
 			return false;
 		}
 
-		if( ! empty($groups) )
+		if( ! empty($roles) )
 		{
-			// TODO check for if specified group(s) exist in db too
+			// TODO check for if specified role(s) exist in db too
 		}
 		else
 		{
-			// no groups supplied, use a default group to associate to user
-			$groups[] = $this->atomicAuthModel->groupModel()->getGroupByGuid( $this->config->defaultGroup );
+			// no roles supplied, use a default role to associate to user
+			$roles[] = $this->atomicAuthModel->roleModel()->getGroupByGuid( $this->config->defaultRole );
 		}
 
 		// setup user to model
@@ -261,8 +261,8 @@ class AtomicAuth
 					return false;
 				}
 
-				// add user to group association
-				$this->atomicAuthModel->addUserToGroup($groups, $user->id);
+				// add user to role association
+				$this->atomicAuthModel->addUserToGroup($roles, $user->id);
 
 				$this->setMessage('AtomicAuth.account_creation_successful');
 
@@ -279,11 +279,11 @@ class AtomicAuth
 	{
 		$this->atomicAuthModel->triggerEvents('logout');
 
-		$activeUser = $this->session->get('activeUser');
+		$activeUser = $this->getSession();
 		if( $activeUser ) {
 			// TODO make these methods work
-			// $this->atomicAuthModel->clearForgottenPasswordCode($activeUser['user_id']);
-			// $this->atomicAuthModel->resetRememberToken($activeUser['user_id']);
+			// $this->atomicAuthModel->clearForgottenPasswordCode($activeUser->id);
+			// $this->atomicAuthModel->resetRememberToken($activeUser->id);
 		}
 
 		$this->setSession(null);
@@ -327,37 +327,26 @@ class AtomicAuth
 	}
 
 	/**
-	 * Get user profile details
-	 *
-	 * @return integer|null The user's ID from the session user data or NULL if not found
-	 * @author jrmadsen67
-	 **/
-	public function getUserProfile( $key = null )
-	{
-		return $this->session->getSession( !is_null($key) ? $key : null );
-	}
-
-	/**
-	 * Check to see if the currently logged in user is an admin.
+	 * Check to see if the user is an admin.
 	 *
 	 * @param integer $id User id
 	 *
 	 * @return boolean Whether the user is an administrator
 	 * @author Ben Edmunds
 	 */
-	public function isAdmin($userOrId = null): bool
+	public function isAdmin(?int $userId = null): bool
 	{
 		$this->atomicAuthModel->triggerEvents('is_admin_check');
 		// TODO do a proper lookup of the user
-		$id = is_null($userOrId) ? $this->getSession( 'user_id' ) : $userOrId;
-		return $this->atomicAuthModel->inGroup($this->config->adminGroup, $id);
+		$id = is_null($userId) ? $this->getSessionProperty( 'id' ) : $userId;
+		return $this->atomicAuthModel->hasRole($this->config->adminRole, $id);
 	}
 
 	public function isDefault($userOrId = null): bool
 	{
 		$this->atomicAuthModel->triggerEvents('is_default_check');
-		$id = is_null($userOrId) ? $this->getSession( 'user_id' ) : $userOrId;
-		return $this->atomicAuthModel->inGroup($this->config->defaultGroup, $id);
+		$id = is_null($userOrId) ? $this->getSessionProperty( 'id' ) : $userOrId;
+		return $this->atomicAuthModel->hasRole($this->config->defaultRole, $id);
 	}
 
 	/**

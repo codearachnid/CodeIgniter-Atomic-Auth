@@ -28,8 +28,8 @@ return [
 	'account_creation_duplicate_identity' => 'ユーザー名が登録済みまたは不正です',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'デフォルトグループが設定されていません',
-	'account_creation_invalid_defaultGroup' => 'デフォルトグループの名前が無効です',
+	'account_creation_missing_defaultRole' => 'デフォルトグループが設定されていません',
+	'account_creation_invalid_defaultRole' => 'デフォルトグループの名前が無効です',
 
 	// Password
 	'password_change_successful' 	 	 => 'パスワードを変更しました',
@@ -59,15 +59,15 @@ return [
 	'delete_successful' 		 	 => 'ユーザーを削除しました',
 	'delete_unsuccessful' 		 => 'ユーザーを削除することが出来ません',
 
-	// Groups
-	'group_creation_successful'  => 'グループを作成しました',
-	'group_already_exists'       => 'このグループ名はすでに使われています',
-	'group_update_successful'    => 'グループ情報を更新しました',
-	'group_delete_successful'    => 'グループを削除しました',
-	'group_delete_unsuccessful' 	=> 'グループを削除することが出来ません',
-	'group_delete_notallowed'    => 'administratorsグループは削除できません',
-	'group_name_required' 		=> 'グループ名が必要です。',
-	'group_name_admin_not_alter' => '管理者グループ名は変更できません',
+	// Roles
+	'role_creation_successful'  => 'グループを作成しました',
+	'role_already_exists'       => 'このグループ名はすでに使われています',
+	'role_update_successful'    => 'グループ情報を更新しました',
+	'role_delete_successful'    => 'グループを削除しました',
+	'role_delete_unsuccessful' 	=> 'グループを削除することが出来ません',
+	'role_delete_notallowed'    => 'administratorsグループは削除できません',
+	'role_name_required' 		=> 'グループ名が必要です。',
+	'role_name_admin_not_alter' => '管理者グループ名は変更できません',
 
 	// Activation Email
 	'emailActivation_subject'            => 'アカウントの承認',

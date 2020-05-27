@@ -20,8 +20,8 @@ return [
 	'account_creation_duplicate_identity' => 'Užívateľské meno už existuje alebo je neplatné',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Základná skupina nenastavená',
-	'account_creation_invalid_defaultGroup' => 'Nesprávne meno základnej skupiny',
+	'account_creation_missing_defaultRole' => 'Základná skupina nenastavená',
+	'account_creation_invalid_defaultRole' => 'Nesprávne meno základnej skupiny',
 
 	// Password
 	'password_change_successful' 	 	 => 'Heslo bolo úspešne zmenené',
@@ -51,15 +51,15 @@ return [
 	'delete_successful' 		 	         => 'Užívateľ bol zmazaný',
 	'delete_unsuccessful' 		 	     => 'Užívateľ sa nedá zmazať ',
 
-	// Groups
-	'group_creation_successful'  => 'Skupina úspešne vytvorená',
-	'group_already_exists'       => 'Meno skupiny už existuje',
-	'group_update_successful'    => 'Detaily skupiny upravené',
-	'group_delete_successful'    => 'Skupina zmazaná',
-	'group_delete_unsuccessful' 	=> 'Nemôžem zmazať skupinu',
-	'group_delete_notallowed'    => 'Nemôžem zmazať administrátorskú skupinu',
-	'group_name_required' 		=> 'Meno skupiny je požadované pole',
-	'group_name_admin_not_alter' => 'Administratorská skupina nemôže byť zmenená',
+	// Roles
+	'role_creation_successful'  => 'Skupina úspešne vytvorená',
+	'role_already_exists'       => 'Meno skupiny už existuje',
+	'role_update_successful'    => 'Detaily skupiny upravené',
+	'role_delete_successful'    => 'Skupina zmazaná',
+	'role_delete_unsuccessful' 	=> 'Nemôžem zmazať skupinu',
+	'role_delete_notallowed'    => 'Nemôžem zmazať administrátorskú skupinu',
+	'role_name_required' 		=> 'Meno skupiny je požadované pole',
+	'role_name_admin_not_alter' => 'Administratorská skupina nemôže byť zmenená',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Aktivácia účtu',

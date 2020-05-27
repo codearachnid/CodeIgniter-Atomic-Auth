@@ -24,8 +24,8 @@ return [
 	'account_creation_unsuccessful' 	 	    => 'Üyelik kaydınız yapılamadı',
 	'account_creation_duplicate_email' 	    => 'E-posta adresi geçersiz ya da daha önceden alınmış',
 	'account_creation_duplicate_identity'    => 'Kullanıcı adı geçersiz ya da daha önceden alınmış',
-	'account_creation_missing_defaultGroup' => 'Herhangi bir varsayılan grup ayarlanmamış',
-	'account_creation_invalid_defaultGroup' => 'Geçersiz bir varsayılan grup seçimi',
+	'account_creation_missing_defaultRole' => 'Herhangi bir varsayılan grup ayarlanmamış',
+	'account_creation_invalid_defaultRole' => 'Geçersiz bir varsayılan grup seçimi',
 
 	// Password
 	'password_change_successful' 	 	    => 'Şifreniz değiştirildi',
@@ -55,15 +55,15 @@ return [
 	'delete_successful' 		 	            => 'Kullanıcı silindi',
 	'delete_unsuccessful' 			        => 'Kullanıcı silme başarısız',
 
-	// Groups
-	'group_creation_successful'              => 'Grup başarıyla oluşturuldu',
-	'group_already_exists'                   => 'Grup adı daha önceden oluşturulmuş',
-	'group_update_successful'                => 'Grup detayları güncellendi',
-	'group_delete_successful'                => 'Grup silindi ',
-	'group_delete_unsuccessful' 	            => 'Grup silinemedi',
-	'group_delete_notallowed'                => 'Yönetici grup silinemez',
-	'group_name_required' 		            => 'Grup adı alanı gereklidir',
-	'group_name_admin_not_alter'             => 'Yönetici grup adı değiştirilemez',
+	// Roles
+	'role_creation_successful'              => 'Grup başarıyla oluşturuldu',
+	'role_already_exists'                   => 'Grup adı daha önceden oluşturulmuş',
+	'role_update_successful'                => 'Grup detayları güncellendi',
+	'role_delete_successful'                => 'Grup silindi ',
+	'role_delete_unsuccessful' 	            => 'Grup silinemedi',
+	'role_delete_notallowed'                => 'Yönetici grup silinemez',
+	'role_name_required' 		            => 'Grup adı alanı gereklidir',
+	'role_name_admin_not_alter'             => 'Yönetici grup adı değiştirilemez',
 
 	// Activation Email
 	'emailActivation_subject'               => 'Hesap Etkinleştirme',

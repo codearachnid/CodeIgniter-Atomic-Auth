@@ -42,12 +42,12 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $accessHash = '4bb42e373b9b4320324603c9b67a0a577dbc8ca04ee34010230f3f3fab7d06c1';
 
 	/**
-	 * Database group name option.
+	 * Database role name option.
 	 * -------------------------------------------------------------------------
-	 * Allows to select a specific group for the database connection
+	 * Allows to select a specific role for the database connection
 	 *
-	 * Default is null: uses default group defined in CI's configuration
-	 * (see application/config/database.php, $active_group variable)
+	 * Default is null: uses default role defined in CI's configuration
+	 * (see application/config/database.php, $active_role variable)
 	 *
 	 * @var string
 	 */
@@ -61,14 +61,14 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $tables = [
 		'config'						=> 'atomicauth_config',
 		'users'							=> 'atomicauth_users',
-		'groups'						=> 'atomicauth_groups',
+		'roles'						=> 'atomicauth_roles',
 		'track_login'				=> 'atomicauth_track_logins',
 		'reset_attempts'		=> 'atomicauth_reset_attempts',
 		'tokens'						=> 'atomicauth_tokens',
-		'permissions'				=> 'atomicauth_permissions',
-		'users_permissions'	=> 'atomicauth_users_permissions',
-		'groups_users'			=> 'atomicauth_groups_users',
-		'groups_permissions'=> 'atomicauth_groups_permissions',
+		'capabilities'				=> 'atomicauth_capabilities',
+		'users_capabilities'	=> 'atomicauth_users_capabilities',
+		'roles_users'			=> 'atomicauth_roles_users',
+		'roles_capabilities'=> 'atomicauth_roles_capabilities',
 	];
 
 	/**
@@ -81,13 +81,13 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	/**
 	 * Users table column and Group table column you want to join WITH.
 	 * Joins from users.id
-	 * Joins from groups.id
+	 * Joins from roles.id
 	 *
 	 * @var array
 	 */
 	public $join = [
 		'users'  => 'user_id',
-		'groups' => 'group_id',
+		'roles' => 'role_id',
 	];
 
 	/*
@@ -111,7 +111,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 | 		With bcrypt, an example hash of "password" is:
 	 | 		$2y$08$200Z6ZZbp3RAEXoaWcMA6uJOFicwNZaqk4oDhqTUiFXFe63MG.Daa
 	 |
-	 |		A specific parameter bcryptAdminCost is available for user in admin group.
+	 |		A specific parameter bcryptAdminCost is available for user in admin role.
 	 |		It is recommended to have a stronger hashing for administrators.
 	 |
 	 | Argon2 specific:
@@ -133,7 +133,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 | 		With argon2, an example hash of "password" is:
 	 | 		$argon2i$v=19$m=1024,t=2,p=2$VEFSSU4wSzh3cllVdE1JZQ$PDeks/7JoKekQrJa9HlfkXIk8dAeZXOzUxLBwNFbZ44
 	 |
-	 |		A specific parameter argon2AdminParams is available for user in admin group.
+	 |		A specific parameter argon2AdminParams is available for user in admin role.
 	 |		It is recommended to have a stronger hashing for administrators.
 	 |
 	 | For more information, check the password_hash function help: http://php.net/manual/en/function.password-hash.php
@@ -141,7 +141,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	 */
 	public $hashMethod          = 'bcrypt';  // bcrypt or argon2
 	public $bcryptDefaultCost   = 10;        // Set cost according to your server benchmark - but no lower than 10 (default PHP value)
-	public $bcryptAdminCost     = 12;        // Cost for user in admin group
+	public $bcryptAdminCost     = 12;        // Cost for user in admin role
 	public $argon2DefaultParams = [
 		'memory_cost' => 1 << 12, // 4MB
 		'time_cost'   => 2,
@@ -172,8 +172,8 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $adminEmail               = 'admin@example.com'; // Admin Email, admin@example.com
 	public $forceAuthorizedUserCreate = false;
 	public $redirectOnSuccess				 = false;
-	public $defaultGroup             = '342bf19ff862494828bfa7c8cb20926a';           // Default group, use guid
-	public $adminGroup               = '5bb7a9e7db3e29a2032bd1c5010561ff';             // Default administrators group, use guid
+	public $defaultRole             = '342bf19ff862494828bfa7c8cb20926a';           // Default role, use guid
+	public $adminRole               = '5bb7a9e7db3e29a2032bd1c5010561ff';             // Default administrators role, use guid
 	public $minPasswordLength        = 8;                   // Minimum Required Length of Password (not enforced by lib - see note above)
 	public $emailActivation          = false;               // Email Activation for registration
 	public $manualActivation         = false;               // Manual Activation for registration
@@ -188,6 +188,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
 	public $forgotPasswordExpiration = 1800;                /* The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
 																	30 minutes to 1 hour are good values (enough for a user to receive the email and reset its password)
 																	You should not set a value too high, as it would be a security issue! */
+public $sessionKey = 'activeUser';
 	public $sessionExpiration        = 0;                   /* The number of seconds after which the session is checked again against database to see if the user still exists and is active.
 																	Leave 0 if you don't want session recheck. if you really think you need to recheck the session against database, we would
 																	recommend a higher value, as this would affect performance */

@@ -19,8 +19,8 @@ return [
 	'account_creation_unsuccessful' 	 	 	    => 'Nem lehet létrehozni a felhasználói fiókot',
 	'account_creation_duplicate_email' 	 	  => 'Az email cím használatban van vagy érvénytelen',
 	'account_creation_duplicate_identity' 	  => 'A felhasználó név használatban van vagy érvénytelen',
-	'account_creation_missing_defaultGroup' => 'Alapértelmezett csoport nincs megadva',
-	'account_creation_invalid_defaultGroup' => 'Érvénytelen alapértelmezett csoport név',
+	'account_creation_missing_defaultRole' => 'Alapértelmezett csoport nincs megadva',
+	'account_creation_invalid_defaultRole' => 'Érvénytelen alapértelmezett csoport név',
 
 	// Password
 	'password_change_successful' 	 	 	=> 'A jelszó sikeresen megváltoztatva',
@@ -50,15 +50,15 @@ return [
 	'delete_successful' 		 	 			=> 'Felhasználó törölve',
 	'delete_unsuccessful' 		 	 		=> 'Nem lehet a felhasználót törölni',
 
-	// Groups
-	'group_creation_successful'  			=> 'Csoport sikeresen létrehozva',
-	'group_already_exists'       			=> 'A csoport már létezik',
-	'group_update_successful'    			=> 'Csoport adatai sikeresen módosítva',
-	'group_delete_successful'    			=> 'Csoport törölve',
-	'group_delete_unsuccessful' 				=> 'Nem lehet a csoportot törölni',
-	'group_delete_notallowed'    			=> 'Az adminisztrátorok csoport nem törölhető',
-	'group_name_required' 				    	=> 'A csoport neve kötelező mező',
-	'group_name_admin_not_alter' 			=> 'Az admin csoport neve nem változtatható meg',
+	// Roles
+	'role_creation_successful'  			=> 'Csoport sikeresen létrehozva',
+	'role_already_exists'       			=> 'A csoport már létezik',
+	'role_update_successful'    			=> 'Csoport adatai sikeresen módosítva',
+	'role_delete_successful'    			=> 'Csoport törölve',
+	'role_delete_unsuccessful' 				=> 'Nem lehet a csoportot törölni',
+	'role_delete_notallowed'    			=> 'Az adminisztrátorok csoport nem törölhető',
+	'role_name_required' 				    	=> 'A csoport neve kötelező mező',
+	'role_name_admin_not_alter' 			=> 'Az admin csoport neve nem változtatható meg',
 
 	// Activation Email
 	'emailActivation_subject'         => 'Felhasználói fiók aktiválása',

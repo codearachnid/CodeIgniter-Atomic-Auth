@@ -30,8 +30,8 @@ return [
 	'account_creation_duplicate_identity' => 'Podana nazwa użytkownika jest nieprawidłowa lub została już użyta',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Domyślna grupa nie jest ustawiona',
-	'account_creation_invalid_defaultGroup' => 'Nieprawidłowa nazwa domyślnej grupy',
+	'account_creation_missing_defaultRole' => 'Domyślna grupa nie jest ustawiona',
+	'account_creation_invalid_defaultRole' => 'Nieprawidłowa nazwa domyślnej grupy',
 
 
 	// Password
@@ -62,15 +62,15 @@ return [
 	'delete_successful' 					 => 'Użytkownik został skasowany',
 	'delete_unsuccessful' 				 => 'Nie można skasować użytkownika',
 
-	// Groups
-	'group_creation_successful'  => 'Grupa została utworzona pomyślnie',
-	'group_already_exists'       => 'Podana grupa już istnieje!',
-	'group_update_successful'    => 'Grupa została zaktualizowana',
-	'group_delete_successful'    => 'Grupa została usunięta',
-	'group_delete_unsuccessful' 	=> 'Unable to delete group',
-	'group_delete_notallowed'    => 'Nie można usunąć grupy administracyjnej',
-	'group_name_required' 		=> 'Nazwa grupy jest wymagana',
-	'group_name_admin_not_alter' => 'Nazwa grupy administracyjnej nie może zostać zmieniona!',
+	// Roles
+	'role_creation_successful'  => 'Grupa została utworzona pomyślnie',
+	'role_already_exists'       => 'Podana grupa już istnieje!',
+	'role_update_successful'    => 'Grupa została zaktualizowana',
+	'role_delete_successful'    => 'Grupa została usunięta',
+	'role_delete_unsuccessful' 	=> 'Unable to delete role',
+	'role_delete_notallowed'    => 'Nie można usunąć grupy administracyjnej',
+	'role_name_required' 		=> 'Nazwa grupy jest wymagana',
+	'role_name_admin_not_alter' => 'Nazwa grupy administracyjnej nie może zostać zmieniona!',
 
 	// Activation Email
 	'emailActivation_subject'  => 'Aktywacja Konta',

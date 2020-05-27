@@ -20,8 +20,8 @@ return [
 	'account_creation_unsuccessful' 	 	 => 'Impossibile creare l\'account.',
 	'account_creation_duplicate_email' 	 => 'Email gi&agrave; in uso o non valida.',
 	'account_creation_duplicate_identity' 	 => 'Nome utente gi&agrave; in uso o non valido.',
-	'account_creation_missing_defaultGroup' => 'Gruppo predefinito non impostato',
-	'account_creation_invalid_defaultGroup' => 'Nome del gruppo predefinito non valido',
+	'account_creation_missing_defaultRole' => 'Gruppo predefinito non impostato',
+	'account_creation_invalid_defaultRole' => 'Nome del gruppo predefinito non valido',
 
 
 	// Password
@@ -52,15 +52,15 @@ return [
 	'delete_successful' 		 	 => 'Utente eliminato.',
 	'delete_unsuccessful' 		 	 => 'Impossibile eliminare l\'utente.',
 
-	// Groups
-	'group_creation_successful'  => 'Gruppo creato con successo',
-	'group_already_exists'       => 'Nome gruppo gi&agrave; assegnato',
-	'group_update_successful'    => 'Dettagli gruppo aggiornati',
-	'group_delete_successful'    => 'Gruppo cancellato',
-	'group_delete_unsuccessful' 	=> 'Impossibile cancellare il gruppo',
-	'group_delete_notallowed'    => 'Impossibile eliminare il gruppo amministratori',
-	'group_name_required' 		=> 'Il nome gruppo &egrave; un campo obbligatorio',
-	'group_name_admin_not_alter' => 'Il nome del gruppo amministratori non pu&ograve; essere modificato',
+	// Roles
+	'role_creation_successful'  => 'Gruppo creato con successo',
+	'role_already_exists'       => 'Nome gruppo gi&agrave; assegnato',
+	'role_update_successful'    => 'Dettagli gruppo aggiornati',
+	'role_delete_successful'    => 'Gruppo cancellato',
+	'role_delete_unsuccessful' 	=> 'Impossibile cancellare il gruppo',
+	'role_delete_notallowed'    => 'Impossibile eliminare il gruppo amministratori',
+	'role_name_required' 		=> 'Il nome gruppo &egrave; un campo obbligatorio',
+	'role_name_admin_not_alter' => 'Il nome del gruppo amministratori non pu&ograve; essere modificato',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Attivazione Account',

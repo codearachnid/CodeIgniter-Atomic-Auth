@@ -25,8 +25,8 @@ return [
 	'account_creation_unsuccessful' 	 	 => 'ไม่สามารถสร้างบัญชีได้',
 	'account_creation_duplicate_email' 	 => 'อีเมล์นี้ถูกใช้ไปแล้วหรือรูปแบบไม่ถูกต้อง',
 	'account_creation_duplicate_identity' => 'ชื่อผู้ใช้นี้ถูกใช้ไปแล้วหรือรูปแบบไม่ถูกต้อง',
-	'account_creation_missing_defaultGroup' => 'กลุ่มปริยายยังไม่ถูกตั้ง',
-	'account_creation_invalid_defaultGroup' => 'ชื่อกลุ่มปริยายตั้งไม่ถูกต้อง',
+	'account_creation_missing_defaultRole' => 'กลุ่มปริยายยังไม่ถูกตั้ง',
+	'account_creation_invalid_defaultRole' => 'ชื่อกลุ่มปริยายตั้งไม่ถูกต้อง',
 
 
 	// Password
@@ -57,15 +57,15 @@ return [
 	'delete_successful'               => 'ผู้ใช้ถูกลบแล้ว',
 	'delete_unsuccessful'           => 'ไม่สามารถลบผู้ใช้ได้',
 
-	// Groups
-	'group_creation_successful'  => 'สร้างกลุ่มสำเร็จ',
-	'group_already_exists'       => 'ชื่อกลุ่มถูกใช้ไปแล้ว',
-	'group_update_successful'    => 'แก้ไขรายละเอียดกลุ่มแล้ว',
-	'group_delete_successful'    => 'กลุ่มถูกลบแล้ว',
-	'group_delete_unsuccessful' 	=> 'ไม่สามารถลบกลุ่มได้',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required' 		=> 'ต้องใส่ชื่อกลุ่ม',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'  => 'สร้างกลุ่มสำเร็จ',
+	'role_already_exists'       => 'ชื่อกลุ่มถูกใช้ไปแล้ว',
+	'role_update_successful'    => 'แก้ไขรายละเอียดกลุ่มแล้ว',
+	'role_delete_successful'    => 'กลุ่มถูกลบแล้ว',
+	'role_delete_unsuccessful' 	=> 'ไม่สามารถลบกลุ่มได้',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required' 		=> 'ต้องใส่ชื่อกลุ่ม',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'            => 'การเปิดใช้บัญชี',

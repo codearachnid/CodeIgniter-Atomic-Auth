@@ -22,8 +22,8 @@ return [
 	'account_creation_unsuccessful'          => 'No ha estat possible crear el compte',
 	'account_creation_duplicate_email'       => 'Email en ús o invàlid',
 	'account_creation_duplicate_identity'    => 'Nom d&#39;usuari en ús o invàlid',
-	'account_creation_missing_defaultGroup' => 'No s&#39;ha establert grup per defecte',
-	'account_creation_invalid_defaultGroup' => 'Conjunt de noms de grup per defecte invalid',
+	'account_creation_missing_defaultRole' => 'No s&#39;ha establert grup per defecte',
+	'account_creation_invalid_defaultRole' => 'Conjunt de noms de grup per defecte invalid',
 
 
 	// Password
@@ -54,15 +54,15 @@ return [
 	'delete_successful'						=> 'Usuari eliminat',
 	'delete_unsuccessful'					=> 'No s&#39;ha pogut Eliminar l&#39;usuari',
 
-	// Groups
-	'group_creation_successful'  => 'Grup creat amb èxit',
-	'group_already_exists'       => 'Nom de grup no disponible',
-	'group_update_successful'    => 'Actualitzats detalls de grup',
-	'group_delete_successful'    => 'Grup esborrat',
-	'group_delete_unsuccessful' 	=> 'No s&#39;ha pogut esborrar el grup',
-	'group_delete_notallowed'    => 'No es pot eliminar el grup dels administradors',
-	'group_name_required' 		    => 'El nom de grup és un camp necessari',
-	'group_name_admin_not_alter' => 'El nom del grup Admin no es pot canviar',
+	// Roles
+	'role_creation_successful'  => 'Grup creat amb èxit',
+	'role_already_exists'       => 'Nom de grup no disponible',
+	'role_update_successful'    => 'Actualitzats detalls de grup',
+	'role_delete_successful'    => 'Grup esborrat',
+	'role_delete_unsuccessful' 	=> 'No s&#39;ha pogut esborrar el grup',
+	'role_delete_notallowed'    => 'No es pot eliminar el grup dels administradors',
+	'role_name_required' 		    => 'El nom de grup és un camp necessari',
+	'role_name_admin_not_alter' => 'El nom del grup Admin no es pot canviar',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Activació del compte',

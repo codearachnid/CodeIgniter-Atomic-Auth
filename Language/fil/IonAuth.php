@@ -20,8 +20,8 @@ return [
 	'account_creation_unsuccessful'          => 'Hindi magawang i-Lumikha ng Account',
 	'account_creation_duplicate_email'       => 'Email ay Nagamit na o Hindi wastong',
 	'account_creation_duplicate_identity'    => 'Pagkakakilanlan ay Nagamit na o Hindi wastong',
-	'account_creation_missing_defaultGroup' => 'Default na grupo ay hindi nakatakda',
-	'account_creation_invalid_defaultGroup' => 'Hindi wasto ang default na ngalan ng grupo',
+	'account_creation_missing_defaultRole' => 'Default na grupo ay hindi nakatakda',
+	'account_creation_invalid_defaultRole' => 'Hindi wasto ang default na ngalan ng grupo',
 
 
 	// Password
@@ -52,15 +52,15 @@ return [
 	'delete_successful'                   => 'User Natanggal na',
 	'delete_unsuccessful'                 => 'Hindi magawang alisin User',
 
-	// Groups
-	'group_creation_successful'           => 'Matagumpay na Nalikha ang Grupo',
-	'group_already_exists'                => 'Ang pangalan ng grupo nagamit na',
-	'group_update_successful'             => 'Detalye sa Grupo Na-Bago na',
-	'group_delete_successful'             => 'Ang Grupo Na-Tanggal na',
-	'group_delete_unsuccessful'           => 'Hindi matanggal ang grupo',
-	'group_delete_notallowed'             => 'Hindi Maaaring tanggalin ang Grupo Administrator',
-	'group_name_required'                 => 'Ang Ngalan sa Grupo ay Kailangan',
-	'group_name_admin_not_alter'          => 'Hndi Maaaring Palitan ang Ngalan sa Grupo',
+	// Roles
+	'role_creation_successful'           => 'Matagumpay na Nalikha ang Grupo',
+	'role_already_exists'                => 'Ang pangalan ng grupo nagamit na',
+	'role_update_successful'             => 'Detalye sa Grupo Na-Bago na',
+	'role_delete_successful'             => 'Ang Grupo Na-Tanggal na',
+	'role_delete_unsuccessful'           => 'Hindi matanggal ang grupo',
+	'role_delete_notallowed'             => 'Hindi Maaaring tanggalin ang Grupo Administrator',
+	'role_name_required'                 => 'Ang Ngalan sa Grupo ay Kailangan',
+	'role_name_admin_not_alter'          => 'Hndi Maaaring Palitan ang Ngalan sa Grupo',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Account Activation',

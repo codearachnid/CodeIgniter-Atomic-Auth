@@ -27,8 +27,8 @@ return [
 	'account_creation_duplicate_identity' => 'Der Benutzername ist ungültig oder wird bereits verwendet',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Standard-Gruppe ist nicht gesetzt',
-	'account_creation_invalid_defaultGroup' => 'Ungültiger Standard-Gruppenname',
+	'account_creation_missing_defaultRole' => 'Standard-Gruppe ist nicht gesetzt',
+	'account_creation_invalid_defaultRole' => 'Ungültiger Standard-Gruppenname',
 
 
 	// Password
@@ -59,15 +59,15 @@ return [
 	'delete_successful' 	 => 'Das Benutzerkonto wurde gelöscht',
 	'delete_unsuccessful' => 'Das Benutzerkonto konnte nicht gelöscht werden',
 
-	// Groups
-	'group_creation_successful'  => 'Gruppe wurde erfolgreich erstellt',
-	'group_already_exists'       => 'Gruppenname bereits vergeben',
-	'group_update_successful'    => 'Gruppendetails aktualisiert',
-	'group_delete_successful'    => 'Gruppe gelöscht',
-	'group_delete_unsuccessful' 	=> 'Gruppe konnte nicht gelöscht werden',
-	'group_delete_notallowed'    => 'Sie können die Administrator-Gruppe nicht löschen',
-	'group_name_required' 		    => '"Gruppenname" ist ein Pflichtfeld',
-	'group_name_admin_not_alter' => 'Admin-Gruppenname kann nicht geändert werden',
+	// Roles
+	'role_creation_successful'  => 'Gruppe wurde erfolgreich erstellt',
+	'role_already_exists'       => 'Gruppenname bereits vergeben',
+	'role_update_successful'    => 'Gruppendetails aktualisiert',
+	'role_delete_successful'    => 'Gruppe gelöscht',
+	'role_delete_unsuccessful' 	=> 'Gruppe konnte nicht gelöscht werden',
+	'role_delete_notallowed'    => 'Sie können die Administrator-Gruppe nicht löschen',
+	'role_name_required' 		    => '"Gruppenname" ist ein Pflichtfeld',
+	'role_name_admin_not_alter' => 'Admin-Gruppenname kann nicht geändert werden',
 
 	// Activation Email
 	'emailActivation_subject'  => 'Aktivierung des Kontos',

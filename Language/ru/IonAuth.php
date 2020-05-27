@@ -22,8 +22,8 @@ return [
 	'account_creation_unsuccessful' 	 	 => 'Невозможно создать учетную запись',
 	'account_creation_duplicate_email' 	 => 'Электронная почта используется или некорректна',
 	'account_creation_duplicate_username' 	 => 'Имя пользователя существует или некорректно',
-	'account_creation_missing_defaultGroup' => 'Группа по умолчанию не установлена',
-	'account_creation_invalid_defaultGroup' => 'Группа по умолчанию задана некорректно',
+	'account_creation_missing_defaultRole' => 'Группа по умолчанию не установлена',
+	'account_creation_invalid_defaultRole' => 'Группа по умолчанию задана некорректно',
 
 	// Password
 	'password_change_successful' 	 	 => 'Пароль успешно изменен',
@@ -53,14 +53,14 @@ return [
 	'delete_successful' 		 	 => 'Учетная запись удалена',
 	'delete_unsuccessful' 		 	 => 'Невозможно удалить учетную запись',
 
-	// Groups
-	'group_creation_successful'  => 'Группа создана успешно',
-	'group_already_exists'       => 'Группа с таким именем уже существует',
-	'group_update_successful'    => 'Данные группы обновлены успешно',
-	'group_delete_successful'    => 'Группа удалена',
-	'group_delete_unsuccessful' 	=> 'Не удалось удалить группу',
-	'group_delete_notallowed'    => 'Нельзя удалить группу администраторов',
-	'group_name_required' 		=> 'Имя группы обязательно к заполнению',
+	// Roles
+	'role_creation_successful'  => 'Группа создана успешно',
+	'role_already_exists'       => 'Группа с таким именем уже существует',
+	'role_update_successful'    => 'Данные группы обновлены успешно',
+	'role_delete_successful'    => 'Группа удалена',
+	'role_delete_unsuccessful' 	=> 'Не удалось удалить группу',
+	'role_delete_notallowed'    => 'Нельзя удалить группу администраторов',
+	'role_name_required' 		=> 'Имя группы обязательно к заполнению',
 	// Activation Email
 	'emailActivation_subject'            => 'Активация учетной записи',
 	'emailActivate_heading'    => 'Активировать акаунт с именем  %s',

@@ -20,8 +20,8 @@ return [
 	'account_creation_unsuccessful'          => '账号创建失败',
 	'account_creation_duplicate_email'       => '电子邮件已被使用或不合法',
 	'account_creation_duplicate_identity'    => '账号已存在或不合法',
-	'account_creation_missing_defaultGroup' => '尚未设定默认群组',
-	'account_creation_invalid_defaultGroup' => '默认群组名称不合法',
+	'account_creation_missing_defaultRole' => '尚未设定默认群组',
+	'account_creation_invalid_defaultRole' => '默认群组名称不合法',
 
 	// Password
 	'password_change_successful'   => '密码已修改',
@@ -51,15 +51,15 @@ return [
 	'delete_successful'   => '账号已删除',
 	'delete_unsuccessful' => '删除账号失败',
 
-	// Groups
-	'group_creation_successful'  => 'Group created Successfully',
-	'group_already_exists'       => 'Group name already taken',
-	'group_update_successful'    => 'Group details updated',
-	'group_delete_successful'    => 'Group deleted',
-	'group_delete_unsuccessful' 	=> 'Unable to delete group',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required' 		=> 'Group name is a required field',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'  => 'Group created Successfully',
+	'role_already_exists'       => 'Group name already taken',
+	'role_update_successful'    => 'Group details updated',
+	'role_delete_successful'    => 'Group deleted',
+	'role_delete_unsuccessful' 	=> 'Unable to delete role',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required' 		=> 'Group name is a required field',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'         => '帐号激活',

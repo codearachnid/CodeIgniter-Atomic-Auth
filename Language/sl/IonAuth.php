@@ -23,8 +23,8 @@ return [
 	'account_creation_duplicate_identity' => 'Uporabniško ime je neveljavno ali pa že obstaja',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Default group is not set',
-	'account_creation_invalid_defaultGroup' => 'Invalid default group name set',
+	'account_creation_missing_defaultRole' => 'Default role is not set',
+	'account_creation_invalid_defaultRole' => 'Invalid default role name set',
 
 	// Geslo
 	'password_change_successful' 	 	 => 'Geslo je bilo uspešno spremenjeno',
@@ -55,14 +55,14 @@ return [
 	'delete_unsuccessful'           => 'Ni možno izbrisati uporabnika',
 
 	// Skupina
-	'group_creation_successful'  => 'Skupina je bila uspešno ustvarjena',
-	'group_already_exists'       => 'Ime skupine že obstaja',
-	'group_update_successful'    => 'Podatki o skupini so bili uspešno posodobljeni',
-	'group_delete_successful'    => 'Skupina izbrisana',
-	'group_delete_unsuccessful' 	=> 'Ni možno izbrisati skupine',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required' 		=> 'Ime skupine je obvezno polje',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	'role_creation_successful'  => 'Skupina je bila uspešno ustvarjena',
+	'role_already_exists'       => 'Ime skupine že obstaja',
+	'role_update_successful'    => 'Podatki o skupini so bili uspešno posodobljeni',
+	'role_delete_successful'    => 'Skupina izbrisana',
+	'role_delete_unsuccessful' 	=> 'Ni možno izbrisati skupine',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required' 		=> 'Ime skupine je obvezno polje',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Aktivacija računa',

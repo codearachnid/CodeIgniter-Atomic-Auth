@@ -22,8 +22,8 @@ return [
 	'account_creation_duplicate_identity' => 'Потребителското име е вече използвано или невалидно',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Default group is not set',
-	'account_creation_invalid_defaultGroup' => 'Invalid default group name set',
+	'account_creation_missing_defaultRole' => 'Default role is not set',
+	'account_creation_invalid_defaultRole' => 'Invalid default role name set',
 
 	// Password
 	'password_change_successful' 	 	 => 'Паролата бе сменена успешно',
@@ -53,16 +53,16 @@ return [
 	'delete_successful'               => 'Потребителя бе изтрит',
 	'delete_unsuccessful'           => 'Неуспешен опит за изтриване на потребител',
 
-	// Groups
-	'group_creation_successful'  => 'Групата бе създадена успешно',
-	'group_already_exists'       => 'Името на групата вече е заето',
-	'group_update_successful'    => 'Детайлите на групата бяха актуализирани',
-	'group_delete_successful'    => 'Групата бе изтрита',
-	'group_delete_unsuccessful' 	=> 'Неуспешен опит за изтриване на групата',
+	// Roles
+	'role_creation_successful'  => 'Групата бе създадена успешно',
+	'role_already_exists'       => 'Името на групата вече е заето',
+	'role_update_successful'    => 'Детайлите на групата бяха актуализирани',
+	'role_delete_successful'    => 'Групата бе изтрита',
+	'role_delete_unsuccessful' 	=> 'Неуспешен опит за изтриване на групата',
 	//TO DO Please translate
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required' 		=> 'Group name is a required field',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required' 		=> 'Group name is a required field',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	//TO DO Please translate
 	// Activation Email

@@ -11,6 +11,7 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
 
   // ... user centric
   $routes->add('list', 'User::list');
+  $routes->add('user', 'User::profile');
   $routes->add('create', 'User::create');
   $routes->add('edit', 'User::edit');
   $routes->add('edit/(:hash)', 'User::edit/$1');
@@ -19,9 +20,9 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
   $routes->delete('delete/(:hash)', 'User::delete/$1');
   // ...
 
-  // ... group/roles
-  $routes->add('group/create', 'Group::create');
-  $routes->patch('group/edit/(:hash)', 'Group::edit/$1');
+  // ... role/roles
+  $routes->add('role/create', 'Group::create');
+  $routes->patch('role/edit/(:hash)', 'Group::edit/$1');
   $routes->add('suspend/(:hash)', 'Group::suspend/$1');
   $routes->delete('delete/(:hash)', 'Group::delete/$1');
   // ...

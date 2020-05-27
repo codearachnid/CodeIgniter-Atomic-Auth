@@ -30,8 +30,8 @@ return [
 	'account_creation_duplicate_identity' => 'نام کاربری قبلا استفاده شده است',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'گروه پیش فرض ذخیره نشده است',
-	'account_creation_invalid_defaultGroup' => 'گروه پیشفرض نامعتبر است',
+	'account_creation_missing_defaultRole' => 'گروه پیش فرض ذخیره نشده است',
+	'account_creation_invalid_defaultRole' => 'گروه پیشفرض نامعتبر است',
 
 	// Password
 	'password_change_successful' 	 	 => 'رمز عبور عوض شد',
@@ -61,15 +61,15 @@ return [
 	'delete_successful'              	 => 'کاربر حذف شد',
 	'delete_unsuccessful'          		 => 'امكان حذف کاربر وجود ندارد',
 
-	// Groups
-	'group_creation_successful'  => 'گروه با موفقيت ايجاد شد',
-	'group_already_exists'       => 'اين نام گروه قبلا استفاده شده است',
-	'group_update_successful'    => 'جزئيات گروه با موفقيت بروز رساني شد',
-	'group_delete_successful'    => 'گروه حذف شد',
-	'group_delete_unsuccessful' 	=> 'امكان حذف گروه وجود ندارد',
-	'group_delete_notallowed'    => 'نمیتوان گروه مدیریت را پاک کرد',
-	'group_name_required' 		=> 'نام گروه لازم است',
-	'group_name_admin_not_alter' => 'نام گروه ادمین را نمیتوان تغییر داد',
+	// Roles
+	'role_creation_successful'  => 'گروه با موفقيت ايجاد شد',
+	'role_already_exists'       => 'اين نام گروه قبلا استفاده شده است',
+	'role_update_successful'    => 'جزئيات گروه با موفقيت بروز رساني شد',
+	'role_delete_successful'    => 'گروه حذف شد',
+	'role_delete_unsuccessful' 	=> 'امكان حذف گروه وجود ندارد',
+	'role_delete_notallowed'    => 'نمیتوان گروه مدیریت را پاک کرد',
+	'role_name_required' 		=> 'نام گروه لازم است',
+	'role_name_admin_not_alter' => 'نام گروه ادمین را نمیتوان تغییر داد',
 
 	// Activation Email
 	'emailActivation_subject'            => 'فعال سازی حساب کاربري',

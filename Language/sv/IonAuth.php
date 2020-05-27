@@ -22,8 +22,8 @@ return [
 	'account_creation_duplicate_identity' => 'Användarnamnet är ogiltigt eller används redan',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Standard grupp är inte satt',
-	'account_creation_invalid_defaultGroup' => 'Ogiltlig standard grupp namn satt',
+	'account_creation_missing_defaultRole' => 'Standard grupp är inte satt',
+	'account_creation_invalid_defaultRole' => 'Ogiltlig standard grupp namn satt',
 
 
 	// Password
@@ -54,15 +54,15 @@ return [
 	'delete_successful'      => 'Användaren är borttagen',
 	'delete_unsuccessful'    => 'Det gick inte att ta bort användaren',
 
-	// Groups
-	'group_creation_successful'  => 'Group created Successfully',
-	'group_already_exists'       => 'Group name already taken',
-	'group_update_successful'    => 'Group details updated',
-	'group_delete_successful'    => 'Group deleted',
-	'group_delete_unsuccessful' 	=> 'Unable to delete group',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required' 		=> 'Group name is a required field',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'  => 'Group created Successfully',
+	'role_already_exists'       => 'Group name already taken',
+	'role_update_successful'    => 'Group details updated',
+	'role_delete_successful'    => 'Group deleted',
+	'role_delete_unsuccessful' 	=> 'Unable to delete role',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required' 		=> 'Group name is a required field',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'   => 'Kontoaktivering',

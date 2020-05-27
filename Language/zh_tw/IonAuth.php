@@ -25,8 +25,8 @@ return [
 	'account_creation_unsuccessful'       => '無法建立帳號',
 	'account_creation_duplicate_email'    => '電子郵件已被使用或不合法',
 	'account_creation_duplicate_identity' => '帳號已存在或不合法',
-	'account_creation_missing_defaultGroup' => '尚未設定預設群組',
-	'account_creation_invalid_defaultGroup' => '預設群組名稱不合法',
+	'account_creation_missing_defaultRole' => '尚未設定預設群組',
+	'account_creation_invalid_defaultRole' => '預設群組名稱不合法',
 
 	// Password
 	'password_change_successful'   => '密碼變更成功',
@@ -56,15 +56,15 @@ return [
 	'delete_successful'   => '帳號已刪除',
 	'delete_unsuccessful' => '刪除帳號失敗',
 
-	// Groups
-	'group_creation_successful'  => '建立群組成功',
-	'group_already_exists'       => '群組名稱已重複',
-	'group_update_successful'    => '更新群組成功',
-	'group_delete_successful'    => '群組已刪除',
-	'group_delete_unsuccessful'  => '刪除群組失敗',
-	'group_delete_notallowed'    => '無法刪除管理者群組',
-	'group_name_required'        => '群組名稱為必填欄位',
-	'group_name_admin_not_alter' => '不能變更管理者群組名稱',
+	// Roles
+	'role_creation_successful'  => '建立群組成功',
+	'role_already_exists'       => '群組名稱已重複',
+	'role_update_successful'    => '更新群組成功',
+	'role_delete_successful'    => '群組已刪除',
+	'role_delete_unsuccessful'  => '刪除群組失敗',
+	'role_delete_notallowed'    => '無法刪除管理者群組',
+	'role_name_required'        => '群組名稱為必填欄位',
+	'role_name_admin_not_alter' => '不能變更管理者群組名稱',
 
 	// Activation Email
 	'emailActivation_subject'  => '啟動帳號',

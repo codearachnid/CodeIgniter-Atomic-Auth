@@ -110,10 +110,36 @@ class User extends \CodeIgniter\Controller
 			$this->data['users'] = $this->atomicAuth->users()->result();
 			foreach ($this->data['users'] as $k => $user)
 			{
-				$this->data['users'][$k]->groups = $this->atomicAuth->getUsersGroups($user->id)->getResult();
+				$this->data['users'][$k]->roles = $this->atomicAuth->getUserRoles($user->id)->getResult();
 			}
 			return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'index', $this->data);
 		}
+	}
+
+	public function profile()
+	{
+		if (! $this->atomicAuth->loggedIn())
+		{
+			// redirect them to the login page
+			return redirect()->to('/auth/login');
+		}
+
+		$user          = $this->atomicAuth->getUserProfile();
+
+		if(is_null($user))
+		{
+			// TODO better handling if user doesn't exist
+			return redirect()->to('/auth/login');
+		}
+
+		$this->data['title'] = lang('Auth.edit_user_heading');
+		$this->data['atomicAuth'] = $this->atomicAuth;
+		$this->data['message'] = $this->session->getFlashdata('message');
+
+		// pass the user to the view
+		$this->data['user']          = $user;
+
+		return view('AtomicAuth\Views\Auth\user_profile', $this->data);
 	}
 
 
@@ -266,7 +292,7 @@ class User extends \CodeIgniter\Controller
 					{
 						// if the password was successfully changed
 						$this->session->setFlashdata('message', $this->atomicAuth->messages());
-						return redirect()->to('/auth/login');
+						return redirect()->to('/auth/user');
 					}
 					else
 					{
@@ -416,10 +442,10 @@ class User extends \CodeIgniter\Controller
 					$identity = strtolower($this->request->getPost($this->configAtomicAuth->identity));
 					$password = $this->request->getPost('password');
 					$userMeta = []; // TODO flesh out user meta data
-					$userGroups = []; // TODO flesh out user group associations
+					$userRoles = []; // TODO flesh out user role associations
 
 					// user entity register the user
-					if( $this->atomicAuth->register($identity, $password, $email, $userMeta, $userGroups) )
+					if( $this->atomicAuth->register($identity, $password, $email, $userMeta, $userRoles) )
 					{
 						// check to see if we are creating the user
 						// redirect them back to the admin page
@@ -504,8 +530,8 @@ class User extends \CodeIgniter\Controller
 		// TODO secure this page
 		if (
 			! $this->atomicAuth->loggedIn()
-			|| ! $this->atomicAuth->userCan('edit_user')
-			|| ($this->atomicAuth->userCan('edit_self') && !is_null($guid))
+			// || ! $this->atomicAuth->userCan('edit_user')
+			// || ($this->atomicAuth->userCan('edit_self') && !is_null($guid))
 			)
 		{
 			return redirect()->to('/auth');
@@ -513,7 +539,7 @@ class User extends \CodeIgniter\Controller
 
 		$refreshUser = false;
 		$user          = $this->atomicAuth->getUserProfile( $guid );
-		$groups        = $this->atomicAuth->groupModel()->where('status', 'active')->findAll();
+		$roles        = $this->atomicAuth->roleModel()->where('status', 'active')->findAll();
 
 		if(is_null($user))
 		{
@@ -540,9 +566,9 @@ class User extends \CodeIgniter\Controller
 
 					if ($atomicAuth->userCan('promote_user'))
 					{
-						// Update the groups user belongs to
-						$groupData = $this->request->getPost('groups');
-						if( !empty($groupData) && count($groupData) == $this->atomicAuth->addUserToGroup( $groupData, $user->id, TRUE ) )
+						// Update the roles user belongs to
+						$roleData = $this->request->getPost('roles');
+						if( !empty($roleData) && count($roleData) == $this->atomicAuth->addUserToGroup( $roleData, $user->id, TRUE ) )
 						{
 							$refreshUser = true;
 						}
@@ -564,12 +590,12 @@ class User extends \CodeIgniter\Controller
 							// $identity = strtolower($this->request->getPost($this->configAtomicAuth->identity));
 
 							$userMeta = []; // TODO flesh out user meta data
-							// $userGroups = []; // TODO flesh out user group associations
+							// $userRoles = []; // TODO flesh out user role associations
 
 
 
 							// user entity register the user
-							// if( $this->atomicAuth->register($identity, $password, $email, $userMeta, $userGroups) )
+							// if( $this->atomicAuth->register($identity, $password, $email, $userMeta, $userRoles) )
 							// {
 							// 	// check to see if we are creating the user
 							// 	// redirect them back to the admin page
@@ -624,19 +650,19 @@ class User extends \CodeIgniter\Controller
 					$data['password'] = $this->request->getPost('password');
 				}
 
-				// Only allow updating groups if user is admin
+				// Only allow updating roles if user is admin
 				if ($this->atomicAuth->isAdmin())
 				{
-					// Update the groups user belongs to
-					$groupData = $this->request->getPost('groups');
+					// Update the roles user belongs to
+					$roleData = $this->request->getPost('roles');
 
-					if (! empty($groupData))
+					if (! empty($roleData))
 					{
 						$this->atomicAuth->removeFromGroup('', $id);
 
-						foreach ($groupData as $grp)
+						foreach ($roleData as $role)
 						{
-							$this->atomicAuth->addToGroup($grp, $id);
+							$this->atomicAuth->addToGroup($role, $id);
 						}
 					}
 				}
@@ -666,8 +692,8 @@ class User extends \CodeIgniter\Controller
 
 		// pass the user to the view
 		$this->data['user']          = $user;
-		$this->data['groups']        = $groups;
-		$this->data['userInGroups']  = array_column($user->groups, 'id');
+		$this->data['roles']        = $roles;
+		$this->data['userInRoles']  = array_column($user->roles, 'id');
 
 		$this->data['password'] = [
 			'name' => 'password',

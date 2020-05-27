@@ -23,8 +23,8 @@ return [
 	'account_creation_unsuccessful'            => 'Neįmanoma sukurti vartotojo',
 	'account_creation_duplicate_email'         => 'Toks el. pašto adresas jau yra, arba yra netaisyklingas',
 	'account_creation_duplicate_identity'      => 'Prisijungimo vardas jau yra arba netaisyklingas',
-	'account_creation_missing_defaultGroup'    => 'Nenustatyta numatytoji grupė',
-	'account_creation_invalid_defaultGroup'    => 'Nustatytas neteisingas numatytosios grupės pavadinimas',
+	'account_creation_missing_defaultRole'    => 'Nenustatyta numatytoji grupė',
+	'account_creation_invalid_defaultRole'    => 'Nustatytas neteisingas numatytosios grupės pavadinimas',
 
 	// Password
 	'password_change_successful'          => 'Slaptažodis sukurtas',
@@ -54,15 +54,15 @@ return [
 	'delete_successful'               => 'Vartotojas pašalintas',
 	'delete_unsuccessful'             => 'Neįmanoma pašalinti vartotojo',
 
-	// Groups
-	'group_creation_successful'       => 'Grupė sėkmingai sukurta',
-	'group_already_exists'            => 'Grupės vardas jau naudojamas',
-	'group_update_successful'         => 'Grupės detalės atnaujintos',
-	'group_delete_successful'         => 'Grupė ištrinta',
-	'group_delete_unsuccessful'       => 'Nepavyksta ištrinti grupės',
-	'group_delete_notallowed'         => 'Administratorių grupės ištrinti negalima',
-	'group_name_required'             => 'Grupės vardą užpildyti būtina',
-	'group_name_admin_not_alter'      => 'Admin grupės pavadinimas negali būti pakeistas',
+	// Roles
+	'role_creation_successful'       => 'Grupė sėkmingai sukurta',
+	'role_already_exists'            => 'Grupės vardas jau naudojamas',
+	'role_update_successful'         => 'Grupės detalės atnaujintos',
+	'role_delete_successful'         => 'Grupė ištrinta',
+	'role_delete_unsuccessful'       => 'Nepavyksta ištrinti grupės',
+	'role_delete_notallowed'         => 'Administratorių grupės ištrinti negalima',
+	'role_name_required'             => 'Grupės vardą užpildyti būtina',
+	'role_name_admin_not_alter'      => 'Admin grupės pavadinimas negali būti pakeistas',
 
 	// Activation Email
 	'emailActivation_subject'  => 'Paskyros aktyvavimas',

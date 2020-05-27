@@ -22,8 +22,8 @@ return [
 	'account_creation_duplicate_identity'     => 'Tunnus on virheellinen tai se on jo käytössä',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup' => 'Default group is not set',
-	'account_creation_invalid_defaultGroup' => 'Invalid default group name set',
+	'account_creation_missing_defaultRole' => 'Default role is not set',
+	'account_creation_invalid_defaultRole' => 'Invalid default role name set',
 
 	// Password
 	'password_change_successful'              => 'Salasana vaihdettu!',
@@ -53,15 +53,15 @@ return [
 	'delete_successful'                       => 'Tili poistettu',
 	'delete_unsuccessful'                     => 'Tilin poisto epäonnistui',
 
-	// Groups
-	'group_creation_successful'               => 'Ryhmä luotiin onnistuneesti!',
-	'group_already_exists'                    => 'Ryhmän nimi jo käytössä',
-	'group_update_successful'                 => 'Ryhmän tiedot päivitetty!',
-	'group_delete_successful'                 => 'Ryhmä poistettu',
-	'group_delete_unsuccessful'               => 'Ryhmän poisto epäonnistui',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required'                     => 'Ryhmän nimi tarvitaan',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'               => 'Ryhmä luotiin onnistuneesti!',
+	'role_already_exists'                    => 'Ryhmän nimi jo käytössä',
+	'role_update_successful'                 => 'Ryhmän tiedot päivitetty!',
+	'role_delete_successful'                 => 'Ryhmä poistettu',
+	'role_delete_unsuccessful'               => 'Ryhmän poisto epäonnistui',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required'                     => 'Ryhmän nimi tarvitaan',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Tilin aktivointi',

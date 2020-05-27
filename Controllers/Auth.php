@@ -143,7 +143,7 @@ class Auth extends \CodeIgniter\Controller
 				//redirect them back to the home page
 				$this->session->setFlashdata('message', $this->atomicAuth->messages());
 				// TODO better handling of redirect (if useful)
-				return redirect()->to('/');
+				return redirect()->to('/auth/user');
 			}
 			else
 			{
@@ -670,8 +670,8 @@ class Auth extends \CodeIgniter\Controller
 		}
 
 		$user          = $this->atomicAuth->user($id)->row();
-		$groups        = $this->atomicAuth->groups()->resultArray();
-		$currentGroups = $this->atomicAuth->getUsersGroups($id)->getResult();
+		$roles        = $this->atomicAuth->roles()->resultArray();
+		$currentRoles = $this->atomicAuth->getUserRoles($id)->getResult();
 
 		if (! empty($_POST))
 		{
@@ -710,19 +710,19 @@ class Auth extends \CodeIgniter\Controller
 					$data['password'] = $this->request->getPost('password');
 				}
 
-				// Only allow updating groups if user is admin
+				// Only allow updating roles if user is admin
 				if ($this->atomicAuth->isAdmin())
 				{
-					// Update the groups user belongs to
-					$groupData = $this->request->getPost('groups');
+					// Update the roles user belongs to
+					$roleData = $this->request->getPost('roles');
 
-					if (! empty($groupData))
+					if (! empty($roleData))
 					{
 						$this->atomicAuth->removeFromGroup('', $id);
 
-						foreach ($groupData as $grp)
+						foreach ($roleData as $role)
 						{
-							$this->atomicAuth->addToGroup($grp, $id);
+							$this->atomicAuth->addToGroup($role, $id);
 						}
 					}
 				}
@@ -748,8 +748,8 @@ class Auth extends \CodeIgniter\Controller
 
 		// pass the user to the view
 		$this->data['user']          = $user;
-		$this->data['groups']        = $groups;
-		$this->data['currentGroups'] = $currentGroups;
+		$this->data['roles']        = $roles;
+		$this->data['currentRoles'] = $currentRoles;
 
 		$this->data['first_name'] = [
 			'name'  => 'first_name',
@@ -791,13 +791,13 @@ class Auth extends \CodeIgniter\Controller
 	}
 
 	/**
-	 * Create a new group
+	 * Create a new role
 	 *
 	 * @return string string|\CodeIgniter\HTTP\RedirectResponse
 	 */
-	public function create_group()
+	public function create_role()
 	{
-		$this->data['title'] = lang('Auth.create_group_title');
+		$this->data['title'] = lang('Auth.create_role_title');
 
 		if (! $this->atomicAuth->loggedIn() || ! $this->atomicAuth->isAdmin())
 		{
@@ -805,14 +805,14 @@ class Auth extends \CodeIgniter\Controller
 		}
 
 		// validate form input
-		$this->validation->setRule('group_name', lang('Auth.create_group_validation_name_label'), 'trim|required|alpha_dash');
+		$this->validation->setRule('role_name', lang('Auth.create_role_validation_name_label'), 'trim|required|alpha_dash');
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{
-			$newGroupId = $this->atomicAuth->createGroup($this->request->getPost('group_name'), $this->request->getPost('description'));
+			$newGroupId = $this->atomicAuth->createGroup($this->request->getPost('role_name'), $this->request->getPost('description'));
 			if ($newGroupId)
 			{
-				// check to see if we are creating the group
+				// check to see if we are creating the role
 				// redirect them back to the admin page
 				$this->session->setFlashdata('message', $this->atomicAuth->messages());
 				return redirect()->to('/auth');
@@ -820,15 +820,15 @@ class Auth extends \CodeIgniter\Controller
 		}
 		else
 		{
-			// display the create group form
+			// display the create role form
 			// set the flash data error message if there is one
 			$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->atomicAuth->errors($this->validationListTemplate) ? $this->atomicAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
 
-			$this->data['group_name'] = [
-				'name'  => 'group_name',
-				'id'    => 'group_name',
+			$this->data['role_name'] = [
+				'name'  => 'role_name',
+				'id'    => 'role_name',
 				'type'  => 'text',
-				'value' => set_value('group_name'),
+				'value' => set_value('role_name'),
 			];
 			$this->data['description'] = [
 				'name'  => 'description',
@@ -837,46 +837,46 @@ class Auth extends \CodeIgniter\Controller
 				'value' => set_value('description'),
 			];
 
-			return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'create_group', $this->data);
+			return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'create_role', $this->data);
 		}
 	}
 
 	/**
-	 * Edit a group
+	 * Edit a role
 	 *
 	 * @param integer $id Group id
 	 *
 	 * @return string|CodeIgniter\Http\Response
 	 */
-	public function edit_group(int $id = 0)
+	public function edit_role(int $id = 0)
 	{
-		// bail if no group id given
+		// bail if no role id given
 		if (! $id)
 		{
 			return redirect()->to('/auth');
 		}
 
-		$this->data['title'] = lang('Auth.edit_group_title');
+		$this->data['title'] = lang('Auth.edit_role_title');
 
 		if (! $this->atomicAuth->loggedIn() || ! $this->atomicAuth->isAdmin())
 		{
 			return redirect()->to('/auth');
 		}
 
-		$group = $this->atomicAuth->group($id)->row();
+		$role = $this->atomicAuth->role($id)->row();
 
 		// validate form input
-		$this->validation->setRule('group_name', lang('Auth.edit_group_validation_name_label'), 'required|alpha_dash');
+		$this->validation->setRule('role_name', lang('Auth.edit_role_validation_name_label'), 'required|alpha_dash');
 
 		if ($this->request->getPost())
 		{
 			if ($this->validation->withRequest($this->request)->run())
 			{
-				$groupUpdate = $this->atomicAuth->updateGroup($id, $this->request->getPost('group_name'), ['description' => $this->request->getPost('group_description')]);
+				$roleUpdate = $this->atomicAuth->updateGroup($id, $this->request->getPost('role_name'), ['description' => $this->request->getPost('role_description')]);
 
-				if ($groupUpdate)
+				if ($roleUpdate)
 				{
-					$this->session->setFlashdata('message', lang('Auth.edit_group_saved'));
+					$this->session->setFlashdata('message', lang('Auth.edit_role_saved'));
 				}
 				else
 				{
@@ -890,25 +890,25 @@ class Auth extends \CodeIgniter\Controller
 		$this->data['message'] = $this->validation->listErrors($this->validationListTemplate) ?: ($this->atomicAuth->errors($this->validationListTemplate) ?: $this->session->getFlashdata('message'));
 
 		// pass the user to the view
-		$this->data['group'] = $group;
+		$this->data['role'] = $role;
 
-		$readonly = $this->configAtomicAuth->adminGroup === $group->name ? 'readonly' : '';
+		$readonly = $this->configAtomicAuth->adminRole === $role->name ? 'readonly' : '';
 
-		$this->data['group_name']        = [
-			'name'    => 'group_name',
-			'id'      => 'group_name',
+		$this->data['role_name']        = [
+			'name'    => 'role_name',
+			'id'      => 'role_name',
 			'type'    => 'text',
-			'value'   => set_value('group_name', $group->name),
+			'value'   => set_value('role_name', $role->name),
 			$readonly => $readonly,
 		];
-		$this->data['group_description'] = [
-			'name'  => 'group_description',
-			'id'    => 'group_description',
+		$this->data['role_description'] = [
+			'name'  => 'role_description',
+			'id'    => 'role_description',
 			'type'  => 'text',
-			'value' => set_value('group_description', $group->description),
+			'value' => set_value('role_description', $role->description),
 		];
 
-		return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'edit_group', $this->data);
+		return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'edit_role', $this->data);
 	}
 
 }

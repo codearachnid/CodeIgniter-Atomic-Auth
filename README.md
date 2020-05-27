@@ -40,7 +40,7 @@ helper('AtomicAuth\auth');
 
 ## Requirements
 
-- PHP 7.2+
+- PHP 7.1 => `PHP 7.2+ recommended`
 - CodeIgniter 4. Changes in beta-3 require the latest develop branch of CodeIgniter 4 to work correctly (4.0.3 won't do).
 
 ## Credit (on the shoulders of giants I stand)

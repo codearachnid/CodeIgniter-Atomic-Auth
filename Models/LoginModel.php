@@ -14,12 +14,8 @@ class LoginModel extends Model
   protected $lockoutTime = null;
   protected $limit = 1;
 
-  public function getLoginsByIdentity( string $identity = null )
+  public function getLoginsByIdentity( bool $excludeSuccess = false )
   {
-    if( !is_null( $identity ) )
-    {
-      $this->identity = $identity;
-    }
     if( empty ( $this->identity ) )
     {
       return 0;
@@ -27,6 +23,10 @@ class LoginModel extends Model
     $builder = $this->asObject()->where('identity', $this->identity);
     if( !is_null($this->lockoutTime) ){
       $builder->where('created_at > ', date( "Y-m-d H:i:s", time() - $this->lockoutTime));
+    }
+    if( $excludeSuccess )
+    {
+      $builder->where('activity !=', 'success');
     }
     if( !is_null($this->limit) )
     {

@@ -51,19 +51,19 @@ if(! function_exists('isDefault'))
 		return $atomicAuth->isDefault();
 	}
 }
-if(! function_exists('getUserProfile'))
-{
-	function getUserProfile()
-	{
-		$atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
-		return $atomicAuth->getUserProfile();
-	}
-}
-if(! function_exists('getUserId'))
-{
-	function getUserId() : int
-	{
-		$atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
-		return $atomicAuth->getUserProfile('user_id');
-	}
-}
+// if(! function_exists('getUserProfile'))
+// {
+// 	function getUserProfile()
+// 	{
+// 		$atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
+// 		return $atomicAuth->getUserProfile();
+// 	}
+// }
+// if(! function_exists('getUserId'))
+// {
+// 	function getUserId() : int
+// 	{
+// 		$atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
+// 		return $atomicAuth->getUserProfile('id');
+// 	}
+// }

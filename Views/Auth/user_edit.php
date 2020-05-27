@@ -22,19 +22,19 @@
 
       <?php if ($atomicAuth->userCan('promote_user')): ?>
 
-          <h3><?php echo lang('Auth.edit_user_groups_heading');?></h3>
-          <?php foreach ($groups as $group):?>
+          <h3><?php echo lang('Auth.edit_user_roles_heading');?></h3>
+          <?php d($roles); foreach ($roles as $role):?>
               <label class="checkbox">
-              <?php echo form_checkbox('groups[]', $group->id, in_array($group->id, $userInGroups) ); ?>
-              <?php echo htmlspecialchars($group->description, ENT_QUOTES, 'UTF-8');?>
+              <?php echo form_checkbox('roles[]', $role->id, in_array($role->id, $userInRoles) ); ?>
+              <?php echo htmlspecialchars($role->description, ENT_QUOTES, 'UTF-8');?>
               </label>
           <?php endforeach?>
 
       <?php else : ?>
-        <h3><?php echo lang('Auth.edit_user_in_groups_heading');?></h3>
-        <?php foreach ($user->groups as $group): ?>
+        <h3><?php echo lang('Auth.edit_user_in_roles_heading');?></h3>
+        <?php foreach ($user->roles as $role): ?>
             <label class="checkbox">
-            <?php echo htmlspecialchars($group->description, ENT_QUOTES, 'UTF-8');?>
+            <?php echo htmlspecialchars($role->description, ENT_QUOTES, 'UTF-8');?>
             </label>
         <?php endforeach?>
       <?php endif; ?>

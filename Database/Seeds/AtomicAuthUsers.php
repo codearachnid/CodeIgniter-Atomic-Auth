@@ -4,7 +4,7 @@
  * @package CodeIgniter-Atomic-Auth
  */
 
-class AtomicAuthGroupsSeeder extends \CodeIgniter\Database\Seeder
+class AtomicAuthRolesSeeder extends \CodeIgniter\Database\Seeder
 {
 	public function run()
 	{
@@ -24,16 +24,16 @@ class AtomicAuthGroupsSeeder extends \CodeIgniter\Database\Seeder
 		];
 		$this->db->table($config->tables['users'])->insertBatch($users);
 
-		$usersGroups = [
+		$usersRoles = [
 			[
 				'user_id'  => '1',
-				'group_id' => '1',
+				'role_id' => '1',
 			],
 			[
 				'user_id'  => '1',
-				'group_id' => '2',
+				'role_id' => '2',
 			],
 		];
-		$this->db->table($config->tables['users_groups'])->insertBatch($usersGroups);
+		$this->db->table($config->tables['users_roles'])->insertBatch($usersRoles);
 	}
 }

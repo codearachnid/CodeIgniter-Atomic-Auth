@@ -2,13 +2,11 @@
 
 use CodeIgniter\Entity;
 
-class Group extends Entity
+class Capability extends Entity
 {
 
   protected $id;
-  protected $guid;
   protected $name;
   protected $description;
   protected $status;
-
 }

@@ -4,14 +4,14 @@
  * @package CodeIgniter-Atomic-Auth
  */
 
-class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
+class AtomicAuthRoles extends \CodeIgniter\Database\Seeder
 {
 	public function run()
 	{
 		$config = config('AtomicAuth\\Config\\AtomicAuth');
 		$this->DBGroup = empty($config->databaseGroupName) ? '' : $config->databaseGroupName;
 
-		$groups = [
+		$roles = [
 			[
 				// 'id'					=> 1,
 				'guid'				=> '5bb7a9e7db3e29a2032bd1c5010561ff',
@@ -28,7 +28,7 @@ class AtomicAuthGroups extends \CodeIgniter\Database\Seeder
 			],
 		];
 
-		$this->db->table($config->tables['groups'])->insertBatch($groups);
+		$this->db->table($config->tables['roles'])->insertBatch($roles);
 
 	}
 }

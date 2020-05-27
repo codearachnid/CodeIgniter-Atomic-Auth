@@ -23,8 +23,8 @@ return [
 	'account_creation_unsuccessful'          => 'অ্যাকাউন্টটি তৈরি করা যাচ্ছেনা',
 	'account_creation_duplicate_email'       => 'ইমেলটি ইতিমধ্যে ব্যবহৃত হয়েছে অথবা এটি ভুল',
 	'account_creation_duplicate_identity'    => 'এটি ইতিমধ্যে ব্যবহৃত হয়েছে অথবা ভুল',
-	'account_creation_missing_defaultGroup' => 'পূর্বনির্ধারিত গ্রুপ সেট করা হয়নি',
-	'account_creation_invalid_defaultGroup' => 'পূর্বনির্ধারিত দলটি ভুল হয়েছে',
+	'account_creation_missing_defaultRole' => 'পূর্বনির্ধারিত গ্রুপ সেট করা হয়নি',
+	'account_creation_invalid_defaultRole' => 'পূর্বনির্ধারিত দলটি ভুল হয়েছে',
 
 
 	// Password
@@ -58,15 +58,15 @@ return [
 	'delete_successful'                   => 'ব্যবহারকারীকে মুছে ফেলা হয়েছে',
 	'delete_unsuccessful'                 => 'ব্যবহারকারীকে মুছে ফেলা যাচ্ছেনা',
 
-	// Groups
-	'group_creation_successful'           => 'সফলভাবে দলটি তৈরি করা হয়েছে',
-	'group_already_exists'                => 'একই নামে ইতিমধ্যে আরেকটি গ্রুপ তৈরি করা হয়েছে',
-	'group_update_successful'             => 'দলটির বিবরণ সংস্করণ করা হয়েছে',
-	'group_delete_successful'             => 'দলটি মুছে ফেলা হয়েছে',
-	'group_delete_unsuccessful'           => 'দলটি মুছে ফেলা যাচ্ছেনা',
-	'group_delete_notallowed'             => 'অ্যাডমিনিস্ট্রেটরদের দলটি মুছে ফেলা যাবেনা',
-	'group_name_required'                 => 'দলের নামটি অবশ্যই দিতে হবে',
-	'group_name_admin_not_alter'          => 'অ্যাডমিনিস্ট্রেটরদের দলটির নাম সংস্করণ করা যাবেনা',
+	// Roles
+	'role_creation_successful'           => 'সফলভাবে দলটি তৈরি করা হয়েছে',
+	'role_already_exists'                => 'একই নামে ইতিমধ্যে আরেকটি গ্রুপ তৈরি করা হয়েছে',
+	'role_update_successful'             => 'দলটির বিবরণ সংস্করণ করা হয়েছে',
+	'role_delete_successful'             => 'দলটি মুছে ফেলা হয়েছে',
+	'role_delete_unsuccessful'           => 'দলটি মুছে ফেলা যাচ্ছেনা',
+	'role_delete_notallowed'             => 'অ্যাডমিনিস্ট্রেটরদের দলটি মুছে ফেলা যাবেনা',
+	'role_name_required'                 => 'দলের নামটি অবশ্যই দিতে হবে',
+	'role_name_admin_not_alter'          => 'অ্যাডমিনিস্ট্রেটরদের দলটির নাম সংস্করণ করা যাবেনা',
 
 	// Activation Email
 	'emailActivation_subject'            => 'অ্যাকাউন্ট সক্রিয়করণ',

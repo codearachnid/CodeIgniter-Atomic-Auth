@@ -20,8 +20,8 @@ return [
 	'account_creation_unsuccessful' 	 	      => 'No se ha podido crear la cuenta',
 	'account_creation_duplicate_email' 	    => 'Email en uso o inválido',
 	'account_creation_duplicate_identity'    => 'Nombre de usuario en uso o inválido',
-	'account_creation_missing_defaultGroup' => 'No se ha especificado grupo por defecto',
-	'account_creation_invalid_defaultGroup' => 'Nombre de grupo no válido',
+	'account_creation_missing_defaultRole' => 'No se ha especificado grupo por defecto',
+	'account_creation_invalid_defaultRole' => 'Nombre de grupo no válido',
 
 	// Password
 	'password_change_successful' 	 	        => 'Contraseña renovada con éxito',
@@ -51,15 +51,15 @@ return [
 	'delete_successful'                      => 'Usuario eliminado',
 	'delete_unsuccessful'                    => 'No se ha podido eliminar el usuario',
 
-	// Groups
-	'group_creation_successful'              => 'Grupo creado',
-	'group_already_exists'                   => 'Nombre de grupo en uso',
-	'group_update_successful'                => 'Grupo actualizado',
-	'group_delete_successful'                => 'Grupo borrado',
-	'group_delete_unsuccessful'              => 'Imposible borrar grupo',
-	'group_delete_notallowed'                => 'No se puede borrar el grupo de administradores',
-	'group_name_required'                    => 'Se requiere un nombre de grupo',
-	'group_name_admin_not_alter'             => 'El nombre del grupo de administradores no puede ser modificado',
+	// Roles
+	'role_creation_successful'              => 'Grupo creado',
+	'role_already_exists'                   => 'Nombre de grupo en uso',
+	'role_update_successful'                => 'Grupo actualizado',
+	'role_delete_successful'                => 'Grupo borrado',
+	'role_delete_unsuccessful'              => 'Imposible borrar grupo',
+	'role_delete_notallowed'                => 'No se puede borrar el grupo de administradores',
+	'role_name_required'                    => 'Se requiere un nombre de grupo',
+	'role_name_admin_not_alter'             => 'El nombre del grupo de administradores no puede ser modificado',
 
 	// Activation Email
 	'emailActivation_subject'               => 'Activación de la cuenta',

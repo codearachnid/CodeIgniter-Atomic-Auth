@@ -60,8 +60,9 @@ class AtomicAuthModel
 	 * @var \AtomicAuth\Models\*
 	 */
 	protected $userModel;
-	protected $groupModel;
+	protected $roleModel;
 	protected $loginModel;
+	protected $capabilityModel;
 
 	/**
 	 * Activation code
@@ -176,18 +177,18 @@ class AtomicAuthModel
 	protected $messageTemplates = [];
 
 	/**
-	 * Caching of users and their groups
+	 * Caching of users and their roles
 	 *
 	 * @var array
 	 */
 	protected $cacheUserInGroup = [];
 
 	/**
-	 * Caching of groups
+	 * Caching of roles
 	 *
 	 * @var array
 	 */
-	protected $cacheGroups = [];
+	protected $cacheRoles = [];
 
 	/**
 	 * Database object
@@ -215,7 +216,7 @@ class AtomicAuthModel
 		}
 		else
 		{
-			// For specific group name, open a new specific connection
+			// For specific role name, open a new specific connection
 			$this->db = \Config\Database::connect($this->config->databaseGroupName);
 		}
 
@@ -223,8 +224,9 @@ class AtomicAuthModel
 		$this->authHooks = new \stdClass();
 
 		$this->userModel = model('AtomicAuth\Models\UserModel');
-		$this->groupModel = model('AtomicAuth\Models\GroupModel');
+		$this->roleModel = model('AtomicAuth\Models\RoleModel');
 		$this->loginModel = model('AtomicAuth\Models\LoginModel');
+		$this->capabilityModel = model('AtomicAuth\Models\CapabilityModel');
 
 		$this->triggerEvents('model_constructor');
 	}
@@ -869,6 +871,8 @@ class AtomicAuthModel
 	 *
 	 * @return boolean
 	 */
+
+	 //TODO rework this!
 	public function recheckSession(): bool
 	{
 		$sessionExpiration = (null !== $this->config->sessionExpiration) ? $this->config->sessionExpiration : 0;
@@ -953,7 +957,8 @@ class AtomicAuthModel
 	{
 		if ($this->config->trackAttempts)
 		{
-			$qres = $this->loginModel->getLoginsByIdentity($identity);
+			$this->loginModel->identity = $identity;
+			$qres = $this->loginModel->getLoginsByIdentity( true );
 			if (count($qres) > 0 )
 			{
 				return $qres[0]->created_at;
@@ -974,7 +979,8 @@ class AtomicAuthModel
 	{
 		if ($this->config->trackAttempts)
 		{
-			$qres = $this->loginModel->getLoginsByIdentity($identity);
+			$this->loginModel->identity = $identity;
+			$qres = $this->loginModel->getLoginsByIdentity();
 			if (count($qres) > 0 )
 			{
 				return $qres[0]->ip_address;
@@ -1046,185 +1052,6 @@ class AtomicAuthModel
 		return false;
 	}
 
-	/**
-	 * Limit
-	 *
-	 * @param integer $limit Limit
-	 *
-	 * @return static
-	 */
-	public function limit(int $limit): self
-	{
-		$this->triggerEvents('limit');
-		$this->ionLimit = $limit;
-
-		return $this;
-	}
-
-	/**
-	 * Offset
-	 *
-	 * @param integer $offset Offset
-	 *
-	 * @return static
-	 */
-	public function offset(int $offset): self
-	{
-		$this->triggerEvents('offset');
-		$this->ionOffset = $offset;
-
-		return $this;
-	}
-
-	/**
-	 * @param array|string $where
-	 * @param null|string  $value
-	 *
-	 * @return static
-	 */
-	public function where($where, $value=null): self
-	{
-		$this->triggerEvents('where');
-
-		if (! is_array($where))
-		{
-			$where = [$where => $value];
-		}
-
-		array_push($this->atomicWhere, $where);
-
-		return $this;
-	}
-
-	/**
-	 * Like
-	 *
-	 * @param string      $like
-	 * @param string|null $value
-	 * @param string      $position
-	 *
-	 * @return static
-	 */
-	public function like(string $like, $value=null, $position='both'): self
-	{
-		$this->triggerEvents('like');
-
-		array_push($this->ionLike, [
-			'like'     => $like,
-			'value'    => $value,
-			'position' => $position,
-		]);
-
-		return $this;
-	}
-
-	/**
-	 * Select
-	 *
-	 * @param array|string $select Select
-	 *
-	 * @return static
-	 */
-	public function select($select): self
-	{
-		$this->triggerEvents('select');
-
-		$this->ionSelect[] = $select;
-
-		return $this;
-	}
-
-	/**
-	 * Order by
-	 *
-	 * @param string $by    By
-	 * @param string $order Order
-	 *
-	 * @return static
-	 */
-	public function orderBy(string $by, string $order='desc'): self
-	{
-		$this->triggerEvents('order_by');
-
-		$this->ionOrderBy = $by;
-		$this->ionOrder   = $order;
-
-		return $this;
-	}
-
-	/**
-	 * Wrapper object to return a row as either an array, an object, or
-	 * a custom class.
-	 *
-	 * If row doesn't exist, returns null.
-	 *
-	 * @return mixed
-	 */
-	public function row()
-	{
-		$this->triggerEvents('row');
-
-		$row = $this->response->getRow();
-
-		return $row;
-	}
-
-	/**
-	 * Returns a single row from the results as an array.
-	 *
-	 * If row doesn't exist, returns null.
-	 *
-	 * @return mixed
-	 */
-	public function rowArray()
-	{
-		$this->triggerEvents(['row', 'row_array']);
-
-		$row = $this->response->getRowArray();
-
-		return $row;
-	}
-
-	/**
-	 * Get result
-	 *
-	 * @return array
-	 */
-	public function result(): array
-	{
-		$this->triggerEvents('result');
-
-		return $this->response->getResult();
-	}
-
-	/**
-	 * Get result array
-	 *
-	 * @return array
-	 */
-	public function resultArray(): array
-	{
-		$this->triggerEvents(['result', 'result_array']);
-
-		$result = $this->response->getResultArray();
-
-		return $result;
-	}
-
-	/**
-	 * Num rows
-	 *
-	 * @return integer
-	 */
-	public function numRows(): int
-	{
-		$this->triggerEvents(['num_rows']);
-
-		$result = $this->response->numRows();
-
-		return $result;
-	}
-
 	public function createUser( string $identity, string $password, string $email, array $userMeta = [] )
 	{
 		// register User Entity to begin insert
@@ -1241,205 +1068,21 @@ class AtomicAuthModel
 		return $user;
 	}
 
-	public function users()
-	{
-
-	}
-
-
 	/**
-	 * Get the users
-	 *
-	 * @param array|string|integer $groups Group IDs, group names, or group IDs and names
-	 *
-	 * @return static
-	 * @author Ben Edmunds
-	 */
-	 public function users_old($groups=null):self
-	// public function users($groups=null): self
-	{
-		$this->triggerEvents('users');
-
-		$builder = $this->db->table($this->config->tables['users']);
-
-		if (! empty($this->ionSelect))
-		{
-			foreach ($this->ionSelect as $select)
-			{
-				$builder->select($select);
-			}
-
-			$this->ionSelect = [];
-		}
-		else
-		{
-			// default selects
-			$builder->select([
-				$this->config->tables['users'] . '.*',
-				$this->config->tables['users'] . '.id as id',
-				$this->config->tables['users'] . '.id as user_id',
-			]);
-		}
-
-		// filter by group id(s) if passed
-		if (isset($groups))
-		{
-			// build an array if only one group was passed
-			if (! is_array($groups))
-			{
-				$groups = [$groups];
-			}
-
-			// join and then run a where_in against the group ids
-			if (! empty($groups))
-			{
-				$builder->distinct();
-				$builder->join(
-					$this->config->tables['users_groups'],
-					$this->config->tables['users_groups'] . '.' . $this->config->join['users'] . '=' . $this->config->tables['users'] . '.id',
-					'inner'
-				);
-			}
-
-			// verify if group name or group id was used and create and put elements in different arrays
-			$groupIds   = [];
-			$groupNames = [];
-			foreach ($groups as $group)
-			{
-				if (is_numeric($group))
-				{
-					$groupIds[] = $group;
-				}
-				else
-				{
-					$groupNames[] = $group;
-				}
-			}
-			$orWhereIn = (! empty($groupIds) && ! empty($groupNames)) ? 'orWhereIn' : 'whereIn';
-			// if group name was used we do one more join with groups
-			if (! empty($groupNames))
-			{
-				$builder->join($this->config->tables['groups'], $this->config->tables['users_groups'] . '.' . $this->config->join['groups'] . ' = ' . $this->config->tables['groups'] . '.id', 'inner');
-				$builder->whereIn($this->config->tables['groups'] . '.name', $groupNames);
-			}
-			if (! empty($groupIds))
-			{
-				$builder->{$orWhereIn}($this->config->tables['users_groups'] . '.' . $this->config->join['groups'], $groupIds);
-			}
-		}
-
-		$this->triggerEvents('extra_where');
-
-		// run each where that was passed
-		if (! empty($this->atomicWhere))
-		{
-			foreach ($this->atomicWhere as $where)
-			{
-				$builder->where($where);
-			}
-
-			$this->atomicWhere = [];
-		}
-
-		if (! empty($this->ionLike))
-		{
-			foreach ($this->ionLike as $like)
-			{
-				$builder->orLike($like['like'], $like['value'], $like['position']);
-			}
-
-			$this->ionLike = [];
-		}
-
-		if (isset($this->ionLimit) && isset($this->ionOffset))
-		{
-			$builder->limit($this->ionLimit, $this->ionOffset);
-
-			$this->ionLimit  = null;
-			$this->ionOffset = null;
-		}
-		else if (isset($this->ionLimit))
-		{
-			$builder->limit($this->ionLimit);
-
-			$this->ionLimit = null;
-		}
-
-		// set the order
-		if (isset($this->ionOrderBy) && isset($this->ionOrder))
-		{
-			$builder->orderBy($this->ionOrderBy, $this->ionOrder);
-
-			$this->ionOrder   = null;
-			$this->ionOrderBy = null;
-		}
-
-		$this->response = $builder->get();
-
-		return $this;
-	}
-
-	/**
-	 * Get a user
-	 *
-	 * @param integer $id If a user id is not passed the id of the currently logged in user will be used
-	 *
-	 * @return static
-	 * @author Ben Edmunds
-	 */
-	public function user(int $id=0): self
-	{
-		$this->triggerEvents('user');
-
-		// if no id was passed use the current users id
-		$id = $id ?: $this->session->get('user_id');
-
-		$this->limit(1);
-		$this->orderBy($this->config->tables['users'] . '.id', 'desc');
-		$this->where($this->config->tables['users'] . '.id', $id);
-
-		$this->users();
-
-		return $this;
-	}
-
-	/**
-	 * Get all groups a user is part of
-	 *
-	 * @param integer $id If a user id is not passed the id of the currently logged in user will be used
-	 *
-	 * @return \CodeIgniter\Database\ResultInterface
-	 * @author Ben Edmunds
-	 */
-	public function getUsersGroups(int $id=0)
-	{
-		$this->triggerEvents('get_users_group');
-
-		// if no id was passed use the current users id
-		$id || $id = $this->session->get('user_id');
-
-		$builder = $this->db->table($this->config->tables['users_groups']);
-		return $builder->select($this->config->tables['users_groups'] . '.' . $this->config->join['groups'] . ' as id, ' . $this->config->tables['groups'] . '.name, ' . $this->config->tables['groups'] . '.description')
-					   ->where($this->config->tables['users_groups'] . '.' . $this->config->join['users'], $id)
-					   ->join($this->config->tables['groups'], $this->config->tables['users_groups'] . '.' . $this->config->join['groups'] . '=' . $this->config->tables['groups'] . '.id')
-					   ->get();
-	}
-
-	/**
-	 * Check to see if a user is in a group(s)
+	 * Check to see if a user is in a role(s)
 	 *
 	 * @param integer|array $checkGroup Group(s) to check
 	 * @param integer       $id         User id
-	 * @param boolean       $checkAll   Check if all groups is present, or any of the groups
+	 * @param boolean       $checkAll   Check if all roles is present, or any of the roles
 	 *
-	 * @return boolean Whether the/all user(s) with the given ID(s) is/are in the given group
+	 * @return boolean Whether the/all user(s) with the given ID(s) is/are in the given role
 	 * @author Phil Sturgeon
 	 **/
-	public function inGroup($checkGroup, int $id=0, bool $checkAll=false): bool
+	public function hasRole($checkGroup, ?int $id=null, bool $checkAll=false): bool
 	{
-		$this->triggerEvents('in_group');
+		$this->triggerEvents('in_role');
 
-		$id || $id = $this->session->get('user_id');
+		$id || $id = $this->getSessionProperty('id');
 
 		if (! is_array($checkGroup))
 		{
@@ -1448,27 +1091,27 @@ class AtomicAuthModel
 
 		if (isset($this->cacheUserInGroup[$id]))
 		{
-			$groupsArray = $this->cacheUserInGroup[$id];
+			$rolesArray = $this->cacheUserInGroup[$id];
 		}
 		else
 		{
-			$usersGroups = $this->getUsersGroups($id)->getResult();
-			$groupsArray = [];
-			foreach ($usersGroups as $group)
+			$usersGroups = $this->getUserRoles($id);
+			$rolesArray = [];
+			foreach ($usersGroups as $role)
 			{
-				$groupsArray[$group->id] = $group->name;
+				$rolesArray[$role->id] = $role->name;
 			}
-			$this->cacheUserInGroup[$id] = $groupsArray;
+			$this->cacheUserInGroup[$id] = $rolesArray;
 		}
 		foreach ($checkGroup as $key => $value)
 		{
-			$groups = (is_numeric($value)) ? array_keys($groupsArray) : $groupsArray;
+			$roles = (is_numeric($value)) ? array_keys($rolesArray) : $rolesArray;
 
 			/**
 			 * if !all (default), in_array
 			 * if all, !in_array
 			 */
-			if (in_array($value, $groups) xor $checkAll)
+			if (in_array($value, $roles) xor $checkAll)
 			{
 				/**
 				 * if !all (default), true
@@ -1486,292 +1129,113 @@ class AtomicAuthModel
 	}
 
 	/**
-	 * Add to group
-	 *
-	 * @param array|integer $groupIds Groups id
-	 * @param integer       $userId   User id
-	 *
-	 * @return integer The number of groups added
-	 * @author Ben Edmunds
-	 */
-	public function addUserToGroup($groupIds, int $userId=0, $force = false ): int
+ * Add to role
+ *
+ * @param array|integer $roleIds Groups id
+ * @param integer       $userId   User id
+ *
+ * @return integer The number of roles added
+ * @author Ben Edmunds
+ */
+public function addUserToGroup($roleIds, int $userId=0, $force = false ): int
+{
+	$this->triggerEvents('add_user_to_role');
+
+	// if no id was passed use the current users id
+	// TODO need security check to ensure user can add themselves to a role
+	$userId || $userId = $this->session->get('user_id');
+
+	if (! is_array($roleIds))
 	{
-		$this->triggerEvents('add_user_to_group');
-
-		// if no id was passed use the current users id
-		// TODO need security check to ensure user can add themselves to a group
-		$userId || $userId = $this->session->get('user_id');
-
-		if (! is_array($groupIds))
-		{
-			$groupIds = [$groupIds];
-		}
-
-		$groupsUsers = [];
-
-		foreach ($groupIds as $group)
-		{
-			if( is_object( $group ) && ! is_null( $group->id ) ) {
-				// $group is an Group Entity
-				$groupId = $group->id;
-			} else if ( is_int($group) || is_float($group) || is_string($group) ){
-				// $group is just a group id
-				$groupId = $group;
-			} else {
-				// could not determine the type of data for $group silent ignore
-				continue;
-			}
-			// Cast to float to support bigint data type
-			$groupsUsers[] = [
-				$this->config->join['groups'] => (float)$groupId, // assumed Group exists
-				$this->config->join['users']  => (float)$userId, // assumed User exists
-			];
-
-			// TODO should this be cached?
-		}
-
-		if( ! empty( $groupsUsers ) )
-		{
-			if( $force )
-			{
-				$this->db->table($this->config->tables['groups_users'])->delete(['user_id' => $userId]);
-			}
-			$this->db->table($this->config->tables['groups_users'])->insertBatch($groupsUsers);
-		}
-
-		return count($groupsUsers);
+		$roleIds = [$roleIds];
 	}
 
-	/**
-	 * Remove from group
-	 *
-	 * @param array|integer $groupIds Group id
-	 * @param integer       $userId   User id
-	 *
-	 * @return boolean
-	 * @author Ben Edmunds
-	 */
-	public function removeFromGroup($groupIds=0, int $userId=0): bool
-	{
-		$this->triggerEvents('remove_from_group');
+	$rolesUsers = [];
 
-		// user id is required
-		if (! $userId)
+	foreach ($roleIds as $role)
+	{
+		if( is_object( $role ) && ! is_null( $role->id ) ) {
+			// $role is an Group Entity
+			$roleId = $role->id;
+		} else if ( is_int($role) || is_float($role) || is_string($role) ){
+			// $role is just a role id
+			$roleId = $role;
+		} else {
+			// could not determine the type of data for $role silent ignore
+			continue;
+		}
+		// Cast to float to support bigint data type
+		$rolesUsers[] = [
+			$this->config->join['roles'] => (float)$roleId, // assumed Group exists
+			$this->config->join['users']  => (float)$userId, // assumed User exists
+		];
+
+		// TODO should this be cached?
+	}
+
+	if( ! empty( $rolesUsers ) )
+	{
+		if( $force )
 		{
-			return false;
+			$this->db->table($this->config->tables['roles_users'])->delete(['user_id' => $userId]);
+		}
+		$this->db->table($this->config->tables['roles_users'])->insertBatch($rolesUsers);
+	}
+
+	return count($rolesUsers);
+}
+
+/**
+ * Remove from role
+ *
+ * @param array|integer $roleIds Group id
+ * @param integer       $userId   User id
+ *
+ * @return boolean
+ * @author Ben Edmunds
+ */
+public function removeFromGroup($roleIds=0, int $userId=0): bool
+{
+	$this->triggerEvents('remove_from_role');
+
+	// user id is required
+	if (! $userId)
+	{
+		return false;
+	}
+
+	$builder = $this->db->table($this->config->tables['users_roles']);
+
+	// if role id(s) are passed remove user from the role(s)
+	if (! empty($roleIds))
+	{
+		if (! is_array($roleIds))
+		{
+			$roleIds = [$roleIds];
 		}
 
-		$builder = $this->db->table($this->config->tables['users_groups']);
-
-		// if group id(s) are passed remove user from the group(s)
-		if (! empty($groupIds))
+		foreach ($roleIds as $roleId)
 		{
-			if (! is_array($groupIds))
+			$builder->delete([$this->config->join['roles'] => (int)$roleId, $this->config->join['users'] => $userId]);
+			if (isset($this->cacheUserInGroup[$userId]) && isset($this->cacheUserInGroup[$userId][$roleId]))
 			{
-				$groupIds = [$groupIds];
+				unset($this->cacheUserInGroup[$userId][$roleId]);
 			}
+		}
 
-			foreach ($groupIds as $groupId)
-			{
-				$builder->delete([$this->config->join['groups'] => (int)$groupId, $this->config->join['users'] => $userId]);
-				if (isset($this->cacheUserInGroup[$userId]) && isset($this->cacheUserInGroup[$userId][$groupId]))
-				{
-					unset($this->cacheUserInGroup[$userId][$groupId]);
-				}
-			}
-
+		$return = true;
+	}
+	// otherwise remove user from all roles
+	else
+	{
+		if ($return = $builder->delete([$this->config->join['users'] => $userId]))
+		{
+			$this->cacheUserInGroup[$userId] = [];
 			$return = true;
 		}
-		// otherwise remove user from all groups
-		else
-		{
-			if ($return = $builder->delete([$this->config->join['users'] => $userId]))
-			{
-				$this->cacheUserInGroup[$userId] = [];
-				$return = true;
-			}
-		}
-		return $return;
 	}
-
-	/**
-	 * Get the groups
-	 *
-	 * @return static
-	 * @author Ben Edmunds
-	 */
-	public function groups(): self
-	{
-		$this->triggerEvents('groups');
-
-		$builder = $this->db->table($this->config->tables['groups']);
-
-		// run each where that was passed
-		if (isset($this->atomicWhere) && ! empty($this->atomicWhere))
-		{
-			foreach ($this->atomicWhere as $where)
-			{
-				$builder->where($where);
-			}
-			$this->atomicWhere = [];
-		}
-
-		if (isset($this->ionLimit) && isset($this->ionOffset))
-		{
-			$builder->limit($this->ionLimit, $this->ionOffset);
-
-			$this->ionLimit  = null;
-			$this->ionOffset = null;
-		}
-		else if (isset($this->ionLimit))
-		{
-			$builder->limit($this->ionLimit);
-
-			$this->ionLimit = null;
-		}
-
-		// set the order
-		if (isset($this->ionOrderBy) && isset($this->ionOrder))
-		{
-			$builder->orderBy($this->ionOrderBy, $this->ionOrder);
-		}
-
-		$this->response = $builder->get();
-
-		return $this;
-	}
-
-	/**
-	 * Get a group
-	 *
-	 * @param integer $id Group id
-	 *
-	 * @return static
-	 * @author Ben Edmunds
-	 */
-	public function group(int $id=0)
-	{
-		$this->triggerEvents('group');
-
-		if ($id)
-		{
-			$this->where($this->config->tables['groups'] . '.id', $id);
-		}
-
-		$this->limit(1);
-		$this->orderBy('id', 'desc');
-
-		return $this->groups();
-	}
-
-	/**
-	 * Update a user
-	 *
-	 * @param integer $id   User id
-	 * @param array   $data Multidimensional array
-	 *
-	 * @return boolean
-	 * @author Phil Sturgeon
-	 */
-	public function update(int $id, array $data): bool
-	{
-		$this->triggerEvents('pre_update_user');
-
-		$user = $this->user($id)->row();
-
-		$this->db->transBegin();
-
-		if (array_key_exists($this->config->identity, $data) && $this->identityCheck($data[$this->config->identity]) && $user->{$this->config->identity} !== $data[$this->config->identity])
-		{
-			$this->db->transRollback();
-			$this->setError('AtomicAuth.account_creation_duplicate_identity');
-
-			$this->triggerEvents(['post_update_user', 'post_update_user_unsuccessful']);
-			$this->setError('AtomicAuth.update_unsuccessful');
-
-			return false;
-		}
-
-		// Filter the data passed
-		$data = $this->filterData($this->config->tables['users'], $data);
-
-		if (array_key_exists($this->config->identity, $data) || array_key_exists('password', $data) || array_key_exists('email', $data))
-		{
-			if (array_key_exists('password', $data))
-			{
-				if (! empty($data['password']))
-				{
-					$data['password'] = $this->hashPassword($data['password'], $user->{$this->config->identity});
-					if ($data['password'] === false)
-					{
-						$this->db->transRollback();
-						$this->triggerEvents(['post_update_user', 'post_update_user_unsuccessful']);
-						$this->setError('AtomicAuth.update_unsuccessful');
-
-						return false;
-					}
-				}
-				else
-				{
-					// unset password so it doesn't effect database entry if no password passed
-					unset($data['password']);
-				}
-			}
-		}
-
-		$this->triggerEvents('extra_where');
-		$this->db->table($this->config->tables['users'])->update($data, ['id' => $user->id]);
-
-		if ($this->db->transStatus() === false)
-		{
-			$this->db->transRollback();
-
-			$this->triggerEvents(['post_update_user', 'post_update_user_unsuccessful']);
-			$this->setError('AtomicAuth.update_unsuccessful');
-			return false;
-		}
-
-		$this->db->transCommit();
-
-		$this->triggerEvents(['post_update_user', 'post_update_user_successful']);
-		$this->setMessage('AtomicAuth.update_successful');
-		return true;
-	}
-
-	/**
-	 * Delete a user
-	 *
-	 * @param integer $id User id
-	 *
-	 * @return boolean
-	 * @author Phil Sturgeon
-	 */
-	public function deleteUser(int $id): bool
-	{
-		$this->triggerEvents('pre_delete_user');
-
-		$this->db->transBegin();
-
-		// remove user from groups
-		$this->removeFromGroup(null, $id);
-
-		// delete user from users table should be placed after remove from group
-		$this->db->table($this->config->tables['users'])->delete(['id' => $id]);
-
-		if ($this->db->transStatus() === false)
-		{
-			$this->db->transRollback();
-			$this->triggerEvents(['post_delete_user', 'post_delete_user_unsuccessful']);
-			$this->setError('AtomicAuth.delete_unsuccessful');
-			return false;
-		}
-
-		$this->db->transCommit();
-
-		$this->triggerEvents(['post_delete_user', 'post_delete_user_successful']);
-		$this->setMessage('delete_successful');
-		return true;
-	}
+	return $return;
+}
 
 	/**
 	 * Update last login
@@ -1784,6 +1248,8 @@ class AtomicAuthModel
 	{
 		$this->triggerEvents('update_last_login');
 		$this->triggerEvents('extra_where');
+
+		// TODO rework this into loginModel
 		$this->db->table($this->config->tables['track_login'])->insert([
 			'identity' => $identity,
 			'user_id' => $id,
@@ -1793,10 +1259,15 @@ class AtomicAuthModel
 		return $this->db->affectedRows() === 1;
 	}
 
-	public function getSession( string $key = null )
+	public function getSession()
 	{
-		$activeUser = $this->session->get('activeUser');
-		return !is_null( $key ) && !is_null( $activeUser ) && $activeUser[ $key ] ? $activeUser[ $key ] : null;
+		return (object) $this->session->get($this->config->sessionKey);
+	}
+
+	public function getSessionProperty( string $key = null )
+	{
+		$activeUser = $this->getSession();
+		return !is_null( $key ) && !is_null( $activeUser ) && isset($activeUser->{$key}) ? $activeUser->{$key} : null;
 	}
 
 	/**
@@ -1810,26 +1281,17 @@ class AtomicAuthModel
 	{
 		$this->triggerEvents('pre_set_session');
 		if( $user && ! is_null( $user->id ) ){
-			$sessionData['activeUser'] = [
-				$this->config->identity => $user->{$this->config->identity},
-				'email'               => $user->email,
-				'user_id'             => $user->id, //everyone likes to overwrite id so we'll use user_id
-				'user_guid'						=> $user->guid,
-				// 'last_login'      		=> $user->last_login,
-				'last_check'          => time(),
-				'permissions'					=> [],
-			];
-			if( !empty($user->permissions) ){
-				$sessionData['activeUser']['permissions'] = $user->permissions;
-			}
-			else
-			{
-				$sessionData['activeUser']['permissions'] = $this->getUserPermissions( $user->id );
-			}
-
-			$this->session->set($sessionData);
+			$profile = new \AtomicAuth\Entities\Profile();
+			$profile->identity = $user->{$this->config->identity};
+			$profile->email = $user->email;
+			$profile->id = $user->id;
+			$profile->guid = $user->guid;
+			$profile->last_check = time();
+			$profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser( $user->id );
+			$profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles( $user->id );
+			$this->session->set([$this->config->sessionKey => $profile->toRawArray()]);
 		} else {
-			$this->session->remove('activeUser');
+			$this->session->remove($this->config->sessionKey);
 		}
 
 		// Regenerate the session (for security purpose: to avoid session fixation)
@@ -1838,30 +1300,18 @@ class AtomicAuthModel
 		$this->triggerEvents('post_set_session');
 		return true;
 	}
-	/**
-	 * Get User permissions (includes permissions tied to group user is in)
-	 */
-	public function getUserPermissions( int $userId = null )
-	{
+
+
 		/**
-		 * This was pretty complex - saving the raw query for later debugging if needed
-		 * select perm.id, perm.name  from atomicauth_permissions perm
-		 * left join `atomicauth_groups_permissions` gperm on gperm.`permission_id` = perm.id
-		 * left join atomicauth_groups groups on groups.id = gperm.group_id
-		 * left join atomicauth_groups_users ugroups on ugroups.group_id = groups.id
-		 * left join atomicauth_users_permissions uperm on uperm.`permission_id` = perm.id
-		 * where ugroups.user_id = 1 OR uperm.user_id = 1
-		 */
-		$permissions = $this->db->table($this->config->tables['permissions'])
-			->select($this->config->tables['permissions'] . '.id,' . $this->config->tables['permissions'] .'.name')
-			->join($this->config->tables['groups_permissions'], $this->config->tables['groups_permissions'] . '.permission_id = ' . $this->config->tables['permissions'] . '.id', 'left')
-			->join($this->config->tables['groups'], $this->config->tables['groups'] . '.id = ' . $this->config->tables['groups_permissions'] . '.group_id', 'left')
-			->join($this->config->tables['groups_users'], $this->config->tables['groups_users'] . '.group_id = ' . $this->config->tables['groups'] . '.id', 'left')
-			->join($this->config->tables['users_permissions'], $this->config->tables['users_permissions'] . '.permission_id = ' . $this->config->tables['permissions'] . '.id', 'left')
-			->where($this->config->tables['groups_users'] . '.user_id', $userId)
-			->orWhere($this->config->tables['users_permissions'] . '.user_id', $userId)
-			->get()->getResult();
-		return $permissions;
+		* @param integer $id If a user id is not passed the id of the currently logged in user will be used
+		*
+		* @return \CodeIgniter\Database\ResultInterface
+		*/
+	public function getUserRoles( int $userId = null )
+	{
+		// if no id provided use the current session active user_id
+		$userId || $userId = $this->session->get('user_id');
+		return $this->roleModel->getRolesByUserId( $userId );
 	}
 
 	/**
@@ -1986,19 +1436,26 @@ class AtomicAuthModel
 		$this->triggerEvents(['post_login_remembered_user', 'post_login_remembered_user_unsuccessful']);
 		return false;
 	}
-
-	public function getUserProfile( string $guid = null, string $identifier = 'user_guid' ){
-
-		// if no guid then look to see if we have one for the session
-		$guid = is_null($guid) ? $this->getSession( $identifier ) : $guid ;
-
-		if( $identifier == 'user_guid' )
+	/**
+	 * Get user profile details
+	 *
+	 * @return integer|null The user's ID from the session user data or NULL if not found
+	 * @author jrmadsen67
+	 **/
+	public function getUserProfile( string $userId = null, string $identifier = 'guid' )
+	{
+		// session fallback if userId not provided
+		if( is_null($userId) )
 		{
-			$user = $this->userModel->getUserByGuid( $guid );
+			$user = $this->getSession();
 		}
-		else if ( $identifier == 'user_id' )
+		else if( $identifier == 'guid' )
 		{
-			$user = $this->userModel->get( $guid )->findAll()->first();
+			$user = $this->userModel->getUserByGuid( $userId );
+		}
+		else if ( $identifier == 'id' )
+		{
+			$user = $this->userModel->get( $userId )->findAll()->first();
 		}
 
 		if( !$user )
@@ -2006,14 +1463,18 @@ class AtomicAuthModel
 			return null;
 		}
 
-		$user->groups = $this->db
-			->table($this->config->tables['groups_users'])
-			->select('id, guid, name, description, status')
-			->join($this->config->tables['groups'], $this->config->tables['groups'] . '.id = ' . $this->config->tables['groups_users'] . '.group_id')
-			->where('user_id', $user->id)
-			->get()->getResult('AtomicAuth\Entities\Group');
+		// build out profile for roles and capabilities
+		$profile = new \AtomicAuth\Entities\Profile();
+		// dd($user);
+		$profile->identity = $user->{$this->config->identity};
+		$profile->email = $user->email;
+		$profile->id = $user->id;
+		$profile->guid = $user->guid;
+		$profile->last_check = time();
+		$profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser( $user->id );
+		$profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles( $user->id );
 
-		return $user;
+		return (object) $profile->toRawArray();
 
 	}
 	/**
@@ -2029,176 +1490,176 @@ class AtomicAuthModel
 		}
 		if( is_null( $userId ) )
 		{
-			$permissions = $this->getSession( 'permissions' );
+			$capabilities = $this->getSessionProperty( 'capabilities' );
 		}
 		else
 		{
-			$permissions = $this->getUserPermissions( $user->id );
+			$capabilities = $this->capabilityModel->getCapabilitiesByUser( $user->id );
 		}
-		if( !empty($permissions) )
+		if( !empty($capabilities) )
 		{
-			$permissions = array_column($permissions, 'name');
+			$capabilities = array_column($capabilities, 'name');
 			if(is_array($key))
 			{
 				// Check if ANY of the needles exist
-				return !empty(array_intersect($key, $permissions));
+				return !empty(array_intersect($key, $capabilities));
 			}
-			return in_array( $key, $permissions );
+			return in_array( $key, $capabilities );
 		}
 		return false;
 	}
 
 	/**
-	 * Create a group
+	 * Create a role
 	 *
-	 * @param string $groupName        Group name
-	 * @param string $groupDescription Group description
+	 * @param string $roleName        Group name
+	 * @param string $roleDescription Group description
 	 * @param array  $additionalData   Additional data
 	 *
-	 * @return integer|boolean The ID of the inserted group, or false on failure
+	 * @return integer|boolean The ID of the inserted role, or false on failure
 	 * @author aditya menon
 	 */
-	public function createGroup(string $groupName='', string $groupDescription='', array $additionalData=[])
+	public function createGroup(string $roleName='', string $roleDescription='', array $additionalData=[])
 	{
-		// bail if the group name was not passed
-		if (! $groupName)
+		// bail if the role name was not passed
+		if (! $roleName)
 		{
-			$this->setError('AtomicAuth.groupName_required');
+			$this->setError('AtomicAuth.roleName_required');
 			return false;
 		}
 
-		// bail if the group name already exists
-		$existingGroup = $this->db->table($this->config->tables['groups'])->where(['name' => $groupName])->countAllResults();
+		// bail if the role name already exists
+		$existingGroup = $this->db->table($this->config->tables['roles'])->where(['name' => $roleName])->countAllResults();
 		if ($existingGroup !== 0)
 		{
-			$this->setError('AtomicAuth.group_already_exists');
+			$this->setError('AtomicAuth.role_already_exists');
 			return false;
 		}
 
 		$data = [
-			'name'        => $groupName,
-			'description' => $groupDescription,
+			'name'        => $roleName,
+			'description' => $roleDescription,
 		];
 
-		// filter out any data passed that doesnt have a matching column in the groups table
-		// and merge the set group data and the additional data
+		// filter out any data passed that doesnt have a matching column in the roles table
+		// and merge the set role data and the additional data
 		if (! empty($additionalData))
 		{
-			$data = array_merge($this->filterData($this->config->tables['groups'], $additionalData), $data);
+			$data = array_merge($this->filterData($this->config->tables['roles'], $additionalData), $data);
 		}
 
-		$this->triggerEvents('extra_group_set');
+		$this->triggerEvents('extra_role_set');
 
-		// insert the new group
-		$this->db->table($this->config->tables['groups'])->insert($data);
-		$groupId = $this->db->insertId($this->config->tables['groups'] . '_id_seq');
+		// insert the new role
+		$this->db->table($this->config->tables['roles'])->insert($data);
+		$roleId = $this->db->insertId($this->config->tables['roles'] . '_id_seq');
 
 		// report success
-		$this->setMessage('AtomicAuth.group_creation_successful');
-		// return the brand new group id
-		return $groupId;
+		$this->setMessage('AtomicAuth.role_creation_successful');
+		// return the brand new role id
+		return $roleId;
 	}
 
 	/**
-	 * Update group
+	 * Update role
 	 *
-	 * @param integer $groupId        Group id
-	 * @param string  $groupName      Group name
+	 * @param integer $roleId        Group id
+	 * @param string  $roleName      Group name
 	 * @param array   $additionalData Additional datas
 	 *
 	 * @return boolean
 	 * @author aditya menon
 	 */
-	public function updateGroup(int $groupId, string $groupName='', array $additionalData=[]): bool
+	public function updateGroup(int $roleId, string $roleName='', array $additionalData=[]): bool
 	{
-		if (! $groupId)
+		if (! $roleId)
 		{
 			return false;
 		}
 
 		$data = [];
 
-		if (! empty($groupName))
+		if (! empty($roleName))
 		{
 			// we are changing the name, so do some checks
 
-			// bail if the group name already exists
-			$existingGroup = $this->db->table($this->config->tables['groups'])->getWhere(['name' => $groupName])->getRow();
-			if (isset($existingGroup->id) && (int)$existingGroup->id !== $groupId)
+			// bail if the role name already exists
+			$existingGroup = $this->db->table($this->config->tables['roles'])->getWhere(['name' => $roleName])->getRow();
+			if (isset($existingGroup->id) && (int)$existingGroup->id !== $roleId)
 			{
-				$this->setError('AtomicAuth.group_already_exists');
+				$this->setError('AtomicAuth.role_already_exists');
 				return false;
 			}
 
-			$data['name'] = $groupName;
+			$data['name'] = $roleName;
 		}
 
-		// restrict change of name of the admin group
-		$group = $this->db->table($this->config->tables['groups'])->getWhere(['id' => $groupId])->getRow();
-		if ($this->config->adminGroup === $group->name && $groupName !== $group->name)
+		// restrict change of name of the admin role
+		$role = $this->db->table($this->config->tables['roles'])->getWhere(['id' => $roleId])->getRow();
+		if ($this->config->adminRole === $role->name && $roleName !== $role->name)
 		{
-			$this->setError('AtomicAuth.groupName_admin_not_alter');
+			$this->setError('AtomicAuth.roleName_admin_not_alter');
 			return false;
 		}
 
-		// filter out any data passed that doesnt have a matching column in the groups table
-		// and merge the set group data and the additional data
+		// filter out any data passed that doesnt have a matching column in the roles table
+		// and merge the set role data and the additional data
 		if (! empty($additionalData))
 		{
-			$data = array_merge($this->filterData($this->config->tables['groups'], $additionalData), $data);
+			$data = array_merge($this->filterData($this->config->tables['roles'], $additionalData), $data);
 		}
 
-		$this->db->table($this->config->tables['groups'])->update($data, ['id' => $groupId]);
+		$this->db->table($this->config->tables['roles'])->update($data, ['id' => $roleId]);
 
-		$this->setMessage('AtomicAuth.group_update_successful');
+		$this->setMessage('AtomicAuth.role_update_successful');
 
 		return true;
 	}
 
 	/**
-	 * Remove a group.
+	 * Remove a role.
 	 *
-	 * @param integer $groupId Group id
+	 * @param integer $roleId Group id
 	 *
 	 * @return boolean
 	 * @author aditya menon
 	 */
-	public function deleteGroup(int $groupId): bool
+	public function deleteGroup(int $roleId): bool
 	{
 		// bail if mandatory param not set
-		if (! $groupId || empty($groupId))
+		if (! $roleId || empty($roleId))
 		{
 			return false;
 		}
-		$group = $this->group($groupId)->row();
-		if ($group->name === $this->config->adminGroup)
+		$role = $this->role($roleId)->row();
+		if ($role->name === $this->config->adminRole)
 		{
-			$this->triggerEvents(['post_delete_group', 'post_delete_group_notallowed']);
-			$this->setError('AtomicAuth.group_delete_notallowed');
+			$this->triggerEvents(['post_delete_role', 'post_delete_role_notallowed']);
+			$this->setError('AtomicAuth.role_delete_notallowed');
 			return false;
 		}
 
-		$this->triggerEvents('pre_delete_group');
+		$this->triggerEvents('pre_delete_role');
 
 		$this->db->transBegin();
 
-		// remove all users from this group
-		$this->db->table($this->config->tables['users_groups'])->delete([$this->config->join['groups'] => $groupId]);
-		// remove the group itself
-		$this->db->table($this->config->tables['groups'])->delete(['id' => $groupId]);
+		// remove all users from this role
+		$this->db->table($this->config->tables['users_roles'])->delete([$this->config->join['roles'] => $roleId]);
+		// remove the role itself
+		$this->db->table($this->config->tables['roles'])->delete(['id' => $roleId]);
 
 		if ($this->db->transStatus() === false)
 		{
 			$this->db->transRollback();
-			$this->triggerEvents(['post_delete_group', 'post_delete_group_unsuccessful']);
-			$this->setError('AtomicAuth.group_delete_unsuccessful');
+			$this->triggerEvents(['post_delete_role', 'post_delete_role_unsuccessful']);
+			$this->setError('AtomicAuth.role_delete_unsuccessful');
 			return false;
 		}
 
 		$this->db->transCommit();
 
-		$this->triggerEvents(['post_delete_group', 'post_delete_group_successful']);
-		$this->setMessage('group_delete_successful');
+		$this->triggerEvents(['post_delete_role', 'post_delete_role_successful']);
+		$this->setMessage('role_delete_successful');
 		return true;
 	}
 
@@ -2208,9 +1669,9 @@ class AtomicAuthModel
 	 * @return string
 	 * @author Timothy Wood
 	 */
-	public function groupModel() //: class
+	public function roleModel() //: class
 	{
-		return $this->groupModel;
+		return $this->roleModel;
 	}
 
 	/**
@@ -2549,33 +2010,33 @@ class AtomicAuthModel
 			}
 
 
-			public function groupExists( string $group = null, string $lookupColumn = 'guid'): bool
+			public function roleExists( string $role = null, string $lookupColumn = 'guid'): bool
 			{
-				$this->triggerEvents('group_exists');
+				$this->triggerEvents('role_exists');
 
-				if (empty($group))
+				if (empty($role))
 				{
 					return false;
 				}
-// dd($this->groupModel->where('name', $group)->limit(1)->first());
-				// TRUE: we expect that the size of found group to be greater than 0
-				return ($this->groupModel->where($lookupColumn, $group)->limit(1)->findAll() > 0);
+// dd($this->roleModel->where('name', $role)->limit(1)->first());
+				// TRUE: we expect that the size of found role to be greater than 0
+				return ($this->roleModel->where($lookupColumn, $role)->limit(1)->findAll() > 0);
 			}
 
-			public function groupsExist(array $groups = []): bool
+			public function rolesExist(array $roles = []): bool
 			{
-				$this->triggerEvents('groups_exists');
+				$this->triggerEvents('roles_exists');
 
-				if (empty($groups))
+				if (empty($roles))
 				{
 					return false;
-				} else if( ! is_array( $groups ) )
+				} else if( ! is_array( $roles ) )
 				{
-					$groups = [ $groups ];
+					$roles = [ $roles ];
 				}
 
-				// TRUE: we expect that the size of provided $groups should be the same as those found
-				return ($this->groupModel->whereIn('name', $groups)->countAllResults() == count( $groups ));
+				// TRUE: we expect that the size of provided $roles should be the same as those found
+				return ($this->roleModel->whereIn('name', $roles)->countAllResults() == count( $roles ));
 			}
 
 	/**
@@ -2676,7 +2137,7 @@ class AtomicAuthModel
 		if ($identity)
 		{
 			$userId = $this->getUserIdFromIdentity($identity);
-			if ($userId && $this->inGroup($this->config->adminGroup, $userId))
+			if ($userId && $this->inGroup($this->config->adminRole, $userId))
 			{
 				$isAdmin = true;
 			}

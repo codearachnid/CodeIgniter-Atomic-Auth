@@ -31,8 +31,8 @@ return [
 	'account_creation_duplicate_identity'	    => 'Identitas Sudah Digunakan atau Tidak Valid',
 
 	// TODO Please Translate
-	'account_creation_missing_defaultGroup'		=> 'Standar grup tidak diatur',
-	'account_creation_invalid_defaultGroup'		=> 'Pengaturan Nama Grup Standar Tidak Valid',
+	'account_creation_missing_defaultRole'		=> 'Standar grup tidak diatur',
+	'account_creation_invalid_defaultRole'		=> 'Pengaturan Nama Grup Standar Tidak Valid',
 
 
 	// Password
@@ -63,15 +63,15 @@ return [
 	'delete_successful'							=> 'Pengguna Telah Dihapus',
 	'delete_unsuccessful'						=> 'Gagal Menghapus Pengguna',
 
-	// Groups
-	'group_creation_successful'				    => 'Grup Berhasil Dibuat',
-	'group_already_exists'						=> 'Nama Grup Sudah Digunakan',
-	'group_update_successful'					=> 'Rincian Grup Berhasil Diubah',
-	'group_delete_successful'					=> 'Grup Berhasil Dihapus',
-	'group_delete_unsuccessful'				    => 'Gagal Menghapus Grup',
-	'group_delete_notallowed'					=> 'Tidak Dapat menghapus Grup Administrator',
-	'group_name_required'						=> 'Nama Grup Tidak Boleh Kosong',
-	'group_name_admin_not_alter'			    	=> 'Nama Grup Admin Tidak Bisa Diubah',
+	// Roles
+	'role_creation_successful'				    => 'Grup Berhasil Dibuat',
+	'role_already_exists'						=> 'Nama Grup Sudah Digunakan',
+	'role_update_successful'					=> 'Rincian Grup Berhasil Diubah',
+	'role_delete_successful'					=> 'Grup Berhasil Dihapus',
+	'role_delete_unsuccessful'				    => 'Gagal Menghapus Grup',
+	'role_delete_notallowed'					=> 'Tidak Dapat menghapus Grup Administrator',
+	'role_name_required'						=> 'Nama Grup Tidak Boleh Kosong',
+	'role_name_admin_not_alter'			    	=> 'Nama Grup Admin Tidak Bisa Diubah',
 
 	// Activation Email
 	'emailActivation_subject'					=> 'Aktivasi Akun',

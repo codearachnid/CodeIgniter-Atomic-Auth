@@ -93,14 +93,14 @@ class InstallAtomicAuth extends Migration
 
 
 			      /*
-			       * Groups Table
+			       * Roles Table
 			       */
 			      $fields = [
 			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
 								'guid'        => ['type' => 'varchar', 'constraint' => 32, 'null' => false],
 			          'name'        => ['type' => 'varchar', 'constraint' => 255],
 			          'description' => ['type' => 'varchar', 'constraint' => 255],
-								'status'           => ['type' => 'varchar', 'constraint' => 15, 'null' => false, 'default' => 'inactive'],
+								'status'           => ['type' => 'tinyint', 'constraint' => 1, 'null' => false, 'default' => 0],
 								'created_at'       => ['type' => 'datetime', 'null' => true],
 			          'updated_at'       => ['type' => 'datetime', 'null' => true],
 			          'deleted_at'       => ['type' => 'datetime', 'null' => true],
@@ -108,16 +108,17 @@ class InstallAtomicAuth extends Migration
 
 			      $this->forge->addField($fields);
 			      $this->forge->addKey('id', true);
-						// $this->forge->addUniqueKey('guid');
-			      $this->forge->createTable($this->tables['groups'], true);
+						$this->forge->addUniqueKey('guid');
+			      $this->forge->createTable($this->tables['roles'], true);
 
 			      /*
-			       * Permissions Table
+			       * Capabilities Table
 			       */
 			      $fields = [
 			          'id'          => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
 			          'name'        => ['type' => 'varchar', 'constraint' => 255, 'null' => false],
 			          'description' => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+								'status'           => ['type' => 'tinyint', 'constraint' => 1, 'null' => false, 'default' => 0],
 								'created_at'       => ['type' => 'datetime', 'null' => true],
 			          'updated_at'       => ['type' => 'datetime', 'null' => true],
 			          'deleted_at'       => ['type' => 'datetime', 'null' => true],
@@ -126,7 +127,7 @@ class InstallAtomicAuth extends Migration
 			      $this->forge->addField($fields);
 			      $this->forge->addKey('id', true);
 						$this->forge->addUniqueKey('name');
-			      $this->forge->createTable($this->tables['permissions'], true);
+			      $this->forge->createTable($this->tables['capabilities'], true);
 
 
 			/*
@@ -193,46 +194,46 @@ class InstallAtomicAuth extends Migration
       // $this->forge->createTable($this->tables['activation_attempts']);
 
       /*
-       * Groups/Permissions Table
+       * Roles/Capabilities Table
        */
       $fields = [
-          'group_id'      => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
-          'permission_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+          'role_id'      => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+          'capability_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
       ];
 
       $this->forge->addField($fields);
-      $this->forge->addKey(['group_id', 'permission_id']);
-      $this->forge->addForeignKey('group_id', $this->tables['groups'], 'id', false, 'CASCADE');
-      $this->forge->addForeignKey('permission_id', $this->tables['permissions'], 'id', false, 'CASCADE');
-      $this->forge->createTable($this->tables['groups_permissions'], true);
+      $this->forge->addKey(['role_id', 'capability_id']);
+      $this->forge->addForeignKey('role_id', $this->tables['roles'], 'id', false, 'CASCADE');
+      $this->forge->addForeignKey('capability_id', $this->tables['capabilities'], 'id', false, 'CASCADE');
+      $this->forge->createTable($this->tables['roles_capabilities'], true);
 
       /*
-       * Users/Groups Table
+       * Users/Roles Table
        */
       $fields = [
-          'group_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+          'role_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
           'user_id'  => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
       ];
 
       $this->forge->addField($fields);
-      $this->forge->addKey(['group_id', 'user_id']);
-      $this->forge->addForeignKey('group_id', $this->tables['groups'], 'id', false, 'CASCADE');
+      $this->forge->addKey(['role_id', 'user_id']);
+      $this->forge->addForeignKey('role_id', $this->tables['roles'], 'id', false, 'CASCADE');
       $this->forge->addForeignKey('user_id', $this->tables['users'], 'id', false, 'CASCADE');
-      $this->forge->createTable($this->tables['groups_users'], true);
+      $this->forge->createTable($this->tables['roles_users'], true);
 
       /*
-       * Users/Permissions Table
+       * Users/Capabilities Table
        */
       $fields = [
           'user_id'       => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
-          'permission_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
+          'capability_id' => ['type' => 'int', 'constraint' => 11, 'unsigned' => true, 'default' => 0],
       ];
 
       $this->forge->addField($fields);
-      $this->forge->addKey(['user_id', 'permission_id']);
+      $this->forge->addKey(['user_id', 'capability_id']);
       $this->forge->addForeignKey('user_id', $this->tables['users'], 'id', false, 'CASCADE');
-      $this->forge->addForeignKey('permission_id', $this->tables['permissions'], 'id', false, 'CASCADE');
-      $this->forge->createTable($this->tables['users_permissions'], true);
+      $this->forge->addForeignKey('capability_id', $this->tables['capabilities'], 'id', false, 'CASCADE');
+      $this->forge->createTable($this->tables['users_capabilities'], true);
 
 	}
 

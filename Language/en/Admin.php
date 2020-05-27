@@ -25,8 +25,8 @@ return [
 	'account_creation_unsuccessful'          => 'Unable to Create Account',
 	'account_creation_duplicate_email'       => 'Email Already Used or Invalid',
 	'account_creation_duplicate_identity'    => 'Identity Already Used or Invalid',
-	'account_creation_missing_defaultGroup' => 'Default group is not set',
-	'account_creation_invalid_defaultGroup' => 'Invalid default group name set',
+	'account_creation_missing_defaultRole' => 'Default role is not set',
+	'account_creation_invalid_defaultRole' => 'Invalid default role name set',
 
 	// Password
 	'password_change_successful'          => 'Password Successfully Changed',
@@ -56,15 +56,15 @@ return [
 	'delete_successful'                   => 'User Deleted',
 	'delete_unsuccessful'                 => 'Unable to Delete User',
 
-	// Groups
-	'group_creation_successful'           => 'Group created Successfully',
-	'group_already_exists'                => 'Group name already taken',
-	'group_update_successful'             => 'Group details updated',
-	'group_delete_successful'             => 'Group deleted',
-	'group_delete_unsuccessful'           => 'Unable to delete group',
-	'group_delete_notallowed'             => 'Can\'t delete the administrators\' group',
-	'group_name_required'                 => 'Group name is a required field',
-	'group_name_admin_not_alter'          => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'           => 'Group created Successfully',
+	'role_already_exists'                => 'Group name already taken',
+	'role_update_successful'             => 'Group details updated',
+	'role_delete_successful'             => 'Group deleted',
+	'role_delete_unsuccessful'           => 'Unable to delete role',
+	'role_delete_notallowed'             => 'Can\'t delete the administrators\' role',
+	'role_name_required'                 => 'Group name is a required field',
+	'role_name_admin_not_alter'          => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Account Activation',

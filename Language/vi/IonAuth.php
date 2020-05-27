@@ -49,15 +49,15 @@ return [
 	'delete_successful'               => 'Đã xoá tài khoản',
 	'delete_unsuccessful'           => 'Không thể xoá tài khoản vào lúc này',
 
-	// Groups
-	'group_creation_successful'  => 'Đã tạo nhóm mới thành công',
-	'group_already_exists'       => 'Tên nhóm bị trùng',
-	'group_update_successful'    => 'Đã cập nhật thông tin nhóm thành công',
-	'group_delete_successful'    => 'Đã xoá nhóm',
-	'group_delete_unsuccessful' 	=> 'Không thể xoá nhóm vào lúc này',
-	'group_delete_notallowed'    => 'Can\'t delete the administrators\' group',
-	'group_name_required' 		=> 'Vui lòng nhập tên nhóm',
-	'group_name_admin_not_alter' => 'Admin group name can not be changed',
+	// Roles
+	'role_creation_successful'  => 'Đã tạo nhóm mới thành công',
+	'role_already_exists'       => 'Tên nhóm bị trùng',
+	'role_update_successful'    => 'Đã cập nhật thông tin nhóm thành công',
+	'role_delete_successful'    => 'Đã xoá nhóm',
+	'role_delete_unsuccessful' 	=> 'Không thể xoá nhóm vào lúc này',
+	'role_delete_notallowed'    => 'Can\'t delete the administrators\' role',
+	'role_name_required' 		=> 'Vui lòng nhập tên nhóm',
+	'role_name_admin_not_alter' => 'Admin role name can not be changed',
 
 	// Activation Email
 	'emailActivation_subject'            => 'Kích hoạt tài khoản',

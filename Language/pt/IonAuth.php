@@ -21,8 +21,8 @@ return [
 	'account_creation_unsuccessful'       	=> 'Não foi possível criar a conta',
 	'account_creation_duplicate_email'    	=> 'Email em uso ou inválido',
 	'account_creation_duplicate_identity' 	=> 'Nome de usuário em uso ou inválido',
-	'account_creation_missing_defaultGroup' => 'Grupo padrão não está definido',
-	'account_creation_invalid_defaultGroup' => 'Nome padrão do grupo definido é inválido',
+	'account_creation_missing_defaultRole' => 'Grupo padrão não está definido',
+	'account_creation_invalid_defaultRole' => 'Nome padrão do grupo definido é inválido',
 
 	// Password
 	'password_change_successful'         => 'Senha alterada com sucesso',
@@ -52,15 +52,15 @@ return [
 	'delete_successful'                  => 'Usuário excluído com sucesso',
 	'delete_unsuccessful'                => 'Não foi possível excluir o usuário',
 
-	// Groups
-	'group_creation_successful'          => 'Grupo criado com sucesso',
-	'group_already_exists'               => 'Um grupo com este nome já existe',
-	'group_update_successful'            => 'Dados do grupo atualizados com sucesso',
-	'group_delete_successful'            => 'Grupo excluído com sucesso',
-	'group_delete_unsuccessful'          => 'Não foi possível excluir o grupo',
-	'group_delete_notallowed'    		=> 'Não é possível excluir o grupo de administradores',
-	'group_name_required' 				=> 'Nome do grupo é um campo obrigatório',
-	'group_name_admin_not_alter' 		=> 'Nome do grupo administrador não pode ser alterado',
+	// Roles
+	'role_creation_successful'          => 'Grupo criado com sucesso',
+	'role_already_exists'               => 'Um grupo com este nome já existe',
+	'role_update_successful'            => 'Dados do grupo atualizados com sucesso',
+	'role_delete_successful'            => 'Grupo excluído com sucesso',
+	'role_delete_unsuccessful'          => 'Não foi possível excluir o grupo',
+	'role_delete_notallowed'    		=> 'Não é possível excluir o grupo de administradores',
+	'role_name_required' 				=> 'Nome do grupo é um campo obrigatório',
+	'role_name_admin_not_alter' 		=> 'Nome do grupo administrador não pode ser alterado',
 
 	// Activation Email
 	'emailActivation_subject'           => 'Ativação da conta',
