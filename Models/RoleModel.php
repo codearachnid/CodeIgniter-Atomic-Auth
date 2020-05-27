@@ -31,19 +31,20 @@ class RoleModel extends Model
     /**
 		 * This was pretty complex - saving the raw query for later debugging if needed
      *
-		 * SELECT `role`.`id`, `role`.`guid`, `role`.`name`, `role`.`description`, `role`.`status`, `role`.`created_at`, `role`.`updated_at`, `role`.`deleted_at`
-     * FROM `atomicauth_roles` AS `role`
+		 * SELECT `role`.`id`, `role`.`guid`, `role`.`name`, `role`.`description`, `role`.`status`
+		 * FROM `atomicauth_roles` AS `role`
 		 * LEFT JOIN `atomicauth_roles_users` AS `role_usr` ON `role_usr`.`role_id` = `role`.`id`
 		 * WHERE `role_usr`.`user_id` = 1
 		 * AND `role`.`status` = 1
 		 */
     $roleEntity = new $this->returnType; //\AtomicAuth\Entities\Role();
-    return $this->select('role.id,role.guid,role.name,role.description,role.status' )
+    $userRoles = $this->select('role.id,role.guid,role.name,role.description,role.status' )
       // TODO make roles_users extensible
       ->join('atomicauth_roles_users AS role_usr', 'role_usr.role_id = role.id', 'left')
       ->where('role_usr.user_id', $userId)
       ->where('role.status', $roleEntity->statusValueMap['active'])
       ->get()->getResult();
+      return $userRoles;
   }
 
 }

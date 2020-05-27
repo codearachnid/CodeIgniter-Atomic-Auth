@@ -1310,7 +1310,7 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 	public function getUserRoles( int $userId = null )
 	{
 		// if no id provided use the current session active user_id
-		$userId || $userId = $this->session->get('user_id');
+		$userId || $userId = $this->getSessionProperty('id');
 		return $this->roleModel->getRolesByUserId( $userId );
 	}
 

@@ -10,9 +10,6 @@
       <p><?php echo form_label(lang('Auth.edit_user_identiy_label'), 'Email');?> <br />
           <?php echo $user->email; ?></p>
 
-
-
-
         <h3><?php echo lang('Auth.edit_user_in_roles_heading');?></h3>
         <?php foreach ($user->roles as $role): ?>
             <label class="checkbox">
