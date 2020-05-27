@@ -11,6 +11,7 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
 
   // ... user centric
   $routes->add('list', 'User::list');
+  $routes->add('list/(:alphanum)', 'User::list/$1');
   $routes->add('user', 'User::profile');
   $routes->add('create', 'User::create');
   $routes->add('edit', 'User::edit');

@@ -11,4 +11,5 @@ class Profile extends Entity
   protected $last_check;
   protected $capabilities;
   protected $roles;
+  protected $status;
 }

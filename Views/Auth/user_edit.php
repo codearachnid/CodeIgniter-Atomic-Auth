@@ -20,10 +20,22 @@
             <?php echo form_input($password_confirm);?>
       </p>
 
+      <?php if ($atomicAuth->userCan('edit_user_status')): ?>
+
+          <p>
+            <?php echo form_label(lang('Auth.edit_user_status_heading'), 'status');?> <br />
+            <?php echo form_dropdown('status', ['pending'=>'Pending','active'=>'Active','inactive'=>'Inactive','suspended'=>'Suspended','banned'=>'Banned',], $user->status); ?>
+          </p>
+
+      <?php else : ?>
+        <p><?php echo form_label(lang('Auth.edit_user_status_label'), 'status');?> <br />
+            <?php echo $user->status; ?></p>
+      <?php endif; ?>
+
       <?php if ($atomicAuth->userCan('promote_user')): ?>
 
           <h3><?php echo lang('Auth.edit_user_roles_heading');?></h3>
-          <?php d($roles); foreach ($roles as $role):?>
+          <?php foreach ($roles as $role):?>
               <label class="checkbox">
               <?php echo form_checkbox('roles[]', $role->id, in_array($role->id, $userInRoles) ); ?>
               <?php echo htmlspecialchars($role->description, ENT_QUOTES, 'UTF-8');?>
@@ -39,8 +51,8 @@
         <?php endforeach?>
       <?php endif; ?>
 
-      <?php echo form_hidden('id', $user->id);?>
+      <?php echo form_hidden('attomic_auth_user_id', $user->id);?>
 
-      <p><?php echo form_submit('submit', lang('Auth.edit_user_submit_btn'));?></p>
+      <p><a href="/auth/user">Profile</a> | <?php echo form_submit('submit', lang('Auth.edit_user_submit_btn'));?></p>
 
 <?php echo form_close();?>

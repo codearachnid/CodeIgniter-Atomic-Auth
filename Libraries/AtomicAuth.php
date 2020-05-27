@@ -269,6 +269,36 @@ class AtomicAuth
 				return $user;
 	}
 
+	public function update(string $userId, $userData ) : bool
+	{
+		$returnStatus = true;
+		$tempUserModel = new \AtomicAuth\Entities\User();
+
+		if( empty($userId) )
+		{
+			return false;
+		}
+
+		// change user group assignments
+		if ( $returnStatus && $this->atomicAuthModel->userCan('promote_user') && isset($userData->roleIds) )
+		{
+			$returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->addUserToGroup( $userData->roleIds, $userId ) : $returnStatus;
+		}
+
+		// change user status
+		if ( $returnStatus && $this->atomicAuthModel->userCan('edit_user_status') && isset($userData->status) )
+		{
+			$tempUserModel->status = $userData->status;
+		}
+
+		if($tempUserModel->hasChanged())
+		{
+			$this->atomicAuthModel->userModel()->update($userId, $userData);
+		}
+
+		return $returnStatus;
+	}
+
 	/**
 	 * Logout
 	 *

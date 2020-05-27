@@ -107,7 +107,7 @@ class Auth extends \CodeIgniter\Controller
 			// set the flash data error message if there is one
 			$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 			//list the users
-			if ( $atomicAuth->userCan('list_user') )
+			if ( $this->atomicAuth->userCan('list_user') )
 			{
 				$this->data['users'] = $this->atomicAuth->users()->result();
 			}

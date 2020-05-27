@@ -786,7 +786,7 @@ class AtomicAuthModel
 								'guid',
 								'id',
 								'password_hash',
-								// 'status',
+								'status',
 						  ])->where([
 								$this->config->identity => $identity,
 								'status' => 'active', // TODO should get any user other than active?
@@ -1059,7 +1059,7 @@ class AtomicAuthModel
 
 		$user->{$this->config->identity} = $identity;
 		$user->password_hash = $this->hashPassword($password, $identity);
-		$user->status = 1; // TODO there needs to be a better way to activate a user
+		$user->status = 'active'; // TODO there needs to be a better way to activate a user
 		// TODO I have a dream that this will work one day *** see after insert for bandaid
 		// $builder->set('guid', 'UUID_TO_BIN(UUID())', FALSE);
 		$user->guid = $this->userModel->generateGuid();
@@ -1137,13 +1137,18 @@ class AtomicAuthModel
  * @return integer The number of roles added
  * @author Ben Edmunds
  */
-public function addUserToGroup($roleIds, int $userId=0, $force = false ): int
+public function addUserToGroup(?array $roleIds = null, ?int $userId = null, bool $append = false ): int
 {
 	$this->triggerEvents('add_user_to_role');
 
 	// if no id was passed use the current users id
 	// TODO need security check to ensure user can add themselves to a role
-	$userId || $userId = $this->session->get('user_id');
+	$userId || $userId = $this->getSession('id');
+
+	if( !$roleIds )
+	{
+		return 0;
+	}
 
 	if (! is_array($roleIds))
 	{
@@ -1175,7 +1180,7 @@ public function addUserToGroup($roleIds, int $userId=0, $force = false ): int
 
 	if( ! empty( $rolesUsers ) )
 	{
-		if( $force )
+		if( !$append )
 		{
 			$this->db->table($this->config->tables['roles_users'])->delete(['user_id' => $userId]);
 		}
@@ -1287,6 +1292,7 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 			$profile->id = $user->id;
 			$profile->guid = $user->guid;
 			$profile->last_check = time();
+			$profile->status = $user->status;
 			$profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser( $user->id );
 			$profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles( $user->id );
 			$this->session->set([$this->config->sessionKey => $profile->toRawArray()]);
@@ -1452,10 +1458,11 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 		else if( $identifier == 'guid' )
 		{
 			$user = $this->userModel->getUserByGuid( $userId );
+			dd($user);
 		}
 		else if ( $identifier == 'id' )
 		{
-			$user = $this->userModel->get( $userId )->findAll()->first();
+			$user = $this->userModel->asObject()->find( $userId );
 		}
 
 		if( !$user )
@@ -1465,12 +1472,12 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 
 		// build out profile for roles and capabilities
 		$profile = new \AtomicAuth\Entities\Profile();
-		// dd($user);
 		$profile->identity = $user->{$this->config->identity};
 		$profile->email = $user->email;
 		$profile->id = $user->id;
 		$profile->guid = $user->guid;
 		$profile->last_check = time();
+		$profile->status = $user->status;
 		$profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser( $user->id );
 		$profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles( $user->id );
 

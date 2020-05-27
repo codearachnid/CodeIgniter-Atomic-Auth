@@ -72,7 +72,7 @@ class User extends \CodeIgniter\Controller
 	{
 		$this->atomicAuth    = new \AtomicAuth\Libraries\AtomicAuth();
 		$this->validation = \Config\Services::validation();
-		helper(['form', 'url']);
+		helper(['form', 'url','AtomicAuth\auth']);
 		$this->configAtomicAuth = config('AtomicAuth');
 		$this->session       = \Config\Services::session();
 
@@ -114,6 +114,37 @@ class User extends \CodeIgniter\Controller
 			}
 			return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'index', $this->data);
 		}
+	}
+
+	public function list( string $filterUserStatus = null )
+	{
+		if (! $this->atomicAuth->loggedIn())
+		{
+			// redirect to the login page
+			return redirect()->to('/auth/login');
+		}
+		else if ( ! $this->atomicAuth->userCan('list_user')) {
+			// redirect unauthorized user to the profile page
+			return redirect()->to('/auth/user');
+		}
+
+		$this->data['title'] = lang('Auth.list_users_heading');
+		$this->data['atomicAuth'] = $this->atomicAuth;
+		$this->data['message'] = $this->session->getFlashdata('message');
+		$filterUserStatus || $filterUserStatus = 'active';
+
+		if( $filterUserStatus == 'all' )
+		{
+			// pass the user to the view
+			$this->data['users']          = $this->atomicAuth->userModel()->findAll();
+		}
+		else
+		{
+			// pass the user to the view
+			$this->data['users']          = $this->atomicAuth->userModel()->where('status', $filterUserStatus )->findAll();
+		}
+
+		return view('AtomicAuth\Views\Auth\user_list', $this->data);
 	}
 
 	public function profile()
@@ -537,13 +568,24 @@ class User extends \CodeIgniter\Controller
 			return redirect()->to('/auth');
 		}
 
-		$refreshUser = false;
-		$user          = $this->atomicAuth->getUserProfile( $guid );
-		$roles        = $this->atomicAuth->roleModel()->where('status', 'active')->findAll();
+		$refreshSession = false;
 
-		if(is_null($user))
+		if( $this->request->getPost('attomic_auth_user_id') )
 		{
-			// TODO better handling if user doesn't exist
+			$user_id = $this->request->getPost('attomic_auth_user_id');
+		}
+		else if( is_null( $guid ) )
+		{
+			$user_id = $this->atomicAuth->getSessionProperty('id');
+		}
+		else
+		{
+			$lookupUserId = $this->atomicAuth->userModel()->getUserByGuid($guid);
+			$user_id = $lookupUserId->id;
+		}
+		// TODO better handling if user doesn't exist
+		if(is_null($user_id))
+		{
 			return redirect()->to('/auth/create');
 		}
 
@@ -554,45 +596,50 @@ class User extends \CodeIgniter\Controller
 				// parse submitted request
 				if ( $this->request->getPost() ){
 
-					/* TODO throws errors on $id
+
+					// dd($this->request->getPost());
+
+					/* TODO is this needed?
 					// do we have a valid request?
-					if ($id !== $this->request->getPost('id', FILTER_VALIDATE_INT))
+					if ($guid !== $this->request->getPost('guid', FILTER_VALIDATE_INT))
 					{
 						//show_error(lang('Auth.error_security'));
 						throw new \Exception(lang('Auth.error_security'));
 					}
 					*/
 
+					// $email    = strtolower($this->request->getPost('email'));
+					// $identity = strtolower($this->request->getPost($this->configAtomicAuth->identity));
 
-					if ($atomicAuth->userCan('promote_user'))
+					$userMeta = []; // TODO flesh out user meta data
+					$userData = (object)[];
+					$userData->roleIds = $this->request->getPost('roles');
+					$userData->status = $this->request->getPost('status');
+
+					// check to see if we are updating the user
+					if ($this->atomicAuth->update($user_id, $userData))
 					{
-						// Update the roles user belongs to
-						$roleData = $this->request->getPost('roles');
-						if( !empty($roleData) && count($roleData) == $this->atomicAuth->addUserToGroup( $roleData, $user->id, TRUE ) )
-						{
-							$refreshUser = true;
-						}
+						$refreshSession = true;
+						$this->session->setFlashdata('message', $this->atomicAuth->messages());
+					}
+					else
+					{
+						$this->session->setFlashdata('message', $this->atomicAuth->errors($this->validationListTemplate));
 					}
 
-					$password = $this->request->getPost('password');
-					// update the password if it was posted
-					if ($password)
-					{
-						$this->validation->setRule('password', lang('Auth.edit_user_validation_password_label'), 'required|min_length[' . $this->configAtomicAuth->minPasswordLength . ']|matches[password_confirm]');
-						$this->validation->setRule('password_confirm', lang('Auth.edit_user_validation_password_confirm_label'), 'required');
-					}
 
 
 						// run validation
 						if($this->validation->withRequest($this->request)->run())
 						{
-							// $email    = strtolower($this->request->getPost('email'));
-							// $identity = strtolower($this->request->getPost($this->configAtomicAuth->identity));
 
-							$userMeta = []; // TODO flesh out user meta data
-							// $userRoles = []; // TODO flesh out user role associations
-
-
+												$password = $this->request->getPost('password');
+												// update the password if it was posted
+												if ($password)
+												{
+													$this->validation->setRule('password', lang('Auth.edit_user_validation_password_label'), 'required|min_length[' . $this->configAtomicAuth->minPasswordLength . ']|matches[password_confirm]');
+													$this->validation->setRule('password_confirm', lang('Auth.edit_user_validation_password_confirm_label'), 'required');
+												}
 
 							// user entity register the user
 							// if( $this->atomicAuth->register($identity, $password, $email, $userMeta, $userRoles) )
@@ -625,6 +672,11 @@ class User extends \CodeIgniter\Controller
 								$this->data['message'];
 
 						}
+
+
+
+
+
 
 								}
 /*
@@ -686,13 +738,20 @@ class User extends \CodeIgniter\Controller
 		// set the flash data error message if there is one
 		// $this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->atomicAuth->errors($this->validationListTemplate) ? $this->atomicAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
 
-		if( $refreshUser ){
-			$user          = $this->atomicAuth->getUserProfile( $guid );
+		$user = $this->atomicAuth->getUserProfile( $user_id, 'id' );
+
+		if( $refreshSession && $user_id == $this->atomicAuth->getSessionProperty('id') )
+		{
+
+			$this->atomicAuth->setSession( $user );
 		}
 
 		// pass the user to the view
 		$this->data['user']          = $user;
-		$this->data['roles']        = $roles;
+
+		// TODO figure out role status to be 'active' => 1 in a cleaner way
+		$roleEntity = new \AtomicAuth\Entities\Role();
+		$this->data['roles']        = $this->atomicAuth->roleModel()->where('status', $roleEntity->statusValueMap['active'])->findAll();
 		$this->data['userInRoles']  = array_column($user->roles, 'id');
 
 		$this->data['password'] = [
