@@ -4,7 +4,7 @@ use CodeIgniter\Model;
 
 class CapabilityModel extends Model
 {
-  protected $table         = 'atomicauth_capabilities as cap'; // TODO make this dynamically driven via config
+  protected $table         = 'atomicauth_capabilities AS cap'; // TODO make this dynamically driven via config
   protected $allowedFields = [
       'guid', 'name', 'description'
   ];

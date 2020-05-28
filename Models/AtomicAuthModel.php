@@ -1285,14 +1285,9 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 	public function setSession(\stdClass $user = null): bool
 	{
 		$this->triggerEvents('pre_set_session');
-		if( $user && ! is_null( $user->id ) ){
-			$profile = new \AtomicAuth\Entities\Profile();
-			$profile->identity = $user->{$this->config->identity};
-			$profile->email = $user->email;
-			$profile->id = $user->id;
-			$profile->guid = $user->guid;
-			$profile->last_check = time();
-			$profile->status = $user->status;
+		if( $user && isset( $user->id ) ){
+			d($user);
+			$profile = $this->fillProfile( $user );
 			$profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser( $user->id );
 			$profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles( $user->id );
 			$this->session->set([$this->config->sessionKey => $profile->toRawArray()]);
@@ -1458,7 +1453,6 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 		else if( $identifier == 'guid' )
 		{
 			$user = $this->userModel->getUserByGuid( $userId );
-			dd($user);
 		}
 		else if ( $identifier == 'id' )
 		{
@@ -1470,19 +1464,26 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 			return null;
 		}
 
+		$profile = $this->fillProfile( $user );
+		$profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser( $user->id );
+		$profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles( $user->id );
+		return (object) $profile->toRawArray();
+
+	}
+
+	private function fillProfile( object $user = null) : \AtomicAuth\Entities\Profile
+	{
 		// build out profile for roles and capabilities
 		$profile = new \AtomicAuth\Entities\Profile();
+		// TODO cleaner way to fill?
+		// $profile->fill( (array) $user);
 		$profile->identity = $user->{$this->config->identity};
+		$profile->last_check = time();
 		$profile->email = $user->email;
 		$profile->id = $user->id;
 		$profile->guid = $user->guid;
-		$profile->last_check = time();
 		$profile->status = $user->status;
-		$profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser( $user->id );
-		$profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles( $user->id );
-
-		return (object) $profile->toRawArray();
-
+		return $profile;
 	}
 	/**
 	 * Can a user do ""

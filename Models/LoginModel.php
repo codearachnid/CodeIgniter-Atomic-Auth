@@ -4,7 +4,7 @@ use CodeIgniter\Model;
 
 class LoginModel extends Model
 {
-  protected $table         = 'atomicauth_track_logins'; // TODO make this dynamically driven via config
+  protected $table         = 'atomicauth_track_logins AS trk'; // TODO make this dynamically driven via config
   protected $allowedFields = [
       'ip_address', 'identity', 'user_id', 'activity'
   ];

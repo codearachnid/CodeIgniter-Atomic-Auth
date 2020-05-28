@@ -48,13 +48,6 @@ class AtomicAuth
 	protected $email;
 
 	/**
-	 * Max cookie lifetime constant
-	 */
-	const MAX_COOKIE_LIFETIME = 63072000; // 2 years = 60*60*24*365*2 = 63072000 seconds;
-
-
-
-	/**
 	 * __construct
 	 *
 	 * @author Ben
