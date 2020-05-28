@@ -181,7 +181,7 @@ class AtomicAuthModel
 	 *
 	 * @var array
 	 */
-	protected $cacheUserInGroup = [];
+	protected $cacheUserInRole = [];
 
 	/**
 	 * Caching of roles
@@ -229,17 +229,6 @@ class AtomicAuthModel
 		$this->capabilityModel = model('AtomicAuth\Models\CapabilityModel');
 
 		$this->triggerEvents('model_constructor');
-	}
-
-	/**
-	 * Getter to the DB connection used by Atomic Auth
-	 * May prove useful for debugging
-	 *
-	 * @return object
-	 */
-	public function db()
-	{
-		return $this->db;
 	}
 
 	/**
@@ -1089,9 +1078,9 @@ class AtomicAuthModel
 			$checkGroup = [$checkGroup];
 		}
 
-		if (isset($this->cacheUserInGroup[$id]))
+		if (isset($this->cacheUserInRole[$id]))
 		{
-			$rolesArray = $this->cacheUserInGroup[$id];
+			$rolesArray = $this->cacheUserInRole[$id];
 		}
 		else
 		{
@@ -1101,7 +1090,7 @@ class AtomicAuthModel
 			{
 				$rolesArray[$role->id] = $role->name;
 			}
-			$this->cacheUserInGroup[$id] = $rolesArray;
+			$this->cacheUserInRole[$id] = $rolesArray;
 		}
 		foreach ($checkGroup as $key => $value)
 		{
@@ -1137,7 +1126,7 @@ class AtomicAuthModel
  * @return integer The number of roles added
  * @author Ben Edmunds
  */
-public function addUserToGroup(?array $roleIds = null, ?int $userId = null, bool $append = false ): int
+public function addUserToRole(?array $roleIds = null, ?int $userId = null, bool $append = false ): int
 {
 	$this->triggerEvents('add_user_to_role');
 
@@ -1145,15 +1134,15 @@ public function addUserToGroup(?array $roleIds = null, ?int $userId = null, bool
 	// TODO need security check to ensure user can add themselves to a role
 	$userId || $userId = $this->getSession('id');
 
-	if( !$roleIds )
+	if( !$roleIds || !$userId )
 	{
 		return 0;
 	}
-
 	if (! is_array($roleIds))
 	{
 		$roleIds = [$roleIds];
 	}
+
 
 	$rolesUsers = [];
 
@@ -1199,7 +1188,7 @@ public function addUserToGroup(?array $roleIds = null, ?int $userId = null, bool
  * @return boolean
  * @author Ben Edmunds
  */
-public function removeFromGroup($roleIds=0, int $userId=0): bool
+public function removeUserFromGroup($roleIds=0, int $userId=0): bool
 {
 	$this->triggerEvents('remove_from_role');
 
@@ -1222,9 +1211,9 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 		foreach ($roleIds as $roleId)
 		{
 			$builder->delete([$this->config->join['roles'] => (int)$roleId, $this->config->join['users'] => $userId]);
-			if (isset($this->cacheUserInGroup[$userId]) && isset($this->cacheUserInGroup[$userId][$roleId]))
+			if (isset($this->cacheUserInRole[$userId]) && isset($this->cacheUserInRole[$userId][$roleId]))
 			{
-				unset($this->cacheUserInGroup[$userId][$roleId]);
+				unset($this->cacheUserInRole[$userId][$roleId]);
 			}
 		}
 
@@ -1235,7 +1224,7 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 	{
 		if ($return = $builder->delete([$this->config->join['users'] => $userId]))
 		{
-			$this->cacheUserInGroup[$userId] = [];
+			$this->cacheUserInRole[$userId] = [];
 			$return = true;
 		}
 	}
@@ -1251,17 +1240,14 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 	 */
 	public function setLoginAttempt(string $identity, string $status = 'failed', int $id = null): bool
 	{
-		$this->triggerEvents('update_last_login');
-		$this->triggerEvents('extra_where');
-
-		// TODO rework this into loginModel
-		$this->db->table($this->config->tables['track_login'])->insert([
+		$this->triggerEvents('save_login_attempt');
+		$insertID = $this->$this->loginModel->insert([
 			'identity' => $identity,
 			'user_id' => $id,
 			'activity' => $status,
 			'created_at' => date('Y-m-d H:i:s'),
 		]);
-		return $this->db->affectedRows() === 1;
+		return $insertID > 1;
 	}
 
 	public function getSession()
