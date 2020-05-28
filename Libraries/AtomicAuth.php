@@ -286,6 +286,12 @@ class AtomicAuth
 		}
 
 		// change user status
+		if ( $returnStatus && $this->atomicAuthModel->userCan(['edit_self','edit_user']) && isset($userData->status) )
+		{
+			$tempUserModel->status = $userData->status;
+		}
+
+		// change user password
 		if ( $returnStatus && $this->atomicAuthModel->userCan('edit_user_status') && isset($userData->status) )
 		{
 			$tempUserModel->status = $userData->status;

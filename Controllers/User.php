@@ -128,10 +128,14 @@ class User extends \CodeIgniter\Controller
 			return redirect()->to('/auth/user');
 		}
 
+		helper('inflector');
+
 		$this->data['title'] = lang('Auth.list_users_heading');
 		$this->data['atomicAuth'] = $this->atomicAuth;
 		$this->data['message'] = $this->session->getFlashdata('message');
+		$this->data['identity'] = $this->configAtomicAuth->identity;
 		$filterUserStatus || $filterUserStatus = 'active';
+		$this->data['filterUserStatus'] = $filterUserStatus;
 
 		if( $filterUserStatus == 'all' )
 		{

@@ -4,7 +4,14 @@
  *
  * @package CodeIgniter
  */
-
+if(! function_exists('getAuthLink'))
+{
+	// TODO build out configurable routes and handler
+	function getAuthLink(string $link = 'login')
+	{
+		return $link;
+	}
+}
 if(! function_exists('loggedIn'))
 {
 	function loggedIn() : bool
@@ -49,6 +56,25 @@ if(! function_exists('isDefault'))
 	{
 		$atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
 		return $atomicAuth->isDefault();
+	}
+}
+if(! function_exists('getUserIdentity'))
+{
+	function getUserIdentity( $user = null )
+	{
+		$identity = config('AtomicAuth')->identity;
+		if( is_null($user) )
+		{
+			$atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
+			return $atomicAuth->getSessionProperty($identity);
+		}
+		else if (isset($user->{$identity}))
+		{
+			return $user->{$identity};
+		}
+		else {
+			return null;
+		}
 	}
 }
 // if(! function_exists('getUserProfile'))

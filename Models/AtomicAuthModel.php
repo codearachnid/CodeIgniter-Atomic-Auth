@@ -1489,7 +1489,7 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 	 * @param $key string or array can accept multiple keys to filter against
 	 * if user has any matches will allow user "can"
 	 */
-	public function userCan( $key = null, int $userId = null ) : bool
+	public function userCan( $key = null, int $userId = null, bool $OR = FALSE ) : bool
 	{
 		if(empty($key))
 		{
@@ -1506,7 +1506,12 @@ public function removeFromGroup($roleIds=0, int $userId=0): bool
 		if( !empty($capabilities) )
 		{
 			$capabilities = array_column($capabilities, 'name');
-			if(is_array($key))
+			if($OR && is_array($key))
+			{
+				// Check if ALL of the needles exist
+				return empty(array_diff($key, $capabilities));
+			}
+			else if(!$OR && is_array($key))
 			{
 				// Check if ANY of the needles exist
 				return !empty(array_intersect($key, $capabilities));
