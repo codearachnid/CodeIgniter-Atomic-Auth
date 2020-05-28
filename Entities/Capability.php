@@ -4,9 +4,8 @@ use CodeIgniter\Entity;
 
 class Capability extends Entity
 {
-
-  protected $id;
-  protected $name;
-  protected $description;
-  protected $status;
+    protected $id;
+    protected $name;
+    protected $description;
+    protected $status;
 }

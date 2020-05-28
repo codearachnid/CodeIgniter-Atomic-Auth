@@ -37,7 +37,7 @@
           <h3><?php echo lang('Auth.edit_user_roles_heading');?></h3>
           <?php foreach ($roles as $role):?>
               <label class="checkbox">
-              <?php echo form_checkbox('roles[]', $role->id, in_array($role->id, $userInRoles) ); ?>
+              <?php echo form_checkbox('roles[]', $role->id, in_array($role->id, $userInRoles)); ?>
               <?php echo htmlspecialchars($role->description, ENT_QUOTES, 'UTF-8');?>
               </label>
           <?php endforeach?>

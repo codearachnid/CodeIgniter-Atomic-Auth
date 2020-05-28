@@ -4,12 +4,12 @@ use CodeIgniter\Entity;
 
 class Profile extends Entity
 {
-  protected $identity;
-  protected $email;
-  protected $id;
-  protected $guid;
-  protected $last_check;
-  protected $capabilities;
-  protected $roles;
-  protected $status;
+    protected $identity;
+    protected $email;
+    protected $id;
+    protected $guid;
+    protected $last_check;
+    protected $capabilities;
+    protected $roles;
+    protected $status;
 }
