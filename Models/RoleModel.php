@@ -26,7 +26,7 @@ class RoleModel extends Model
     return $this->asObject()->where('guid', $guid)->limit(1)->first();
   }
 
-  public function getRolesByUserId( $userId = null )
+  public function getRolesByUserId( ?int $userId = null )
   {
     /**
 		 * This was pretty complex - saving the raw query for later debugging if needed

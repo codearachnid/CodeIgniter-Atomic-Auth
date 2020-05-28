@@ -714,7 +714,7 @@ class User extends \CodeIgniter\Controller
 
 					if (! empty($roleData))
 					{
-						$this->atomicAuth->removeFromGroup('', $id);
+						$this->atomicAuth->removeUserFromGroup('', $id);
 
 						foreach ($roleData as $role)
 						{
