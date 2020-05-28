@@ -1232,7 +1232,7 @@ public function removeUserFromGroup($roleIds=0, int $userId=0): bool
 }
 
 	/**
-	 * Update last login
+	 * Save last login
 	 *
 	 * @param integer $id User id
 	 *
@@ -1248,17 +1248,6 @@ public function removeUserFromGroup($roleIds=0, int $userId=0): bool
 			'created_at' => date('Y-m-d H:i:s'),
 		]);
 		return $insertID > 1;
-	}
-
-	public function getSession()
-	{
-		return (object) $this->session->get($this->config->sessionKey);
-	}
-
-	public function getSessionProperty( string $key = null )
-	{
-		$activeUser = $this->getSession();
-		return !is_null( $key ) && !is_null( $activeUser ) && isset($activeUser->{$key}) ? $activeUser->{$key} : null;
 	}
 
 	/**
@@ -1286,6 +1275,17 @@ public function removeUserFromGroup($roleIds=0, int $userId=0): bool
 
 		$this->triggerEvents('post_set_session');
 		return true;
+	}
+
+	public function getSession()
+	{
+		return (object) $this->session->get($this->config->sessionKey);
+	}
+
+	public function getSessionProperty( string $key = null )
+	{
+		$activeUser = $this->getSession();
+		return !is_null( $key ) && !is_null( $activeUser ) && isset($activeUser->{$key}) ? $activeUser->{$key} : null;
 	}
 
 
