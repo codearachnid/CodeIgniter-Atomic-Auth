@@ -1,5 +1,8 @@
 <?php namespace Config;
 
+/**
+ * Be careful leaving these in if you aren't sure what they do.
+ */
 $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($routes) {
 
     // ... generic auth routes
@@ -28,11 +31,15 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
     $routes->delete('delete/(:hash)', 'Group::delete/$1');
     // ...
 
-    // ... be careful leaving these in if you aren't sure what they do
+    // ... admin management for Atomic Auth
     $routes->add('admin', 'Admin::go_away');
     $routes->add('admin/generate', 'Admin::salt');
     $routes->add('admin/generate/(:num)', 'Admin::salt/$1');
     $routes->add('admin/install?(:hash)', 'Admin::install/$1');
     $routes->add('admin/uninstall?(:hash)', 'Admin::uninstall/$1');
+    // ...
+
+    // ...
+    $routes->get('api/user/(:hash)', 'Api:get_user/$1');
     // ...
 });

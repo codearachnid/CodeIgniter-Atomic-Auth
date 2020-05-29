@@ -161,7 +161,6 @@ class Auth extends \CodeIgniter\Controller
             'type' => 'password',
         ];
 
-        // render response vs redirect
         return view('AtomicAuth\Views\Auth\login', $this->data);
     }
 

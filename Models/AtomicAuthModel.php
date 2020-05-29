@@ -1158,11 +1158,10 @@ class AtomicAuthModel
     public function setLoginAttempt(string $identity, string $status = 'failed', int $id = null): bool
     {
         $this->triggerEvents('save_login_attempt');
-        $insertID = $this->$this->loginModel->insert([
+        $insertID = $this->loginModel->insert([
             'identity' => $identity,
             'user_id' => $id,
             'activity' => $status,
-            'created_at' => date('Y-m-d H:i:s'),
         ]);
         return $insertID > 1;
     }
@@ -1178,7 +1177,6 @@ class AtomicAuthModel
     {
         $this->triggerEvents('pre_set_session');
         if ($user && isset($user->id)) {
-            d($user);
             $profile = $this->fillProfile($user);
             $profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser($user->id);
             $profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles($user->id);
