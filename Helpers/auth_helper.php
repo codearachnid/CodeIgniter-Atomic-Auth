@@ -11,11 +11,11 @@ if (! function_exists('getAuthLink')) {
         return $link;
     }
 }
-if (! function_exists('loggedIn')) {
-    function loggedIn() : bool
+if (! function_exists('isLoggedIn')) {
+    function isLoggedIn() : bool
     {
         $atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
-        return $atomicAuth->loggedIn();
+        return $atomicAuth->isLoggedIn();
     }
 }
 if (! function_exists('userCan')) {

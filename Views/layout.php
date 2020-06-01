@@ -1,10 +1,12 @@
 <!doctype html>
 <html>
 <head>
-    <title>My Layout</title>
+    <title>AtomicAuth</title>
 </head>
 <body>
-    <?= $this->renderSection('navigation') ?>
-    <div id="infoMessage"><?= $message ?></div>
+    <?= $this->include('AtomicAuth\Views\navigation') ?>
+    <?= $this->include('AtomicAuth\Views\message') ?>
+    <?= $this->renderSection('app') ?>
+    <?= $this->include('AtomicAuth\Views\footer') ?>
 </body>
 </html>

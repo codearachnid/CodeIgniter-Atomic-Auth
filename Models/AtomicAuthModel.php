@@ -331,7 +331,7 @@ class AtomicAuthModel
         if (! $id) {
             $this->setError('AtomicAuth.deactivate_unsuccessful');
             return false;
-        } elseif ((new \AtomicAuth\Libraries\AtomicAuth())->loggedIn() && $this->user()->row()->id == $id) {
+        } elseif ((new \AtomicAuth\Libraries\AtomicAuth())->isLoggedIn() && $this->user()->row()->id == $id) {
             $this->setError('AtomicAuth.deactivate_current_user_unsuccessful');
             return false;
         }
@@ -1402,6 +1402,18 @@ class AtomicAuthModel
     public function userModel() //: class
     {
         return $this->userModel;
+    }
+
+    public function addUserToRole(?array $roleIds = null, ?int $userId = null, bool $append = false){
+
+
+              // TODO need security check to ensure user can add user to a role
+              // if( ! userHasRole('promote_user') )
+              // {
+              // BLOCK USER
+              // }
+        $this->triggerEvents('add_user_to_role');
+      return $this->usersRolesModel->setUserToRole($roleIds, $userId, $append);
     }
 
     /**

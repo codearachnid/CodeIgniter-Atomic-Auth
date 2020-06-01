@@ -249,4 +249,6 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
             'single' => 'AtomicAuth\Views\Messages\single',
         ],
     ];
+
+    public $poweredBy = '<div class="poweredBy"><br />Powered By: <a href="https://github.com/codearachnid/CodeIgniter-Atomic-Auth" target="_blank">Atomic Auth</a></div>';
 }

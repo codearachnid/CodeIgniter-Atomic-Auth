@@ -232,7 +232,7 @@ class AtomicAuth
         }
 
         // add user to role association
-        $this->atomicAuthModel->addUserToGroup($roles, $user->id);
+        $this->atomicAuthModel->addUserToRole($roles, $user->id);
 
         $this->setMessage('AtomicAuth.account_creation_successful');
 
@@ -250,7 +250,7 @@ class AtomicAuth
 
         // change user group assignments
         if ($returnStatus && $this->atomicAuthModel->userCan('promote_user') && isset($userData->roleIds)) {
-            $returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->addUserToGroup($userData->roleIds, $userId) : $returnStatus;
+            $returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->addUserToRole($userData->roleIds, $userId) : $returnStatus;
         }
 
         // change user status
@@ -312,7 +312,7 @@ class AtomicAuth
      *
      * @return boolean Whether the user is logged in
      */
-    public function loggedIn(): bool
+    public function isLoggedIn(): bool
     {
         $this->atomicAuthModel->triggerEvents('logged_in');
 
