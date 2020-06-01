@@ -34,7 +34,7 @@ class CapabilityModel extends Model
          * SELECT `cap`.`id`, `cap`.`name`
          * FROM `atomicauth_capabilities` AS `cap`
          * LEFT JOIN `atomicauth_roles_capabilities` AS `role_cap`
-         *    ON `role_cap`.`capability_id` = `cap`.`id` 
+         *    ON `role_cap`.`capability_id` = `cap`.`id`
          * LEFT JOIN `atomicauth_roles` AS `role`
          *    ON `role`.`id` = `role_cap`.`role_id`
          * LEFT JOIN `atomicauth_roles_users` AS `role_usr`
@@ -44,6 +44,9 @@ class CapabilityModel extends Model
          * WHERE `role_usr`.`user_id` = 1
          *    OR `usr_cap`.`user_id` = 1
          */
+         // tightly coupled to the role entity
+       $roleEntity = new \AtomicAuth\Entities\Role();
+       $capabilityEntity = new \AtomicAuth\Entities\Capability();
         $capabilities = $this->builder($this->table . ' AS cap')->select('cap.id,cap.name')
             ->join('atomicauth_roles_capabilities AS role_cap', 'role_cap.capability_id = cap.id', 'left')
             ->join('atomicauth_roles AS role', 'role.id = role_cap.role_id', 'left')
@@ -51,6 +54,8 @@ class CapabilityModel extends Model
             ->join('atomicauth_users_capabilities AS usr_cap', 'usr_cap.capability_id = cap.id', 'left')
             ->where('role_usr.user_id', $userId)
             ->orWhere('usr_cap.user_id', $userId)
+            ->where('cap.status', $capabilityEntity->statusValueMap['active'])
+            ->where('role.status', $roleEntity->statusValueMap['active'])
             ->get()->getResult();
         return $capabilities;
     }

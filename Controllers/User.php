@@ -160,7 +160,7 @@ class User extends \CodeIgniter\Controller
         // pass the user to the view
         $this->data['user']          = $user;
 
-        return view('AtomicAuth\Views\Auth\user_profile', $this->data);
+        return view('AtomicAuth\Views\user_profile', $this->data);
     }
 
 
@@ -516,7 +516,7 @@ class User extends \CodeIgniter\Controller
         } elseif (is_null($guid)) {
             $user_id = $this->atomicAuth->getSessionProperty('id');
         } else {
-            $lookupUserId = $this->atomicAuth->userModel()->getUserByGuid($guid);
+            $lookupUserId = $this->atomicAuth->userModel()->getByGuid($guid);
             $user_id = $lookupUserId->id;
         }
         // TODO better handling if user doesn't exist
@@ -630,7 +630,7 @@ class User extends \CodeIgniter\Controller
 
                             if (! empty($roleData))
                             {
-                                $this->atomicAuth->removeUserFromGroup('', $id);
+                                $this->atomicAuth->removeUserFromRole('', $id);
 
                                 foreach ($roleData as $role)
                                 {

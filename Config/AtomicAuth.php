@@ -77,18 +77,6 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
      */
     public $identity = 'email';
 
-    /**
-     * Users table column and Group table column you want to join WITH.
-     * Joins from users.id
-     * Joins from roles.id
-     *
-     * @var array
-     */
-    public $join = [
-        'users'  => 'user_id',
-        'roles' => 'role_id',
-    ];
-
     /*
      | -------------------------------------------------------------------------
      | Hash Method (bcrypt or argon2)

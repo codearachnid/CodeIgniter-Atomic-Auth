@@ -60,6 +60,7 @@ class AtomicAuthModel
      * @var \AtomicAuth\Models\*
      */
     protected $userModel;
+    protected $usersRolesModel;
     protected $roleModel;
     protected $loginModel;
     protected $capabilityModel;
@@ -90,63 +91,6 @@ class AtomicAuthModel
      * @var string
      */
     public $activationCode;
-
-
-    /**
-     * Where
-     *
-     * @var array
-     */
-    protected $atomicWhere = [];
-
-    /**
-     * Select
-     *
-     * @var array
-     */
-    protected $atomicSelect = [];
-
-    /**
-     * Like
-     *
-     * @var array
-     */
-    protected $atomicLike = [];
-
-    /**
-     * Limit
-     *
-     * @var string
-     */
-    protected $atomicLimit = null;
-
-    /**
-     * Offset
-     *
-     * @var string
-     */
-    protected $atomicOffset = null;
-
-    /**
-     * Order By
-     *
-     * @var string
-     */
-    protected $atomicOrderBy = null;
-
-    /**
-     * Order
-     *
-     * @var string
-     */
-    protected $atomicOrder = null;
-
-    /**
-     * Hooks
-     *
-     * @var object
-     */
-    protected $atomicHooks;
 
     /**
      * Response
@@ -181,13 +125,8 @@ class AtomicAuthModel
      *
      * @var array
      */
+     // TODO engineer caching for general objects
     protected $cacheUserInRole = [];
-
-    /**
-     * Caching of roles
-     *
-     * @var array
-     */
     protected $cacheRoles = [];
 
     /**
@@ -221,9 +160,11 @@ class AtomicAuthModel
         $this->authHooks = new \stdClass();
 
         $this->userModel = model('AtomicAuth\Models\UserModel');
+        $this->usersRolesModel = model('AtomicAuth\Models\UsersRolesModel');
         $this->roleModel = model('AtomicAuth\Models\RoleModel');
         $this->loginModel = model('AtomicAuth\Models\LoginModel');
         $this->capabilityModel = model('AtomicAuth\Models\CapabilityModel');
+
 
         $this->triggerEvents('model_constructor');
     }
@@ -473,7 +414,8 @@ class AtomicAuthModel
     {
         $this->triggerEvents('pre_change_password');
 
-        if (! $this->identityCheck($identity)) {
+
+        if (! $this->userModel->identityExists($identity)) {
             $this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
             return false;
         }
@@ -540,74 +482,7 @@ class AtomicAuthModel
         return false;
     }
 
-    /**
-     * Checks username
-     *
-     * @param string $username User name
-     *
-     * @return boolean
-     * @author Mathew
-     */
-    public function usernameCheck(string $username): bool
-    {
-        $this->triggerEvents('username_check');
 
-        if (empty($username)) {
-            return false;
-        }
-
-        $this->triggerEvents('extra_where');
-
-        return $this->db->where('username', $username)
-                        ->limit(1)
-                        ->count_all_results($this->config->tables['users']) > 0;
-    }
-
-    /**
-     * Checks email to see if the email is already registered.
-     *
-     * @param string $email Email to check
-     *
-     * @return boolean true if the user is registered false if the user is not registered.
-     * @author Mathew
-     */
-    public function emailCheck(string $email=''): bool
-    {
-        $this->triggerEvents('emailCheck');
-
-        if (empty($email)) {
-            return false;
-        }
-
-        $this->triggerEvents('extra_where');
-
-        return $this->db->table($this->config->tables['users'])
-                        ->where('email', $email)
-                        ->limit(1)
-                        ->countAllResults() > 0;
-    }
-
-    /**
-     * Identity check : Check to see if the identity is already registered
-     *
-     * @param string $identity Identity
-     *
-     * @return boolean
-     * @author Mathew
-     */
-    public function identityCheck(string $identity=''): bool
-    {
-        $this->triggerEvents('identity_check');
-
-        if (empty($identity)) {
-            return false;
-        }
-
-        $builder = $this->db->table($this->config->tables['users']);
-        return $builder->where($this->config->identity, $identity)
-                       ->limit(1)
-                       ->countAllResults() > 0;
-    }
 
     /**
      * Get user ID from identity
@@ -987,7 +862,7 @@ class AtomicAuthModel
         $user->status = 'active'; // TODO there needs to be a better way to activate a user
         // TODO I have a dream that this will work one day *** see after insert for bandaid
         // $builder->set('guid', 'UUID_TO_BIN(UUID())', FALSE);
-        $user->guid = $this->userModel->generateGuid();
+        $user->guid = $this->generateGuid();
         $user->id = $this->userModel->insert($user);
 
         return $user;
@@ -1047,63 +922,6 @@ class AtomicAuthModel
     }
 
     /**
- * Add to role
- *
- * @param array|integer $roleIds Groups id
- * @param integer       $userId   User id
- *
- * @return integer The number of roles added
- * @author Ben Edmunds
- */
-    public function addUserToRole(?array $roleIds = null, ?int $userId = null, bool $append = false): int
-    {
-        $this->triggerEvents('add_user_to_role');
-
-        // if no id was passed use the current users id
-        // TODO need security check to ensure user can add themselves to a role
-        $userId || $userId = $this->getSession('id');
-
-        if (!$roleIds || !$userId) {
-            return 0;
-        }
-        if (! is_array($roleIds)) {
-            $roleIds = [$roleIds];
-        }
-
-
-        $rolesUsers = [];
-
-        foreach ($roleIds as $role) {
-            if (is_object($role) && ! is_null($role->id)) {
-                // $role is an Group Entity
-                $roleId = $role->id;
-            } elseif (is_int($role) || is_float($role) || is_string($role)) {
-                // $role is just a role id
-                $roleId = $role;
-            } else {
-                // could not determine the type of data for $role silent ignore
-                continue;
-            }
-            // Cast to float to support bigint data type
-            $rolesUsers[] = [
-            $this->config->join['roles'] => (float)$roleId, // assumed Group exists
-            $this->config->join['users']  => (float)$userId, // assumed User exists
-        ];
-
-            // TODO should this be cached?
-        }
-
-        if (! empty($rolesUsers)) {
-            if (!$append) {
-                $this->db->table($this->config->tables['roles_users'])->delete(['user_id' => $userId]);
-            }
-            $this->db->table($this->config->tables['roles_users'])->insertBatch($rolesUsers);
-        }
-
-        return count($rolesUsers);
-    }
-
-    /**
      * Remove from role
      *
      * @param array|integer $roleIds Group id
@@ -1112,7 +930,7 @@ class AtomicAuthModel
      * @return boolean
      * @author Ben Edmunds
      */
-    public function removeUserFromGroup($roleIds=0, int $userId=0): bool
+    public function removeUserFromRole($roleIds=0, int $userId=0): bool
     {
         $this->triggerEvents('remove_from_role');
 
@@ -1213,7 +1031,7 @@ class AtomicAuthModel
     {
         // if no id provided use the current session active user_id
         $userId || $userId = $this->getSessionProperty('id');
-        return $this->roleModel->getRolesByUserId($userId);
+        return $this->usersRolesModel->getRolesByUserId($userId);
     }
 
     /**
@@ -1343,7 +1161,7 @@ class AtomicAuthModel
         if (is_null($userId)) {
             $user = $this->getSession();
         } elseif ($identifier == 'guid') {
-            $user = $this->userModel->getUserByGuid($userId);
+            $user = $this->userModel->getByGuid($userId);
         } elseif ($identifier == 'id') {
             $user = $this->userModel->asObject()->find($userId);
         }
@@ -1542,6 +1360,26 @@ class AtomicAuthModel
         $this->triggerEvents(['post_delete_role', 'post_delete_role_successful']);
         $this->setMessage('role_delete_successful');
         return true;
+    }
+
+
+    /**
+       * Generate a GUID
+       * @author Timothy Wood <codearachnid@gmail.com>
+       */
+    public function generateGuid()
+    {
+        $guid = bin2hex(random_bytes(16));
+
+        // check if $guid exists in users table
+        for ($i = 1; ; $i++) {
+            if (! $this->where('guid', $guid)->first() || $i > 10) {
+                break;
+            }
+            $guid = bin2hex(random_bytes(16));
+        }
+
+        return $guid;
     }
 
     /**

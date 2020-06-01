@@ -636,7 +636,7 @@ class Auth extends \CodeIgniter\Controller
                     $roleData = $this->request->getPost('roles');
 
                     if (! empty($roleData)) {
-                        $this->atomicAuth->removeUserFromGroup('', $id);
+                        $this->atomicAuth->removeUserFromRole('', $id);
 
                         foreach ($roleData as $role) {
                             $this->atomicAuth->addToGroup($role, $id);
