@@ -118,7 +118,7 @@ class Auth extends \CodeIgniter\Controller
     public function login()
     {
         $this->data['title'] = lang('Auth.login_heading');
-        $this->data['messages'] = $this->atomicAuth->getMessages(); //$this->session->getflashdata('AtomicAuthMessages');
+        $this->data['messages'] = $this->atomicAuth->message()->get(); //$this->session->getflashdata('AtomicAuthMessages');
 
         // validate form input
         $this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
@@ -132,13 +132,13 @@ class Auth extends \CodeIgniter\Controller
             if ($this->atomicAuth->login($this->request->getVar('identity'), $this->request->getVar('password'), $remember)) {
                 // if the login is successful
                 // redirect them back to the home page
-                $this->atomicAuth->setMessage('Successfully logged in', 'info');
+                $this->atomicAuth->message()->set('Successfully logged in', 'info');
                 // TODO better handling of redirect (if useful)
                 return redirect()->to('/auth/user');
             } else {
                 // if the login was un-successful
                 // redirect them back to the login page
-                $this->atomicAuth->setMessage('Successfully logged in', 'info');
+                $this->atomicAuth->message()->set('Successfully logged in', 'info');
                 $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->errors($this->validationListTemplate));
                 // use redirects instead of loading views for compatibility with MY_Controller libraries
                 return redirect()->back()->withInput();

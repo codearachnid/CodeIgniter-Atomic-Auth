@@ -130,10 +130,10 @@ class User extends \CodeIgniter\Controller
 
         if ($filterUserStatus == 'all') {
             // pass the user to the view
-            $this->data['users']          = $this->atomicAuth->userModel()->findAll();
+            $this->data['users']          = $this->atomicAuth->user()->findAll();
         } else {
             // pass the user to the view
-            $this->data['users']          = $this->atomicAuth->userModel()->where('status', $filterUserStatus)->findAll();
+            $this->data['users']          = $this->atomicAuth->user()->where('status', $filterUserStatus)->findAll();
         }
 
         return view('AtomicAuth\Views\user_list', $this->data);
@@ -516,7 +516,7 @@ class User extends \CodeIgniter\Controller
         } elseif (is_null($guid)) {
             $user_id = $this->atomicAuth->getSessionProperty('id');
         } else {
-            $lookupUserId = $this->atomicAuth->userModel()->getByGuid($guid);
+            $lookupUserId = $this->atomicAuth->user()->getByGuid($guid);
             $user_id = $lookupUserId->id;
         }
         // TODO better handling if user doesn't exist
@@ -554,7 +554,7 @@ class User extends \CodeIgniter\Controller
             // check to see if we are updating the user
             if ($this->atomicAuth->update($user_id, $userData)) {
                 $refreshSession = true;
-                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->getMessages());
+                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->messages()->get());
             } else {
                 $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->errors($this->validationListTemplate));
             }
@@ -669,7 +669,7 @@ class User extends \CodeIgniter\Controller
 
         // TODO figure out role status to be 'active' => 1 in a cleaner way
         $roleEntity = new \AtomicAuth\Entities\Role();
-        $this->data['roles']        = $this->atomicAuth->roleModel()->where('status', $roleEntity->statusValueMap['active'])->findAll();
+        $this->data['roles']        = $this->atomicAuth->role()->where('status', $roleEntity->statusValueMap['active'])->findAll();
         $this->data['userInRoles']  = array_column($user->roles, 'id');
 
         $this->data['password'] = [

@@ -90,10 +90,10 @@ class AtomicAuth
     public function __call(string $method, array $arguments)
     {
         if ($method === 'setMessage') {
-            return call_user_func_array([$this->atomicAuthModel->messageModel(), $method], $arguments);
+            return call_user_func_array([$this->atomicAuthModel->message(), $method], $arguments);
         }
         else if ($method === 'getMessages') {
-            return call_user_func_array([$this->atomicAuthModel->messageModel(), $method], $arguments);
+            return call_user_func_array([$this->atomicAuthModel->message(), $method], $arguments);
         }
         else if (! method_exists($this->atomicAuthModel, $method)) {
             throw new \Exception('Undefined method Atomic_auth::' . $method . '() called');
@@ -127,7 +127,7 @@ class AtomicAuth
                 ];
 
                 if (! $this->config->useCiEmail) {
-                    $this->setMessage('AtomicAuth.forgot_password_successful');
+                    $this->set('AtomicAuth.forgot_password_successful');
                     return $data;
                 } else {
                     $message = view($this->config->emailTemplates . $this->config->emailForgotPassword, $data);
@@ -135,9 +135,9 @@ class AtomicAuth
                     $this->email->setFrom($this->config->adminEmail, $this->config->siteTitle);
                     $this->email->setTo($user->email);
                     $this->email->setSubject($this->config->siteTitle . ' - ' . lang('AtomicAuth.email_forgotten_password_subject'));
-                    $this->email->setMessage($message);
+                    $this->email->setMessages($message);
                     if ($this->email->send()) {
-                        $this->setMessage('AtomicAuth.forgot_password_successful');
+                        $this->set('AtomicAuth.forgot_password_successful');
                         return true;
                     }
                 }
@@ -199,7 +199,7 @@ class AtomicAuth
         // $this->atomicAuthModel->triggerEvents('pre_account_creation');
 
         // check if user exists
-        if ($this->atomicAuthModel->userModel()->identityExists($identity)) {
+        if ($this->atomicAuthModel->user()->identityExists($identity)) {
             $this->setError('AtomicAuth.account_creation_duplicate_identity');
             return false;
         }
@@ -220,7 +220,7 @@ class AtomicAuth
             // TODO check for if specified role(s) exist in db too
         } else {
             // no roles supplied, use a default role to associate to user
-            $roles[] = $this->atomicAuthModel->roleModel()->getGroupByGuid($this->config->defaultRole);
+            $roles[] = $this->atomicAuthModel->role()->getGroupByGuid($this->config->defaultRole);
         }
 
         // setup user to model
@@ -234,7 +234,7 @@ class AtomicAuth
         // add user to role association
         $this->atomicAuthModel->addUserToRole($roles, $user->id);
 
-        $this->setMessage('AtomicAuth.account_creation_successful');
+        $this->set('AtomicAuth.account_creation_successful');
 
         return $user;
     }
@@ -250,12 +250,12 @@ class AtomicAuth
 
         // change user group assignments
         if ($returnStatus && $this->atomicAuthModel->userCan('promote_user') && isset($userData->roleIds)) {
-            $returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->usersRolesModel()->setUserToRole($userData->roleIds, $userId) : $returnStatus;
+            $returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->usersRoles()->setUserToRole($userData->roleIds, $userId) : $returnStatus;
         }
         // user has all groups removed
         else if ($returnStatus && $this->atomicAuthModel->userCan('promote_user') && is_null($userData->roleIds) )
         {
-            $returnStatus = $returnStatus ? $this->atomicAuthModel->usersRolesModel()->removeUserToRole( $userId ) : $returnStatus;
+            $returnStatus = $returnStatus ? $this->atomicAuthModel->usersRoles()->removeUserToRole( $userId ) : $returnStatus;
         }
 
         // change user status
@@ -269,7 +269,7 @@ class AtomicAuth
         }
 
         if ($tempUserModel->hasChanged()) {
-            $this->atomicAuthModel->userModel()->update($userId, $userData);
+            $this->atomicAuthModel->user()->update($userId, $userData);
         }
 
         return $returnStatus;
@@ -304,7 +304,7 @@ class AtomicAuth
         session_start();
         session_regenerate_id(true);
 
-        $this->setMessage('AtomicAuth.logout_successful');
+        $this->set('AtomicAuth.logout_successful');
         return true;
     }
 

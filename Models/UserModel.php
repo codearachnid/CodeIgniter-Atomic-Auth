@@ -60,16 +60,21 @@ class UserModel extends Model
      *
      * @return boolean|integer
      */
-    public function getByIdentity(string $identity='')
+    public function getByIdentity(string $identity='', string $status = 'all')
     {
         if (empty($identity)) {
             return null;
         }
 
         $config = config('AtomicAuth');
-        return $this->asObject()->where($config->identity, $identity)
-                                ->limit(1)
-                                ->first();
+        $builder = $this->asObject()->where($config->identity, $identity);
+
+        if( $status != 'all' )
+        {
+          $builder->where('status', $status);
+        }
+
+        return $builder->limit(1)->first();
     }
 
     public function getByGuid(string $guid = null)

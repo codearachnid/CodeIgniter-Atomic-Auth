@@ -50,10 +50,9 @@ class MessageModel
      * Set a message
      *
      * @param string $message The message
-     *
      * @return string The given message
      */
-    public function setMessage(string $message, string $type = 'info'): string
+    public function set(string $message, string $type = 'info'): string
     {
         if ($this->config->logMessages) {
             log_message($type, "{env}###{file}::{line} " . $message);
@@ -72,7 +71,7 @@ class MessageModel
      *
      * @return array
      */
-    public function getMessages(?array $filter = null): array
+    public function get(?array $filter = null): array
     {
         $messages = (array) $this->session->getflashdata($this->config->sessionKeyMessages);
         if(is_null($messages))
@@ -89,16 +88,14 @@ class MessageModel
      * Clear messages
      *
      * @return true
-     * @author Ben Edmunds
      */
-    public function clearMessages()
+    public function clear() : bool
     {
-        $this->messages = [];
-        return true;
+        return $this->session->setflashdata($this->config->sessionKeyMessages, null);
     }
 
     public function flash(string $message, string $type = 'info'): string
     {
-      return $this->setMessage($message, $type, flash);
+      return $this->set($message, $type, flash);
     }
 }

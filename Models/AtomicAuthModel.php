@@ -97,7 +97,7 @@ class AtomicAuthModel
      *
      * @var \CodeIgniter\Database\BaseConnection
      */
-    protected $db;
+    // protected $db;
 
     /**
      * Constructor
@@ -111,13 +111,13 @@ class AtomicAuthModel
         $this->session = session();
 
         // initialize the database
-        if (empty($this->config->databaseGroupName)) {
-            // By default, use CI's db that should be already loaded
-            $this->db = \Config\Database::connect();
-        } else {
-            // For specific role name, open a new specific connection
-            $this->db = \Config\Database::connect($this->config->databaseGroupName);
-        }
+        // if (empty($this->config->databaseGroupName)) {
+        //     // By default, use CI's db that should be already loaded
+        //     $this->db = \Config\Database::connect();
+        // } else {
+        //     // For specific role name, open a new specific connection
+        //     $this->db = \Config\Database::connect($this->config->databaseGroupName);
+        // }
 
         // initialize our hooks object
         $this->authHooks = new \stdClass();
@@ -266,13 +266,13 @@ class AtomicAuthModel
             ];
 
             $this->triggerEvents('extra_where');
-            $this->db->table($this->config->tables['users'])->update($data, ['id' => $id]);
-
-            if ($this->db->affectedRows() === 1) {
-                $this->triggerEvents(['post_activate', 'post_activate_successful']);
-                $this->messageModel->setMessage('AtomicAuth.activate_successful');
-                return true;
-            }
+            // $this->db->table($this->config->tables['users'])->update($data, ['id' => $id]);
+            //
+            // if ($this->db->affectedRows() === 1) {
+            //     $this->triggerEvents(['post_activate', 'post_activate_successful']);
+            //     $this->messageModel->set('AtomicAuth.activate_successful');
+            //     return true;
+            // }
         }
 
         $this->triggerEvents(['post_activate', 'post_activate_unsuccessful']);
@@ -310,11 +310,11 @@ class AtomicAuthModel
         ];
 
         $this->triggerEvents('extra_where');
-        $this->db->table($this->config->tables['users'])->update($data, ['id' => $id]);
-
-        $return = $this->db->affectedRows() === 1;
+        // $this->db->table($this->config->tables['users'])->update($data, ['id' => $id]);
+        //
+        // $return = $this->db->affectedRows() === 1;
         if ($return) {
-            $this->messageModel->setMessage('AtomicAuth.deactivate_successful');
+            $this->messageModel->set('AtomicAuth.deactivate_successful');
         } else {
             $this->setError('AtomicAuth.deactivate_unsuccessful');
         }
@@ -341,7 +341,7 @@ class AtomicAuthModel
             'forgotten_password_time'     => null,
         ];
 
-        return $this->db->table($this->config->tables['users'])->update($data, [$this->config->identity => $identity]);
+        // return $this->db->table($this->config->tables['users'])->update($data, [$this->config->identity => $identity]);
     }
 
     /**
@@ -362,7 +362,7 @@ class AtomicAuthModel
             'remember_code'     => null,
         ];
 
-        return $this->db->table($this->config->tables['users'])->update($data, [$this->config->identity => $identity]);
+        // return $this->db->table($this->config->tables['users'])->update($data, [$this->config->identity => $identity]);
     }
 
     /**
@@ -388,7 +388,7 @@ class AtomicAuthModel
 
         if ($return) {
             $this->triggerEvents(['post_change_password', 'post_change_password_successful']);
-            $this->messageModel->setMessage('AtomicAuth.password_change_successful');
+            $this->messageModel->set('AtomicAuth.password_change_successful');
         } else {
             $this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
             $this->setError('AtomicAuth.password_change_unsuccessful');
@@ -433,7 +433,7 @@ class AtomicAuthModel
 
             if ($result) {
                 $this->triggerEvents(['post_change_password', 'post_change_password_successful']);
-                $this->messageModel->setMessage('AtomicAuth.password_change_successful');
+                $this->messageModel->set('AtomicAuth.password_change_successful');
             } else {
                 $this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
                 $this->setError('AtomicAuth.password_change_unsuccessful');
@@ -477,15 +477,15 @@ class AtomicAuthModel
         ];
 
         $this->triggerEvents('extra_where');
-        $this->db->table($this->config->tables['users'])->update($update, [$this->config->identity => $identity]);
+        // $this->db->table($this->config->tables['users'])->update($update, [$this->config->identity => $identity]);
 
-        if ($this->db->affectedRows() === 1) {
-            $this->triggerEvents(['post_forgotten_password', 'post_forgotten_password_successful']);
-            return $token->userCode;
-        } else {
-            $this->triggerEvents(['post_forgotten_password', 'post_forgotten_password_unsuccessful']);
-            return false;
-        }
+        // if ($this->db->affectedRows() === 1) {
+        //     $this->triggerEvents(['post_forgotten_password', 'post_forgotten_password_successful']);
+        //     return $token->userCode;
+        // } else {
+        //     $this->triggerEvents(['post_forgotten_password', 'post_forgotten_password_unsuccessful']);
+        //     return false;
+        // }
     }
 
     /**
@@ -536,22 +536,23 @@ class AtomicAuthModel
         }
 
         $this->triggerEvents('extra_where');
-        $user = $this->db->table($this->config->tables['users'])
-                          ->select([
-                                $this->config->identity,
-                                'email',
-                                'guid',
-                                'id',
-                                'password_hash',
-                                'status',
-                          ])->where([
-                                $this->config->identity => $identity,
-                                'status' => 'active', // TODO should get any user other than active?
-                                'force_pass_reset' => 0, // TODO should user be able to login without a password reset?
-                            ])->limit(1)
-                          ->orderBy('id', 'desc')
-                            ->get()
-                            ->getRow();
+        $user = $this->userModel->getByIdentity($identity, 'active');
+        // $user = $this->db->table($this->config->tables['users'])
+        //                   ->select([
+        //                         $this->config->identity,
+        //                         'email',
+        //                         'guid',
+        //                         'id',
+        //                         'password_hash',
+        //                         'status',
+        //                   ])->where([
+        //                         $this->config->identity => $identity,
+        //                         'status' => 'active', // TODO should get any user other than active?
+        //                         'force_pass_reset' => 0, // TODO should user be able to login without a password reset?
+        //                     ])->limit(1)
+        //                   ->orderBy('id', 'desc')
+        //                     ->get()
+        //                     ->getRow();
 
         if ($this->isMaxAttemptsExceeded($identity)) {
             // Hash something anyway, just to take up time
@@ -603,7 +604,7 @@ class AtomicAuthModel
             // $this->rehashPasswordIfNeeded($user->password, $identity, $password);
 
             $this->triggerEvents(['post_login', 'post_login_successful']);
-            $this->messageModel->setMessage('AtomicAuth.login_successful');
+            $this->messageModel->set('AtomicAuth.login_successful');
 
             return true;
         }
@@ -1200,7 +1201,7 @@ class AtomicAuthModel
         $roleId = $this->db->insertId($this->config->tables['roles'] . '_id_seq');
 
         // report success
-        $this->messageModel->setMessage('AtomicAuth.role_creation_successful');
+        $this->messageModel->set('AtomicAuth.role_creation_successful');
         // return the brand new role id
         return $roleId;
     }
@@ -1251,7 +1252,7 @@ class AtomicAuthModel
 
         $this->db->table($this->config->tables['roles'])->update($data, ['id' => $roleId]);
 
-        $this->messageModel->setMessage('AtomicAuth.role_update_successful');
+        $this->messageModel->set('AtomicAuth.role_update_successful');
 
         return true;
     }
@@ -1296,7 +1297,7 @@ class AtomicAuthModel
         $this->db->transCommit();
 
         $this->triggerEvents(['post_delete_role', 'post_delete_role_successful']);
-        $this->messageModel->setMessage('AtomicAuth.role_delete_successful');
+        $this->messageModel->set('AtomicAuth.role_delete_successful');
         return true;
     }
 
@@ -1320,40 +1321,30 @@ class AtomicAuthModel
         return $guid;
     }
 
+    /**====================================================**/
+
     /**
-     * expose the Auth Group Model
+     * expose the underlying Auth Models
      *
-     * @return string
-     * @author Timothy Wood
+     * @return class
      */
-    public function roleModel() //: class
+    public function role() //: class
     {
         return $this->roleModel;
     }
-
-    /**
-     * expose the Auth Group Model
-     *
-     * @return string
-     * @author Timothy Wood
-     */
-    public function messageModel() //: class
+    public function message() //: class
     {
         return $this->messageModel;
     }
-
-    /**
-     * expose the Auth User Model
-     *
-     * @return string
-     * @author Timothy Wood
-     */
-    public function userModel() //: class
+    public function user() //: class
     {
         return $this->userModel;
     }
 
-
+    public function usersRoles()
+    {
+      return $this->usersRolesModel;
+    }
     /**====================================================**/
 
     // public function addUserToRole(?array $roleIds = null, ?int $userId = null, bool $append = false)
