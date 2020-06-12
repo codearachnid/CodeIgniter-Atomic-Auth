@@ -40,14 +40,14 @@ if (! function_exists('isAdmin')) {
     function isAdmin() : bool
     {
         $atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
-        return $atomicAuth->isAdmin();
+        return $atomicAuth->isUserAdmin();
     }
 }
 if (! function_exists('isDefault')) {
     function isDefault() : bool
     {
         $atomicAuth = new \AtomicAuth\Libraries\AtomicAuth();
-        return $atomicAuth->isDefault();
+        return $atomicAuth->isUserDefault();
     }
 }
 if (! function_exists('getUserIdentity')) {

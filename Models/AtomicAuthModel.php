@@ -2,43 +2,24 @@
 
 /**
  * Name:    Atomic Auth Model
- *
- * Created:  10.01.2009
- *
- * Description:  Modified auth system based on redux_auth with extensive customization.
- *               This is basically what Redux Auth 2 should be.
- * Original Author name has been kept but that does not mean that the method has not been modified.
- *
  * Requirements: PHP 7.2 or above
  *
  * @package    CodeIgniter-Atomic-Auth
- * @Author		 Timothy Wood <codearachnid@gmail.com>
- * @author     Ben Edmunds <ben.edmunds@gmail.com>
- * @author     Phil Sturgeon
- * @author     Benoit VRIGNAUD <benoit.vrignaud@tangue.fr>
- * @license    https://opensource.org/licenses/MIT	MIT License
- * @link       http://github.com/benedmunds/CodeIgniter-Ion-Auth
- * @filesource
+ *
+ * @property Atomic_auth $atomic_auth The Atomic_auth library
  */
 
 use \CodeIgniter\Database\ConnectionInterface;
 
-/**
- * Class AtomicAuthModel
- *
- * @property Atomic_auth $atomic_auth The Atomic_auth library
- */
 class AtomicAuthModel
 {
-    /**
-     * Max cookie lifetime constant
-     */
-    const MAX_COOKIE_LIFETIME = 63072000; // 2 years = 60*60*24*365*2 = 63072000 seconds;
 
-    /**
-     * Max password size constant
-     */
+    /**====================================================**/
+
+    const MAX_COOKIE_LIFETIME = 63072000; // 2 years = 60*60*24*365*2 = 63072000 seconds;
     const MAX_PASSWORD_SIZE_BYTES = 4096;
+
+    /**====================================================**/
 
     /**
      * AtomicAuth config
@@ -64,6 +45,7 @@ class AtomicAuthModel
     protected $roleModel;
     protected $loginModel;
     protected $capabilityModel;
+    protected $messageModel;
 
     /**
      * Activation code
@@ -92,19 +74,6 @@ class AtomicAuthModel
      */
     public $activationCode;
 
-    /**
-     * Response
-     *
-     * @var \CodeIgniter\Database\ResultInterface
-     */
-    protected $response = null;
-
-    /**
-     * Message (uses lang file)
-     *
-     * @var string
-     */
-    protected $messages = [];
 
     /**
      * Error message (uses lang file)
@@ -113,12 +82,6 @@ class AtomicAuthModel
      */
     protected $errors = [];
 
-    /**
-     * Message templates (single, list).
-     *
-     * @var array
-     */
-    protected $messageTemplates = [];
 
     /**
      * Caching of users and their roles
@@ -164,6 +127,7 @@ class AtomicAuthModel
         $this->roleModel = model('AtomicAuth\Models\RoleModel');
         $this->loginModel = model('AtomicAuth\Models\LoginModel');
         $this->capabilityModel = model('AtomicAuth\Models\CapabilityModel');
+        $this->messageModel = model('AtomicAuth\Models\MessageModel');
 
 
         $this->triggerEvents('model_constructor');
@@ -306,7 +270,7 @@ class AtomicAuthModel
 
             if ($this->db->affectedRows() === 1) {
                 $this->triggerEvents(['post_activate', 'post_activate_successful']);
-                $this->setMessage('AtomicAuth.activate_successful');
+                $this->messageModel->setMessage('AtomicAuth.activate_successful');
                 return true;
             }
         }
@@ -350,7 +314,7 @@ class AtomicAuthModel
 
         $return = $this->db->affectedRows() === 1;
         if ($return) {
-            $this->setMessage('AtomicAuth.deactivate_successful');
+            $this->messageModel->setMessage('AtomicAuth.deactivate_successful');
         } else {
             $this->setError('AtomicAuth.deactivate_unsuccessful');
         }
@@ -424,7 +388,7 @@ class AtomicAuthModel
 
         if ($return) {
             $this->triggerEvents(['post_change_password', 'post_change_password_successful']);
-            $this->setMessage('AtomicAuth.password_change_successful');
+            $this->messageModel->setMessage('AtomicAuth.password_change_successful');
         } else {
             $this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
             $this->setError('AtomicAuth.password_change_unsuccessful');
@@ -469,7 +433,7 @@ class AtomicAuthModel
 
             if ($result) {
                 $this->triggerEvents(['post_change_password', 'post_change_password_successful']);
-                $this->setMessage('AtomicAuth.password_change_successful');
+                $this->messageModel->setMessage('AtomicAuth.password_change_successful');
             } else {
                 $this->triggerEvents(['post_change_password', 'post_change_password_unsuccessful']);
                 $this->setError('AtomicAuth.password_change_unsuccessful');
@@ -484,33 +448,7 @@ class AtomicAuthModel
 
 
 
-    /**
-     * Get user ID from identity
-     *
-     * @param string $identity Identity
-     *
-     * @return boolean|integer
-     */
-    public function getUserIdFromIdentity(string $identity='')
-    {
-        if (empty($identity)) {
-            return false;
-        }
 
-        $builder = $this->db->table($this->config->tables['users']);
-        $query = $builder->select('id')
-                         ->where($this->config->identity, $identity)
-                         ->limit(1)
-                         ->get();
-
-        $user = $query->getRow();
-
-        if ($user) {
-            return $user->id;
-        }
-
-        return false;
-    }
 
     /**
      * Insert a forgotten password key.
@@ -665,7 +603,7 @@ class AtomicAuthModel
             // $this->rehashPasswordIfNeeded($user->password, $identity, $password);
 
             $this->triggerEvents(['post_login', 'post_login_successful']);
-            $this->setMessage('AtomicAuth.login_successful');
+            $this->messageModel->setMessage('AtomicAuth.login_successful');
 
             return true;
         }
@@ -693,7 +631,7 @@ class AtomicAuthModel
     public function recheckSession(): bool
     {
         $sessionExpiration = (null !== $this->config->sessionExpiration) ? $this->config->sessionExpiration : 0;
-        $activeUser = $this->session->get('activeUser');
+        $activeUser = $this->session->get($this->config->sessionKeyProfile);
 
         if ($sessionExpiration !== 0) {
             dd($userSession);
@@ -998,9 +936,9 @@ class AtomicAuthModel
             $profile = $this->fillProfile($user);
             $profile->capabilities = !empty($user->capabilities) ? $user->capabilities : $this->capabilityModel->getCapabilitiesByUser($user->id);
             $profile->roles = !empty($user->roles) ? $user->roles : $this->getUserRoles($user->id);
-            $this->session->set([$this->config->sessionKey => $profile->toRawArray()]);
+            $this->session->set([$this->config->sessionKeyProfile => $profile->toRawArray()]);
         } else {
-            $this->session->remove($this->config->sessionKey);
+            $this->session->remove($this->config->sessionKeyProfile);
         }
 
         // Regenerate the session (for security purpose: to avoid session fixation)
@@ -1012,7 +950,7 @@ class AtomicAuthModel
 
     public function getSession()
     {
-        return (object) $this->session->get($this->config->sessionKey);
+        return (object) $this->session->get($this->config->sessionKeyProfile);
     }
 
     public function getSessionProperty(string $key = null)
@@ -1262,7 +1200,7 @@ class AtomicAuthModel
         $roleId = $this->db->insertId($this->config->tables['roles'] . '_id_seq');
 
         // report success
-        $this->setMessage('AtomicAuth.role_creation_successful');
+        $this->messageModel->setMessage('AtomicAuth.role_creation_successful');
         // return the brand new role id
         return $roleId;
     }
@@ -1313,7 +1251,7 @@ class AtomicAuthModel
 
         $this->db->table($this->config->tables['roles'])->update($data, ['id' => $roleId]);
 
-        $this->setMessage('AtomicAuth.role_update_successful');
+        $this->messageModel->setMessage('AtomicAuth.role_update_successful');
 
         return true;
     }
@@ -1358,7 +1296,7 @@ class AtomicAuthModel
         $this->db->transCommit();
 
         $this->triggerEvents(['post_delete_role', 'post_delete_role_successful']);
-        $this->setMessage('role_delete_successful');
+        $this->messageModel->setMessage('AtomicAuth.role_delete_successful');
         return true;
     }
 
@@ -1394,6 +1332,17 @@ class AtomicAuthModel
     }
 
     /**
+     * expose the Auth Group Model
+     *
+     * @return string
+     * @author Timothy Wood
+     */
+    public function messageModel() //: class
+    {
+        return $this->messageModel;
+    }
+
+    /**
      * expose the Auth User Model
      *
      * @return string
@@ -1404,17 +1353,34 @@ class AtomicAuthModel
         return $this->userModel;
     }
 
-    public function addUserToRole(?array $roleIds = null, ?int $userId = null, bool $append = false){
 
+    /**====================================================**/
 
-              // TODO need security check to ensure user can add user to a role
-              // if( ! userHasRole('promote_user') )
-              // {
-              // BLOCK USER
-              // }
-        $this->triggerEvents('add_user_to_role');
-      return $this->usersRolesModel->setUserToRole($roleIds, $userId, $append);
-    }
+    // public function addUserToRole(?array $roleIds = null, ?int $userId = null, bool $append = false)
+    // {
+    //
+    //
+    //           // TODO need security check to ensure user can add user to a role
+    //           if( !$this->atomicAuthModel->userCan('promote_user') )
+    //           {
+    //             // throw hard exception?
+    //           return false;
+    //           }
+    //     $this->triggerEvents('add_user_to_role');
+    //   return $this->usersRolesModel->setUserToRole($roleIds, $userId, $append);
+    // }
+    //
+    // public function removeUserToRole( ?int $userId = null, ?array $roleIds = null )
+    // {
+    //   // TODO need security check to ensure user can add user to a role
+    //   if( !$this->atomicAuthModel->userCan('promote_user') )
+    //   {
+    //     // throw hard exception?
+    //   return false;
+    //   }
+    //   $this->triggerEvents('remove_user_to_role');
+    //   return $this->usersRolesModel->removeUserToRole($userId, $roleIds);
+    // }
 
     /**
      * Set a single or multiple functions to be called when trigged by triggerEvents().
@@ -1506,96 +1472,6 @@ class AtomicAuthModel
         }
     }
 
-    /**
-     * Set the message templates
-     *
-     * @param string $single Template for single message
-     * @param string $list	 Template for list messages
-     *
-     * @return true
-     * @author Ben Edmunds
-     */
-    public function setMessageTemplate(string $single='', string $list=''): bool
-    {
-        if (! empty($single)) {
-            $this->config->templates['messages']['single'] = $single;
-        }
-
-        if (! empty($list)) {
-            $this->config->templates['messages']['list'] = $list;
-        }
-
-        return true;
-    }
-
-    /**
-     * Set a message
-     *
-     * @param string $message The message
-     *
-     * @return string The given message
-     * @author Ben Edmunds
-     */
-    public function setMessage(string $message): string
-    {
-        $this->messages[] = $message;
-
-        return $message;
-    }
-
-    /**
-     * Get the messages
-     *
-     * @return string
-     * @author Ben Edmunds
-     */
-    public function messages(): string
-    {
-        if (empty($this->messages)) {
-            return '';
-        }
-
-        $messageLang = [];
-        foreach ($this->messages as $message) {
-            $messageLang[] = lang($message) !== $message ? lang($message) : '##' . $message . '##';
-        }
-        return view($this->config->templates['messages']['list'], ['messages' => $messageLang]);
-    }
-
-    /**
-     * Get the messages as an array
-     *
-     * @param boolean $langify Translate messages ?
-     *
-     * @return array
-     * @author Raul Baldner Junior
-     */
-    public function messagesArray(bool $langify=true): array
-    {
-        if ($langify) {
-            $output = [];
-            foreach ($this->messages as $message) {
-                $messageLang = lang($message) !== $message ? lang($message) : '##' . $message . '##';
-                $output[]    = view($this->config->templates['messages']['single'], ['message' => $messageLang]);
-            }
-            return $output;
-        } else {
-            return $this->messages;
-        }
-    }
-
-    /**
-     * Clear messages
-     *
-     * @return true
-     * @author Ben Edmunds
-     */
-    public function clearMessages()
-    {
-        $this->messages = [];
-
-        return true;
-    }
 
     /**
      * Set an error message
@@ -1634,28 +1510,6 @@ class AtomicAuthModel
         return view(config('Validation')->templates[$template], ['errors' => $errors]);
     }
 
-    /**
-     * Get the error messages as an array
-     *
-     * @param boolean $langify Langify errors ?
-     *
-     * @return array
-     * @author Raul Baldner Junior
-     *
-     * @deprecated No longer used by internal code and not recommended.
-     */
-    public function errorsArray(bool $langify = true): array
-    {
-        if ($langify) {
-            $output = [];
-            foreach ($this->errors as $error) {
-                $output[] = lang($error) !== $error ? lang($error) : '##' . $error . '##';
-            }
-            return $output;
-        } else {
-            return $this->errors;
-        }
-    }
 
     /**
      * Get the error messages as an array
@@ -1691,28 +1545,6 @@ class AtomicAuthModel
         return true;
     }
 
-
-
-    /**
-       * Identity Exists : Check to see if the identity is already registered
-       *
-       * @param string $identity Identity
-       *
-       * @return boolean
-       * @author Mathew
-       */
-    public function identityExists(string $identity=''): bool
-    {
-        $this->triggerEvents('identity_exists');
-
-        if (empty($identity)) {
-            return false;
-        }
-        // check against identity
-        return $this->userModel->where($this->config->identity, $identity)->limit(1)->countAllResults() > 0;
-    }
-
-
     public function roleExists(string $role = null, string $lookupColumn = 'guid'): bool
     {
         $this->triggerEvents('role_exists');
@@ -1720,23 +1552,8 @@ class AtomicAuthModel
         if (empty($role)) {
             return false;
         }
-        // dd($this->roleModel->where('name', $role)->limit(1)->first());
         // TRUE: we expect that the size of found role to be greater than 0
         return ($this->roleModel->where($lookupColumn, $role)->limit(1)->findAll() > 0);
-    }
-
-    public function rolesExist(array $roles = []): bool
-    {
-        $this->triggerEvents('roles_exists');
-
-        if (empty($roles)) {
-            return false;
-        } elseif (! is_array($roles)) {
-            $roles = [ $roles ];
-        }
-
-        // TRUE: we expect that the size of provided $roles should be the same as those found
-        return ($this->roleModel->whereIn('name', $roles)->countAllResults() == count($roles));
     }
 
     /**
@@ -1829,7 +1646,7 @@ class AtomicAuthModel
         // Check if user is administrator or not
         $isAdmin = false;
         if ($identity) {
-            $userId = $this->getUserIdFromIdentity($identity);
+            $userId = $this->userModel->getByIdentity($identity);
             if ($userId && $this->inGroup($this->config->adminRole, $userId)) {
                 $isAdmin = true;
             }

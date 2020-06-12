@@ -157,25 +157,26 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
      */
     public $siteTitle                = 'Example.com';       // Site Title, example.com
     public $adminEmail               = 'admin@example.com'; // Admin Email, admin@example.com
-    public $forceAuthorizedUserCreate = false;
-    public $redirectOnSuccess				 = false;
+    public $forceAuthorizedUserCreate = FAlSE;
+    public $redirectOnSuccess				 = FAlSE;
     public $defaultRole             = '342bf19ff862494828bfa7c8cb20926a';           // Default role, use guid
     public $adminRole               = '5bb7a9e7db3e29a2032bd1c5010561ff';             // Default administrators role, use guid
     public $minPasswordLength        = 8;                   // Minimum Required Length of Password (not enforced by lib - see note above)
-    public $emailActivation          = false;               // Email Activation for registration
-    public $manualActivation         = false;               // Manual Activation for registration
-    public $rememberUsers            = true;                // Allow users to be remembered and enable auto-login
+    public $emailActivation          = FAlSE;               // Email Activation for registration
+    public $manualActivation         = FAlSE;               // Manual Activation for registration
+    public $rememberUsers            = TRUE;                // Allow users to be remembered and enable auto-login
     public $userExpire               = 86500;               // How long to remember the user (seconds). Set to zero for no expiration
-    public $userExtendonLogin        = false;               // Extend the users cookies every time they auto-login
-    public $trackAttempts       = true;                // Track the number of failed login attempts for each user or ip.
+    public $userExtendonLogin        = FAlSE;               // Extend the users cookies every time they auto-login
+    public $trackAttempts       = TRUE;                // Track the number of failed login attempts for each user or ip.
     public $maxAttempts     = 3;                   // The maximum number of failed login attempts.
-    public $trackActivity = [0=>'failed', 1=>'success', 2=>'failed_password', 3=>'failed'];
+    // public $trackActivity = [0=>'failed', 1=>'success', 2=>'failed_password', 3=>'failed'];
     public $lockoutTime              = 600;                 /* The number of seconds to lockout an account due to exceeded attempts
                                                                     You should not use a value below 60 (1 minute) */
     public $forgotPasswordExpiration = 1800;                /* The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
                                                                     30 minutes to 1 hour are good values (enough for a user to receive the email and reset its password)
                                                                     You should not set a value too high, as it would be a security issue! */
-    public $sessionKey = 'activeUser';
+    public $sessionKeyMessages = 'AtomicAuthMessages';
+    public $sessionKeyProfile = 'AtomicAuthProfile';
     public $sessionExpiration        = 0;                   /* The number of seconds after which the session is checked again against database to see if the user still exists and is active.
                                                                     Leave 0 if you don't want session recheck. if you really think you need to recheck the session against database, we would
                                                                     recommend a higher value, as this would affect performance */
@@ -196,7 +197,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
      | 	  'file' = Use the default CI config or use from a config file
      | 	  array  = Manually set your email config settings
      */
-    public $useCiEmail  = false; // Send Email using the builtin CI email class, if false it will return the code and the identity
+    public $useCiEmail  = TRUE; // Send Email using the builtin CI email class, if FAlSE it will return the code and the identity
     public $emailConfig = [
         'mailtype' => 'html',
     ];
@@ -250,5 +251,6 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
         ],
     ];
 
+    public $logMessages = TRUE;
     public $poweredBy = '<div class="poweredBy"><br />Powered By: <a href="https://github.com/codearachnid/CodeIgniter-Atomic-Auth" target="_blank">Atomic Auth</a></div>';
 }

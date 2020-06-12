@@ -18,7 +18,6 @@ class UserModel extends Model
      * @param string $email Email to check
      *
      * @return boolean true if the user is registered false if the user is not registered.
-     * @author Mathew
      */
     public function emailExists(string $email=null): bool
     {
@@ -39,7 +38,6 @@ class UserModel extends Model
      * @param string $identity Identity
      *
      * @return boolean
-     * @author Mathew
      */
     public function identityExists(string $identity=null): bool
     {
@@ -51,8 +49,27 @@ class UserModel extends Model
 
         $config = config('AtomicAuth');
         return $this->where($config->identity, $identity)
-                           ->limit(1)
-                           ->countAllResults() > 0;
+                    ->limit(1)
+                    ->countAllResults() > 0;
+    }
+
+    /**
+     * Get user ID from identity
+     *
+     * @param string $identity Identity
+     *
+     * @return boolean|integer
+     */
+    public function getByIdentity(string $identity='')
+    {
+        if (empty($identity)) {
+            return null;
+        }
+
+        $config = config('AtomicAuth');
+        return $this->asObject()->where($config->identity, $identity)
+                                ->limit(1)
+                                ->first();
     }
 
     public function getByGuid(string $guid = null)

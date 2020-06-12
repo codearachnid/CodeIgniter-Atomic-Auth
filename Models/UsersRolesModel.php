@@ -56,7 +56,7 @@ class UsersRolesModel extends Model
         if (! empty($rolesUsers)) {
             // configure the lookup for delete where clause
             $this->primaryKey = 'user_id';
-            if (!$append && $this->delete(['user_id' => $userId])) {
+            if (!$append && $this->removeUserToRole( $userId )) {
                 $this->insertBatch($rolesUsers);
             }
             else
@@ -68,6 +68,23 @@ class UsersRolesModel extends Model
         return count($rolesUsers);
     }
 
+    public function removeUserToRole( ?int $userId = null, ?array $roleIds = null) : bool
+    {
+      if( is_null($userId) )
+      {
+          return false;
+      }
+
+      $this->where(['user_id' => $userId]);
+
+      if( is_array($roleIds) )
+      {
+        $this->orWhereIn(['role_id' => $roleIds]);
+      }
+
+      return $this->delete()->resultID;
+    }
+
 
     public function getRolesByUserId(?int $userId = null)
     {
@@ -75,17 +92,19 @@ class UsersRolesModel extends Model
          * This was pretty complex - saving the raw query for later debugging if needed
          *
          * SELECT `role`.`id`, `role`.`guid`, `role`.`name`, `role`.`description`, `role`.`status`
-         * FROM `atomicauth_roles` AS `role`
-         * LEFT JOIN `atomicauth_roles_users` AS `role_usr`
-         *    ON `role_usr`.`role_id` = `role`.`id`
-         * WHERE `role_usr`.`user_id` = 1
+         * FROM `atomicauth_roles_users`
+         * LEFT JOIN `atomicauth_roles` AS `role`
+         *        ON `atomicauth_roles_users`.`role_id` = `role`.`id`
+         * WHERE `atomicauth_roles_users`.`user_id` = 1
          * AND `role`.`status` = 1
          */
         // tightly coupled to the role entity
-        $roleEntity = new \AtomicAuth\Entities\Role();
-        $userRoles = $this->builder('atomicauth_roles AS role')->select('role.id,role.guid,role.name,role.description,role.status')
-        ->join($this->table . ' AS role_usr', 'role_usr.role_id = role.id', 'left')
-        ->where('role_usr.user_id', $userId)
+        $roleEntityName = '\AtomicAuth\Entities\Role';
+        $roleEntity = new $roleEntityName();
+        $userRoles = $this->asObject($roleEntityName)->builder()
+        ->select('role.id,role.guid,role.name,role.description,role.status')
+        ->join('atomicauth_roles AS role', $this->table . '.role_id = role.id', 'left')
+        ->where($this->table . '.user_id', $userId)
         ->where('role.status', $roleEntity->statusValueMap['active'])
         ->get()->getResult();
         return $userRoles;

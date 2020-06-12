@@ -89,14 +89,14 @@ class AtomicAuth
     // TODO update this to reflect new models
     public function __call(string $method, array $arguments)
     {
-        if (! method_exists($this->atomicAuthModel, $method)) {
+        if ($method === 'setMessage') {
+            return call_user_func_array([$this->atomicAuthModel->messageModel(), $method], $arguments);
+        }
+        else if ($method === 'getMessages') {
+            return call_user_func_array([$this->atomicAuthModel->messageModel(), $method], $arguments);
+        }
+        else if (! method_exists($this->atomicAuthModel, $method)) {
             throw new \Exception('Undefined method Atomic_auth::' . $method . '() called');
-        }
-        if ($method === 'create_user') {
-            return call_user_func_array([$this, 'register'], $arguments);
-        }
-        if ($method === 'update_user') {
-            return call_user_func_array([$this, 'update'], $arguments);
         }
         return call_user_func_array([$this->atomicAuthModel, $method], $arguments);
     }
@@ -199,7 +199,7 @@ class AtomicAuth
         // $this->atomicAuthModel->triggerEvents('pre_account_creation');
 
         // check if user exists
-        if ($this->identityExists($identity)) {
+        if ($this->atomicAuthModel->userModel()->identityExists($identity)) {
             $this->setError('AtomicAuth.account_creation_duplicate_identity');
             return false;
         }
@@ -250,7 +250,12 @@ class AtomicAuth
 
         // change user group assignments
         if ($returnStatus && $this->atomicAuthModel->userCan('promote_user') && isset($userData->roleIds)) {
-            $returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->addUserToRole($userData->roleIds, $userId) : $returnStatus;
+            $returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->usersRolesModel()->setUserToRole($userData->roleIds, $userId) : $returnStatus;
+        }
+        // user has all groups removed
+        else if ($returnStatus && $this->atomicAuthModel->userCan('promote_user') && is_null($userData->roleIds) )
+        {
+            $returnStatus = $returnStatus ? $this->atomicAuthModel->usersRolesModel()->removeUserToRole( $userId ) : $returnStatus;
         }
 
         // change user status
@@ -335,18 +340,19 @@ class AtomicAuth
      * @return boolean Whether the user is an administrator
      * @author Ben Edmunds
      */
-    public function isAdmin(?int $userId = null): bool
+    public function isUserAdmin(?int $userId = null): bool
     {
         $this->atomicAuthModel->triggerEvents('is_admin_check');
-        // TODO do a proper lookup of the user
         $id = is_null($userId) ? $this->getSessionProperty('id') : $userId;
+        // TODO do a proper lookup of the user
         return $this->atomicAuthModel->hasRole($this->config->adminRole, $id);
     }
 
-    public function isDefault($userOrId = null): bool
+    public function isUserDefault($userOrId = null): bool
     {
         $this->atomicAuthModel->triggerEvents('is_default_check');
         $id = is_null($userOrId) ? $this->getSessionProperty('id') : $userOrId;
+        // TODO do a proper lookup of the user
         return $this->atomicAuthModel->hasRole($this->config->defaultRole, $id);
     }
 
