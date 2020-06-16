@@ -1,7 +1,9 @@
-<?php if( !empty( $messages ) ) : d($messages); /*?>
+<?php if( !empty( $messages ) ) : ?>
 <div id="infoMessage">
-		<?php foreach ($messages as $msg) : ?>
-			<aside class="alert alert-info" role="alert"><?= esc($msg['message']) ?></aside>
-		<?php endforeach ?>
+		<?php if(is_array($messages)) : foreach ($messages as $msg) : $message = isset($msg['message']) ? $msg['message'] : $msg; ?>
+			<aside class="alert alert-info" role="alert"><?= esc($message) ?></aside>
+		<?php endforeach; else : ?>
+<?= esc( $messages ) ?>
+			<?php endif; ?>
 </div>
-<?php */ endif; ?>
+<?php endif; ?>

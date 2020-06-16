@@ -127,7 +127,7 @@ class AtomicAuth
                 ];
 
                 if (! $this->config->useCiEmail) {
-                    $this->set('AtomicAuth.forgot_password_successful');
+                    $this->atomicAuthModel->message()->set('AtomicAuth.forgot_password_successful');
                     return $data;
                 } else {
                     $message = view($this->config->emailTemplates . $this->config->emailForgotPassword, $data);
@@ -135,9 +135,9 @@ class AtomicAuth
                     $this->email->setFrom($this->config->adminEmail, $this->config->siteTitle);
                     $this->email->setTo($user->email);
                     $this->email->setSubject($this->config->siteTitle . ' - ' . lang('AtomicAuth.email_forgotten_password_subject'));
-                    $this->email->setMessages($message);
+                    $this->email->setMessage($message);
                     if ($this->email->send()) {
-                        $this->set('AtomicAuth.forgot_password_successful');
+                        $this->atomicAuthModel->message()->set('forgot_password_successful');
                         return true;
                     }
                 }
@@ -234,7 +234,7 @@ class AtomicAuth
         // add user to role association
         $this->atomicAuthModel->addUserToRole($roles, $user->id);
 
-        $this->set('AtomicAuth.account_creation_successful');
+        $this->atomicAuthModel->message()->set('AtomicAuth.account_creation_successful');
 
         return $user;
     }
@@ -250,7 +250,7 @@ class AtomicAuth
 
         // change user group assignments
         if ($returnStatus && $this->atomicAuthModel->userCan('promote_user') && isset($userData->roleIds)) {
-            $returnStatus = $returnStatus ? count($userData->roleIds) == $this->atomicAuthModel->usersRoles()->setUserToRole($userData->roleIds, $userId) : $returnStatus;
+            $returnStatus = count($userData->roleIds) == $this->atomicAuthModel->usersRoles()->setUserToRole($userData->roleIds, $userId);
         }
         // user has all groups removed
         else if ($returnStatus && $this->atomicAuthModel->userCan('promote_user') && is_null($userData->roleIds) )
@@ -271,6 +271,8 @@ class AtomicAuth
         if ($tempUserModel->hasChanged()) {
             $this->atomicAuthModel->user()->update($userId, $userData);
         }
+
+        $this->atomicAuthModel->message()->set('user_update');
 
         return $returnStatus;
     }
@@ -304,10 +306,9 @@ class AtomicAuth
         session_start();
         session_regenerate_id(true);
 
-        $this->set('AtomicAuth.logout_successful');
+        $this->atomicAuthModel->message()->set('logout_successful');
         return true;
     }
-
 
 
     /**
@@ -330,6 +331,17 @@ class AtomicAuth
         // }
 
         return $recheck;
+    }
+
+
+    /**
+     * expose auth errors
+     *
+     * @return array
+     */
+    public function getErrors(): array
+    {
+      return $this->atomicAuthModel->message()->get(['error']);
     }
 
     /**

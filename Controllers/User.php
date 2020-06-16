@@ -99,7 +99,7 @@ class User extends \CodeIgniter\Controller
             $this->data['title'] = lang('Auth.index_heading');
 
             // set the flash data error message if there is one
-            $this->data['messages'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getflashdata('AtomicAuthMessages');
+            $this->data['messages'] = $this->validation->getErrors() ? $this->validation->listErrors() : $this->session->getflashdata('AtomicAuthMessages');
             //list the users
             $this->data['users'] = $this->atomicAuth->users()->result();
             foreach ($this->data['users'] as $k => $user) {
@@ -184,7 +184,7 @@ class User extends \CodeIgniter\Controller
         if ($this->validation->run() === false) {
             // display the form
             // set the flash data error message if there is one
-            $this->data['messages'] = ($this->validation->getErrors()) ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getflashdata('AtomicAuthMessages');
+            $this->data['messages'] = ($this->validation->getErrors()) ? $this->validation->listErrors() : $this->session->getflashdata('AtomicAuthMessages');
 
             $this->data['minPasswordLength'] = $this->configAtomicAuth->minPasswordLength;
             $this->data['old_password'] = [
@@ -256,7 +256,7 @@ class User extends \CodeIgniter\Controller
                 // display the form
 
                 // set the flash data error message if there is one
-                $this->data['messages'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getflashdata('AtomicAuthMessages');
+                $this->data['messages'] = $this->validation->getErrors() ? $this->validation->listErrors() : $this->session->getflashdata('AtomicAuthMessages');
 
                 $this->data['minPasswordLength'] = $this->configAtomicAuth->minPasswordLength;
                 $this->data['new_password'] = [
@@ -448,7 +448,7 @@ class User extends \CodeIgniter\Controller
                 // display the create user form
                 // set the flash data error message if there is one
                 $this->data['messages'] = $this->validation->getErrors() ?
-                        $this->validation->listErrors($this->validationListTemplate) :
+                        $this->validation->listErrors() :
                         $this->data['messages'];
             }
         }
@@ -554,9 +554,9 @@ class User extends \CodeIgniter\Controller
             // check to see if we are updating the user
             if ($this->atomicAuth->update($user_id, $userData)) {
                 $refreshSession = true;
-                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->messages()->get());
+                // $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->messages()->get());
             } else {
-                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->errors($this->validationListTemplate));
+                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->errors());
             }
 
 
@@ -591,73 +591,16 @@ class User extends \CodeIgniter\Controller
                             // 		$this->atomicAuth->errors($this->validationListTemplate) :
                             // 		$this->data['messages'];
                             // }
-            } else {
+            }
+            else if($this->validation->getErrors())
+            {
                 // display the create user form
                 // set the flash data error message if there is one
-                $this->data['messages'] = $this->validation->getErrors() ?
-                                $this->validation->listErrors($this->validationListTemplate) :
-                                $this->data['messages'];
+                $this->data['messages'] =  $this->validation->listErrors();
             }
         }
-        /*
-                if (! empty($_POST))
-                {
 
-
-
-
-
-                    if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
-                    {
-                        $data = [
-                            'first_name' => $this->request->getPost('first_name'),
-                            'last_name'  => $this->request->getPost('last_name'),
-                            'company'    => $this->request->getPost('company'),
-                            'phone'      => $this->request->getPost('phone'),
-                        ];
-
-                        // update the password if it was posted
-                        if ($this->request->getPost('password'))
-                        {
-                            $data['password'] = $this->request->getPost('password');
-                        }
-
-                        // Only allow updating roles if user is admin
-                        if ($this->atomicAuth->isUserAdmin())
-                        {
-                            // Update the roles user belongs to
-                            $roleData = $this->request->getPost('roles');
-
-                            if (! empty($roleData))
-                            {
-                                $this->atomicAuth->removeUserFromRole('', $id);
-
-                                foreach ($roleData as $role)
-                                {
-                                    $this->atomicAuth->addToGroup($role, $id);
-                                }
-                            }
-                        }
-
-                        // check to see if we are updating the user
-                        if ($this->atomicAuth->update($user->id, $data))
-                        {
-                            $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->messages());
-                        }
-                        else
-                        {
-                            $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->errors($this->validationListTemplate));
-                        }
-                        // redirect them back to the admin page if admin, or to the base url if non admin
-                        return $this->redirect();
-                    }
-                }
-        */
         // display the edit user form
-
-        // set the flash data error message if there is one
-        // $this->data['messages'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->atomicAuth->errors($this->validationListTemplate) ? $this->atomicAuth->errors($this->validationListTemplate) : $this->session->getflashdata('AtomicAuthMessages'));
-
         $user = $this->atomicAuth->getUserProfile($user_id, 'id');
 
         if ($refreshSession && $user_id == $this->atomicAuth->getSessionProperty('id')) {
