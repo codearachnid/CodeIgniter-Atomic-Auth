@@ -19,6 +19,16 @@ class AtomicAuthCapabilities extends \CodeIgniter\Database\Seeder
             [ 'name' => 'edit_user_status', 'description' => 'Can edit user status', ],
             [ 'name' => 'delete_user', 'description' => 'Can delete user', ],
             [ 'name' => 'promote_user', 'description' => 'Can add/remove user to roles', ],
+            [ 'name' => 'edit_user_capability', 'description' => ''],
+            [ 'name' => 'list_capability', 'description' => '' ],
+            [ 'name' => 'create_capability', 'description' => '' ],
+            [ 'name' => 'edit_capability', 'description' => '' ],
+            [ 'name' => 'delete_capability', 'description' => '' ],
+            [ 'name' => 'list_role', 'description' => '' ],
+            [ 'name' => 'create_role', 'description' => '' ],
+            [ 'name' => 'edit_role', 'description' => '' ],
+            [ 'name' => 'delete_role', 'description' => '' ],
+            [ 'name' => 'edit_role_capability', 'description' => ''],
         ];
 
         $defaultCapabilities = [
