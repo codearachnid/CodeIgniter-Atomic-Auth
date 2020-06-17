@@ -32,7 +32,8 @@ class AtomicAuthCapabilities extends \CodeIgniter\Database\Seeder
         ];
 
         $defaultCapabilities = [
-            [ 'name' => 'edit_self', 'description' => 'Allow user to edit self (superceded by `edit_user`)', ],
+            //superceded by `edit_user`
+            [ 'name' => 'edit_self', 'description' => 'Can edit self', ],
         ];
 
         if ($this->db->tableExists($config->tables['capabilities'])) {

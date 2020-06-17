@@ -59,6 +59,15 @@
             <?php echo htmlspecialchars($capability->description, ENT_QUOTES, 'UTF-8');?>
             </label>
           <?php endforeach; ?>
+        <?php else : ?>
+          <h3><?php echo lang('Auth.edit_user_capabilities_heading');?></h3>
+          <?php foreach ($user->capabilities as $user_capability): ?>
+              <label class="checkbox">
+                <?php foreach( $capabilities as $capability ) : if( $user_capability->id != $capability->id ) continue; ?>
+                  <?php echo htmlspecialchars($capability->description, ENT_QUOTES, 'UTF-8');?>
+                <?php endforeach; ?>
+              </label>
+          <?php endforeach?>
         <?php endif; ?>
 
         <?php echo form_hidden('attomic_auth_user_id', $user->id);?>
