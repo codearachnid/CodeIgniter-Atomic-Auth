@@ -26,10 +26,19 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
     // ...
 
     // ... role/roles
-    $routes->add('role/create', 'Group::create');
-    $routes->patch('role/edit/(:hash)', 'Group::edit/$1');
-    $routes->add('suspend/(:hash)', 'Group::suspend/$1');
-    $routes->delete('delete/(:hash)', 'Group::delete/$1');
+    $routes->add('role/list', 'Role::list');
+    $routes->add('role/list/(:hash)', 'Role::list');
+    $routes->add('role/create', 'Role::create');
+    $routes->add('role/edit/(:hash)', 'Role::edit/$1');
+    $routes->delete('role/delete/(:hash)', 'Role::delete/$1');
+    // ...
+
+    // ... capability/capabilities
+    $routes->add('capability/list', 'Capability::list');
+    $routes->add('capability/list/(:hash)', 'Capability::list');
+    $routes->add('capability/create', 'Capability::create');
+    $routes->add('capability/edit/(:hash)', 'Capability::edit/$1');
+    $routes->delete('capability/delete/(:hash)', 'Capability::delete/$1');
     // ...
 
     // ... admin management for Atomic Auth
