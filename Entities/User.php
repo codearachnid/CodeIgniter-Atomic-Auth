@@ -10,4 +10,7 @@ class User extends Entity
     protected $password_hash;
     protected $status;
     protected $status_message;
+    protected $reset_expires;
+    protected $reset_hash;
+    protected $reset_at;
 }

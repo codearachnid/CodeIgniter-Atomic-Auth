@@ -237,13 +237,21 @@ class Auth extends \CodeIgniter\Controller
         $this->data['title'] = lang('Auth.forgot_password_heading');
 
         // setting validation rules by checking whether identity is username or email
-        if ($this->configAtomicAuth->identity !== 'email') {
-            $this->validation->setRule('identity', lang('Auth.forgot_password_identity_label'), 'required');
-        } else {
+        if ($this->configAtomicAuth->identity == 'email')
+        {
             $this->validation->setRule('identity', lang('Auth.forgot_password_validation_email_label'), 'required|valid_email');
+            $this->data['identity_label'] = lang('Auth.forgot_password_email_identity_label');
+        }
+        else
+        {
+            $this->validation->setRule('identity', lang('Auth.forgot_password_identity_label'), 'required');
+            $this->data['identity_label'] = lang('Auth.forgot_password_identity_label');
         }
 
-        if (! ($this->request->getPost() && $this->validation->withRequest($this->request)->run())) {
+
+
+        if (! ($this->request->getPost() && $this->validation->withRequest($this->request)->run()))
+        {
             $this->data['type'] = $this->configAtomicAuth->identity;
             // setup the input
             $this->data['identity'] = [
@@ -251,42 +259,38 @@ class Auth extends \CodeIgniter\Controller
                 'id'   => 'identity',
             ];
 
-            if ($this->configAtomicAuth->identity !== 'email') {
-                $this->data['identity_label'] = lang('Auth.forgot_password_identity_label');
-            } else {
-                $this->data['identity_label'] = lang('Auth.forgot_password_email_identity_label');
-            }
-
             // set any errors and display the form
-            $this->data['messages'] = $this->validation->getErrors() ? $this->validation->listErrors() : $this->session->getflashdata('AtomicAuthMessages');
-            return $this->renderPage($this->pathViews . DIRECTORY_SEPARATOR . 'forgot_password', $this->data);
-        } else {
-            $identityColumn = $this->configAtomicAuth->identity;
-            $identity = $this->atomicAuth->where($identityColumn, $this->request->getPost('identity'))->users()->row();
-
-            if (empty($identity)) {
-                if ($this->configAtomicAuth->identity !== 'email') {
-                    $this->atomicAuth->setError('Auth.forgot_password_identity_not_found');
-                } else {
-                    $this->atomicAuth->setError('Auth.forgot_password_email_not_found');
-                }
-
-                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->errors($this->validationListTemplate));
-                return redirect()->to('/auth/forgot_password');
-            }
-
-            // run the forgotten password method to email an activation code to the user
-            $forgotten = $this->atomicAuth->forgottenPassword($identity->{$this->configAtomicAuth->identity});
-
-            if ($forgotten) {
-                // if there were no errors
-                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->messages());
-                return redirect()->to('/auth/login'); //we should display a confirmation page here instead of the login page
-            } else {
-                $this->session->setflashdata('AtomicAuthMessages', $this->atomicAuth->errors($this->validationListTemplate));
-                return redirect()->to('/auth/forgot_password');
-            }
+            $this->data['messages'] = $this->validation->getErrors();
         }
+        else
+        {
+
+            if ( $this->atomicAuth->user()->identityExists( $this->request->getPost('identity') ) )
+            {
+              // run the forgotten password method to email an activation code to the user
+                if ($this->atomicAuth->emailForgottenPasswordRequest($this->request->getPost('identity')))
+                {
+                    // if there were no errors
+                    $this->atomicAuth->message()->set('Auth.forgot_password_email_sent', 'info');
+                    return redirect()->to('/auth/login');
+                }
+                else
+                {
+                    $this->atomicAuth->message()->set('Auth.forgot_password_email_not_sent', 'error');
+                }
+            }
+            else if ($this->configAtomicAuth->identity == 'email')
+            {
+              $this->atomicAuth->message()->set('Auth.forgot_password_email_not_found', 'error');
+              }
+              else
+              {
+                  $this->atomicAuth->message()->set('Auth.forgot_password_identity_not_found', 'error');
+            }
+
+        }
+
+        return view('AtomicAuth\Views\forgot_password', $this->data);
     }
 
     /**

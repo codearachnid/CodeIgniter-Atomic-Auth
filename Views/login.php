@@ -25,6 +25,8 @@
 
   <?php echo form_close();?>
 
+  <?php if( userCan('create_user') ) : ?>
   <p><a href="create"><?php echo lang('Auth.login_user_create');?></a></p>
+  <?php endif; ?>
   <p><a href="forgot"><?php echo lang('Auth.login_forgot_password');?></a></p>
 <?= $this->endSection() ?>

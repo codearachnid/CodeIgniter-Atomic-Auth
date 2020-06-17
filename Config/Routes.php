@@ -10,6 +10,7 @@ $routes->group('auth', ['namespace' => 'AtomicAuth\Controllers'], function ($rou
     $routes->add('login', 'Auth::login');
     $routes->add('logout', 'Auth::logout');
     $routes->add('forgot', 'Auth::forgot_password');
+    $routes->add('reset', 'Auth::reset_password');
     // ...
 
     // ... user centric

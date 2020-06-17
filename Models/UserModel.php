@@ -6,7 +6,7 @@ class UserModel extends Model
 {
     protected $table         = 'atomicauth_users'; // TODO make this dynamically driven via config
     protected $allowedFields = [
-      'guid', 'email', 'password_hash', 'status', 'status_message'
+      'guid', 'email', 'password_hash', 'status', 'status_message', 'reset_hash', 'reset_at','reset_expires'
   ];
     protected $returnType    = 'AtomicAuth\Entities\User';
     protected $useTimestamps = true;
@@ -41,8 +41,6 @@ class UserModel extends Model
      */
     public function identityExists(string $identity=null): bool
     {
-        $this->triggerEvents('identity_check');
-
         if (is_null($identity)) {
             return false;
         }

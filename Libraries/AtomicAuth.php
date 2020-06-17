@@ -109,7 +109,50 @@ class AtomicAuth
      * @return array|boolean
      * @author Mathew
      */
-    public function forgottenPassword(string $identity)
+    public function emailForgottenPasswordRequest( string $identity ): bool
+    {
+      $user = $this->atomicAuthModel->user()->getByIdentity($identity);
+      $data = [];
+      if( $user )
+      {
+        if( $this->config->forgotPasswordExpire > 0 )
+        {
+          $data['reset_hash'] = 'hash';
+          $data['reset_at'] = date("Y-m-d H:i:s", time() );
+          $data['reset_expires'] = date("Y-m-d H:i:s", time() + $this->config->forgotPasswordExpire );
+
+          // add user reset info for duration of expire ($forgotPasswordExpire)
+          if($this->atomicAuthModel->user()->update($user->id, $data))
+          {
+
+            if (! $this->config->useCiEmail)
+            {
+                $this->atomicAuthModel->message()->set('AtomicAuth.forgot_password_successful');
+                return true;
+            }
+            else
+            {
+                $data['identity'] = $identity;
+                $message = view('AtomicAuth\Views\email\forgot_password', $data);
+                $this->email->clear();
+                $this->email->setFrom($this->config->adminEmail, $this->config->siteTitle);
+                $this->email->setTo($user->email);
+                $this->email->setSubject($this->config->siteTitle . ' - ' . lang('AtomicAuth.email_forgotten_password_subject'));
+                $this->email->setMessage($message);
+                if ($this->email->send()) {
+                    $this->atomicAuthModel->message()->set('forgot_password_successful');
+                    return true;
+                }
+            }
+
+          }
+
+
+        }
+      }
+      return false;
+    }
+    public function forgottenPassword(string $user)
     {
         // Retrieve user information
         $user = $this->where($this->atomicAuthModel->identityColumn, $identity)

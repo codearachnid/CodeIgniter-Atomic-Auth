@@ -156,7 +156,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
      | This is an arbitrary (long) value to protect against DOS attack.
      */
     public $siteTitle                = 'Example.com';       // Site Title, example.com
-    public $adminEmail               = 'admin@example.com'; // Admin Email, admin@example.com
+    public $adminEmail               = 'codearachnid@gmail.com'; // Admin Email, admin@example.com
     public $forceAuthorizedUserCreate = FAlSE;
     public $redirectOnSuccess				 = FAlSE;
     public $defaultRole             = '342bf19ff862494828bfa7c8cb20926a';           // Default role, use guid
@@ -172,7 +172,7 @@ class AtomicAuth extends \CodeIgniter\Config\BaseConfig
     // public $trackActivity = [0=>'failed', 1=>'success', 2=>'failed_password', 3=>'failed'];
     public $lockoutTime              = 600;                 /* The number of seconds to lockout an account due to exceeded attempts
                                                                     You should not use a value below 60 (1 minute) */
-    public $forgotPasswordExpiration = 1800;                /* The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
+    public $forgotPasswordExpire = 1800;                /* The number of seconds after which a forgot password request will expire. If set to 0, forgot password requests will not expire.
                                                                     30 minutes to 1 hour are good values (enough for a user to receive the email and reset its password)
                                                                     You should not set a value too high, as it would be a security issue! */
     public $sessionKeyMessages = 'AtomicAuthMessages';
