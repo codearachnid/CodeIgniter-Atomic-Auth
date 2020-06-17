@@ -19,20 +19,20 @@ class AtomicAuthCapabilities extends \CodeIgniter\Database\Seeder
             [ 'name' => 'edit_user_status', 'description' => 'Can edit user status', ],
             [ 'name' => 'delete_user', 'description' => 'Can delete user', ],
             [ 'name' => 'promote_user', 'description' => 'Can add/remove user to roles', ],
-            [ 'name' => 'edit_user_capability', 'description' => ''],
-            [ 'name' => 'list_capability', 'description' => '' ],
-            [ 'name' => 'create_capability', 'description' => '' ],
-            [ 'name' => 'edit_capability', 'description' => '' ],
-            [ 'name' => 'delete_capability', 'description' => '' ],
-            [ 'name' => 'list_role', 'description' => '' ],
-            [ 'name' => 'create_role', 'description' => '' ],
-            [ 'name' => 'edit_role', 'description' => '' ],
-            [ 'name' => 'delete_role', 'description' => '' ],
-            [ 'name' => 'edit_role_capability', 'description' => ''],
+            [ 'name' => 'edit_user_capability', 'description' => 'Can associate user to a capability'],
+            [ 'name' => 'list_capability', 'description' => 'Can list capabilities' ],
+            [ 'name' => 'create_capability', 'description' => 'Can create capability' ],
+            [ 'name' => 'edit_capability', 'description' => 'Can edit capability' ],
+            [ 'name' => 'delete_capability', 'description' => 'Can delete capability' ],
+            [ 'name' => 'list_role', 'description' => 'Can list roles' ],
+            [ 'name' => 'create_role', 'description' => 'Can create role' ],
+            [ 'name' => 'edit_role', 'description' => 'Can edit role' ],
+            [ 'name' => 'delete_role', 'description' => 'Can delete role' ],
+            [ 'name' => 'edit_role_capability', 'description' => 'Can associate capability to a role'],
         ];
 
         $defaultCapabilities = [
-            [ 'name' => 'edit_self', 'description' => 'Allow user to edit themself', ],
+            [ 'name' => 'edit_self', 'description' => 'Allow user to edit self (superceded by `edit_user`)', ],
         ];
 
         if ($this->db->tableExists($config->tables['capabilities'])) {

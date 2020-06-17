@@ -1314,6 +1314,10 @@ class AtomicAuthModel
     {
         return $this->roleModel;
     }
+    public function capability() //: class
+    {
+      return $this->capabilityModel;
+    }
     /**
      * expose the underlying user model
      *

@@ -51,6 +51,16 @@
           <?php endforeach?>
         <?php endif; ?>
 
+        <?php if ($atomicAuth->userCan('list_capability')): ?>
+          <h3><?php echo lang('Auth.edit_user_capabilities_heading');?></h3>
+          <?php foreach( $capabilities as $capability ) : ?>
+            <label class="checkbox">
+            <?php echo form_checkbox('capabilities[]', $capability->id, in_array($capability->id, $userInCapabilities)); ?>
+            <?php echo htmlspecialchars($capability->description, ENT_QUOTES, 'UTF-8');?>
+            </label>
+          <?php endforeach; ?>
+        <?php endif; ?>
+
         <?php echo form_hidden('attomic_auth_user_id', $user->id);?>
 
         <p><?php echo form_submit('submit', lang('Auth.edit_user_submit_btn'));?></p>

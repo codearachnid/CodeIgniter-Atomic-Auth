@@ -612,8 +612,11 @@ class User extends \CodeIgniter\Controller
 
         // TODO figure out role status to be 'active' => 1 in a cleaner way
         $roleEntity = new \AtomicAuth\Entities\Role();
+        $capabilityEntity = new \AtomicAuth\Entities\Capability();
         $this->data['roles']        = $this->atomicAuth->role()->where('status', $roleEntity->statusValueMap['active'])->findAll();
+        $this->data['capabilities']        = $this->atomicAuth->capability()->where('status', $capabilityEntity->statusValueMap['active'])->findAll();
         $this->data['userInRoles']  = array_column($user->roles, 'id');
+        $this->data['userInCapabilities']  = array_column($user->capabilities, 'id');
 
         $this->data['password'] = [
             'name' => 'password',
